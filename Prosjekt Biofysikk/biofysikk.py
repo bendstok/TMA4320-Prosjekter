@@ -65,7 +65,9 @@ for i in range(3):
 '''N virrevandrere med M-1 bevegelser'''
 M = 10
 N = 10
+høyreSannsynlighet = 0.5
 N_virrevandrere = np.zeros((N, M))
+randomnums = np.random.uniform(0,1,(N,M-1))
 for i in range(N):
-    N_virrevandrere[i] = virrevandring(M, høyreSannsynlighet, randomnums, dx, dt)[0]
+    N_virrevandrere[i] = virrevandring(M, høyreSannsynlighet, randomnums[i], dx, dt)[0]
 print(N_virrevandrere)
