@@ -117,7 +117,7 @@ def n_antall_virrevandrere(n, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
         for j in range(M-1):
             # j er kollonnen
             # vi er i rad i og itererer over den med hjelp av j
-            if tilfeldigeTall[j][i] < høyreSannsynlighet:
+            if tilfeldigeTall[i][j] < høyreSannsynlighet:
                 posisjon[i][j+1] = posisjon[i][j] + dx 
             else:
                 posisjon[i][j+1] = posisjon[i][j] - dx
@@ -185,7 +185,7 @@ def empirisk_varians(Matrise):
 
     return variance
 
-    
+
 positions, time_intervall = n_antall_virrevandrere(10,10,0.5,randomnums, 1,1)
 variance_pos = empirisk_varians(positions)
 
