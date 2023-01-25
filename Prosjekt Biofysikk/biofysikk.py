@@ -31,18 +31,43 @@ Nå som vi har en virrevnadrer, lager vi flere av dem samtidig. vi lager den ras
 # https://www.wolframalpha.com/input?i2d=true&i=D%5BDivide%5BPower%5Be%2C-%5C%2840%29Divide%5BPower%5Bx%2C2%5D%2C%5C%2840%292*a*t%5C%2841%29%5D%5C%2841%29+%5D%2Csqrt%5C%2840%292*pi*a*t%5C%2841%29%5D+%2C%7Bx%2C2%7D%5D
 # https://www.wolframalpha.com/input?i2d=true&i=D%5BDivide%5BPower%5Be%2C-%5C%2840%29Divide%5BPower%5Bx%2C2%5D%2C%5C%2840%292*a*t%5C%2841%29%5D%5C%2841%29+%5D%2Csqrt%5C%2840%292*pi*a*t%5C%2841%29%5D%2Ct%5D
 # a = 2 ^^
+'''
 
-'''1-d virrevandring'''
+
+'''1-d virrevandring (Oppgave 1b)'''
+# Importerer libraries
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
+# Setter konstanter
 dx = 1
 dt = 1
+# Grense for å gå til høyre i virrevandringen
 høyreSannsynlighet = 0.5
 M = 10
 def virrevandring(n, høyreSannsynlighet, tilfeldigeTall, dx, dt):
-    posisjon = np.zeros(M)
-    tidsIntervaller = np.linspace(0, dt*(n-1), (M))
+    """
+    Simulererer en virrevandrer i en dimensjon
+
+    ...
+
+    Input: \n
+    n  --> Virrevandreren vil bevege seg n-1 ganger \n
+    høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    tilfeldigeTall --> En 1d array med lengde (n-1) med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    
+    Output: \n
+    To matriser, 'posisjon' og 'tidsIntervaller':  \n
+    posisjon --> En 1d array med lengde 10, som viser posisjonen til virrevandreren \n
+    tidsIntervaller --> En 1d array med lengde 10 som viser tidspunktet til en posisjon,
+    altså at virrevandreren er i posisjon[n] ved tidspunkt tidsIntervaller[n].  
+
+    """
+    posisjon = np.zeros(n)
+    tidsIntervaller = np.linspace(0, dt*(n-1), (n))
     for i in range(M-1):
         if tilfeldigeTall[i] < høyreSannsynlighet:
             posisjon[i+1] = posisjon[i] + dx 
@@ -54,20 +79,108 @@ randomnums = np.random.uniform(0,1,M-1)
 print(virrevandring(M, høyreSannsynlighet, randomnums, dx, dt))
 
 
-'''plotter p = 0.45, 0.50, og 0.55'''
+'''plotter p = 0.45, 0.50, og 0.55 (Oppgave 1c)'''
 M = 10000
 randomnums = np.random.uniform(0,1,M-1)
 for i in range(3):
     høyreSannsynlighet = i*0.05 + 0.45
     plotterVirrevandring = virrevandring(M, høyreSannsynlighet,randomnums, dx, dt)
-    plt.plot(plotterVirrevandring[1], plotterVirrevandring[0])
+    #plt.plot(plotterVirrevandring[1], plotterVirrevandring[0])
     
-'''N virrevandrere med M-1 bevegelser'''
-M = 10
-N = 10
-høyreSannsynlighet = 0.5
-N_virrevandrere = np.zeros((N, M))
-randomnums = np.random.uniform(0,1,(N,M-1))
-for i in range(N):
-    N_virrevandrere[i] = virrevandring(M, høyreSannsynlighet, randomnums[i], dx, dt)[0]
-print(N_virrevandrere)
+'''N virrevandrere med M-1 bevegelser (Oppgave 1d)'''
+
+def n_antall_virrevandrere(n, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
+    """
+    Simulererer n virrevandrer i en dimensjon
+
+    ...
+
+    Input: \n
+    n  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg n-1 ganger \n
+    høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    tilfeldigeTall --> En n*n matrise med lengde (n-1) med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    
+    Output: \n
+    To matriser, 'posisjon' og 'tidsIntervaller': \n
+    posisjon --> En n*n matrise med lengde , som viser posisjonen til virrevandreren \n
+    tidsIntervaller --> En 1d array med lengde 10 som viser tidspunktet til en posisjon,
+    altså at virrevandreren er i posisjon[n][i] ved tidspunkt tidsIntervaller[n].  
+
+    """
+    posisjon = np.zeros((n,n))
+    tidsIntervaller = np.linspace(0, dt*(n-1), (n))
+    for i in range(M):
+        # i er raden
+        for j in range(M-1):
+            # j er kollonnen
+            # vi er i rad i og itererer over den med hjelp av j
+            if tilfeldigeTall[j][i] < høyreSannsynlighet:
+                posisjon[i][j+1] = posisjon[i][j] + dx 
+            else:
+                posisjon[i][j+1] = posisjon[i][j] - dx
+    return posisjon, tidsIntervaller
+
+
+randomnums = np.random.uniform(0,1,(10,10))
+
+time_slow_b4 = time.time()
+print(n_antall_virrevandrere(10,10,0.5,randomnums, 1,1))
+time_slow_after = time.time()
+time_slow_diff = time_slow_after - time_slow_b4
+print(time_slow_diff)
+
+#M = 10
+#N = 10
+#høyreSannsynlighet = 0.5
+#
+#N_virrevandrere = np.zeros((N, M))
+#randomnums = np.random.uniform(0,1,(N,M-1))
+#for i in range(N):
+#    N_virrevandrere[i] = virrevandring(M, høyreSannsynlighet, randomnums[i], dx, dt)[0]
+#
+#print(N_virrevandrere)
+
+"""Oppgave 1e"""
+
+
+
+
+
+"""Oppgave 1f"""
+
+def empirisk_varians(Matrise):
+    """
+    Regner ut empirisk varians til hver kollonne til en MxM matrise
+
+    Input:
+
+    Matrise --> MxM kvadratisk matrise
+
+    Output:
+    
+    empirisk_varians --> 1d array, som inneholder den empiriske variansen til tilhørende kollonne i Matrise, altså er
+    empirisk_varians[n] den empiriske variansen til Matrise[i,n], der i går fra 0->n
+    
+    """
+
+    coloumns = len(Matrise) 
+    rows = coloumns
+    variance  = np.zeros(coloumns)
+
+    for j in range(coloumns):
+        coloumn_j = np.zeros(coloumns)
+
+        for i in range(rows):
+            coloumn_j[i] = Matrise[i][j]
+        mean = np.sum(coloumn_j)/coloumns
+        variance[j] += sum((coloumn_j  - mean)**2)/coloumns
+
+    return variance
+positions, time_intervall = n_antall_virrevandrere(10,10,0.5,randomnums, 1,1)
+variance_pos = empirisk_varians(positions)
+
+#plt.plot(time_intervall, variance_pos)
+#plt.show()
