@@ -97,9 +97,9 @@ def n_antall_virrevandrere(n, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
 
     Input: \n
     n  --> Antall virrevandrere \n
-    M  --> Virrevandreren vil bevege seg n-1 ganger \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
     høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
-    tilfeldigeTall --> En n*n matrise med lengde (n-1) med tilfeldige tall i intervallet [0,1] \n
+    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
     dx --> Hvor langt den vil vandre pr tidsintervall \n
     dt --> Tidsintervall \n 
     
@@ -161,7 +161,7 @@ def empirisk_varians(Matrise):
 
     Output:
     
-    empirisk_varians --> 1d array, som inneholder den empiriske variansen til tilhørende kollonne i Matrise, altså er
+    empirisk_varians --> 1d array, som inneholder den empiriske variansen til tilhørende kollonnen i Matrise, altså er
     empirisk_varians[n] den empiriske variansen til Matrise[i,n], der i går fra 0->n
     
     """
@@ -171,14 +171,21 @@ def empirisk_varians(Matrise):
     variance  = np.zeros(coloumns)
 
     for j in range(coloumns):
+        # j er kollonnen
+
+        # Vil inneholde alle verdier i kolonne j
         coloumn_j = np.zeros(coloumns)
 
         for i in range(rows):
             coloumn_j[i] = Matrise[i][j]
+        
+        #Utregning av mean og variansen til kolonne j
         mean = np.sum(coloumn_j)/coloumns
         variance[j] += sum((coloumn_j  - mean)**2)/coloumns
 
     return variance
+
+    
 positions, time_intervall = n_antall_virrevandrere(10,10,0.5,randomnums, 1,1)
 variance_pos = empirisk_varians(positions)
 
