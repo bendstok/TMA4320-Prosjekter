@@ -119,7 +119,8 @@ def n_antall_virrevandrere(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
     altså at virrevandreren er i posisjon[n][i] ved tidspunkt tidsIntervaller[n].  
 
     """
-    posisjon = np.zeros((N,N)) ''''<-- eh skal det ikke være nXm eller mXn?'''
+    posisjon = np.zeros((N,N))
+    ''' ^^ eh skal det ikke være nXm eller mXn?'''
     tidsIntervaller = np.linspace(0, dt*(N-1), (N))
     for i in range(M):
         # i er raden
