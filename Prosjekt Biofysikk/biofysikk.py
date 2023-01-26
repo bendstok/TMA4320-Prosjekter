@@ -114,7 +114,7 @@ randomnums = np.random.uniform(0,1,M-1)
 for i in range(3):
     høyreSannsynlighet = i*0.05 + 0.45
     plotterVirrevandring = virrevandring(M, høyreSannsynlighet, randomnums, dx, dt)
-    plt.plot(plotterVirrevandring[1], plotterVirrevandring[0])
+    #plt.plot(plotterVirrevandring[1], plotterVirrevandring[0])
 
 '''
 Her plottes høyreSannsynlighet = 0.45, 0.50, og 0.55.
@@ -277,6 +277,8 @@ Vi forklarer observasjonene vi får av koden, og hvordan den kan nermere bli lik
 '''
 
 """Oppgave 1f"""
+from scipy.optimize import curve_fit
+
 def empirisk_varians(Matrise):
     """
     Regner ut empirisk varians til hver kollonne til en MxM matrise
@@ -310,12 +312,28 @@ def empirisk_varians(Matrise):
 
     return variance
 
+M = 100
+N = 100
+np.random.uniform(0,1,(M-1)*N)
 
-randomXnums = np.random.uniform(0,1,(10,10))
-positions, time_intervall = n_antall_virrevandrere(10,10,0.5, randomXnums, 1,1)
+randomXnums = np.random.uniform(0,1,(M,N))
+positions, time_intervall = n_antall_virrevandrere(N,M,0.5, randomXnums, 1,1)
 variance_pos = empirisk_varians(positions)
 
-#plt.plot(time_intervall, variance_pos)
+# Curve fitting
+def linear(x, a, b):
+    return a*x + b
+
+# Scipy magi skjer under
+# Vi  er kun interresert i popt, som inneholder hva den beste verdien av a og b er
+popt, pcov = curve_fit(linear, time_intervall, variance_pos)
+
+# Plotting
+#plt.plot(time_intervall, linear(time_intervall, *popt), 'r--', label='fit: a=%5.3f, b=%5.3f' % tuple(popt))
+#plt.plot(time_intervall, variance_pos, label="Empirisk Varians")
+#plt.xlabel('Tid')
+#plt.ylabel('Verdi')
+#plt.legend()
 #plt.show()
 
 '''Skal ikke scipy brukes her?, og skal ikke variansen forklares?? (scipy.optimize.curve_fit)'''
