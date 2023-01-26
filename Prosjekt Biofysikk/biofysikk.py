@@ -308,7 +308,7 @@ def empirisk_varians(Matrise):
         
         #Utregning av mean og variansen til kolonne j
         mean = np.sum(coloumn_j)/coloumns
-        variance[j] += 1/(coloumns)*sum((coloumn_j  - mean)**2)/coloumns
+        variance[j] += sum((coloumn_j  - mean)**2)/coloumns
 
     return variance
 
