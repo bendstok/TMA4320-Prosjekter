@@ -212,12 +212,13 @@ def n_antall_virrevandrere(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
                 posisjon[i][j+1] = posisjon[i][j] - dx
     return posisjon, tidsIntervaller
 '''
-
+M = 1000
+N = 1000
+randomNums = np.random.uniform(0,1,(N,M-1))
 time_slow_b4 = time.time()
-print(n_antall_virrevandrere(10,10,0.5,randomNums, 1,1))
+n_antall_virrevandrere(M,N,0.5,randomNums, 1,1)
 time_slow_after = time.time()
 time_slow_diff = time_slow_after - time_slow_b4
-print(time_slow_diff)
 
 '''
 posisjon = np.zeros((N,N))
@@ -242,8 +243,8 @@ Nå forbedrer vi kodene slik at de kan kjøre raskere. En forklaring på hvordan
 
 '''kumulativVirrevandring = kVv. kumulativPosisjon = kP'''
 '''(Oppgave 1e)'''
-M = 10
-N = 10
+M = 1000
+N = 1000
 randomNums = np.random.uniform(0,1,(M-1)*N)
 
 def kVv(M, N, randomNums, dx, dt):
@@ -255,7 +256,14 @@ def kVv(M, N, randomNums, dx, dt):
     tidsIntervaller = np.linspace(0, dt*(M-1), (M))
     return(kP, tidsIntervaller)
 
-print(kVv(M, N, randomNums, dx, dt))
+time_fast_b4 = time.time()
+kVv(M, N, randomNums, dx, dt)
+time_fast_after = time.time()
+time_fast_diff = time_fast_after - time_fast_b4
+
+print("Tid treig: " + str(time_slow_diff))
+print("Tid rask: " + str(time_fast_diff))
+print("Tid spart: " + str(time_slow_diff - time_fast_diff))
 
 '''
 Raskere (muligens) versjon av forrige kode.
