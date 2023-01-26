@@ -18,21 +18,20 @@ konstanten D er dispersjonskonstanten. jo lavere den er, jo tregere sprer moleky
 Med a = 2D, løser likningen seg.
 
 Bilder er tatt fra wolfram alpha, og (Prosjektoppgavearket)
-
-
-Nå går vi løs på det numeriske.
-Vi starter med å konstruere en 1-dimensjonal virrevandrer, som beveger seg ett skritt enten til høyre eller til venstre, med lik sannsynlighet. Akkurat nå lager vi en enkel kode. vi forbedrer den senere.
-
-Med denne enkle modellen, tester vi den, med ulike sannsynligheter å gå til høyre eller venstre, for å sjekke om de er representative med den virkelige verden:
-
-Nå som vi har en virrevnadrer, lager vi flere av dem samtidig. vi lager den rask, og viktigst av alt, forståelig:
-
-
-# https://www.wolframalpha.com/input?i2d=true&i=D%5BDivide%5BPower%5Be%2C-%5C%2840%29Divide%5BPower%5Bx%2C2%5D%2C%5C%2840%292*a*t%5C%2841%29%5D%5C%2841%29+%5D%2Csqrt%5C%2840%292*pi*a*t%5C%2841%29%5D+%2C%7Bx%2C2%7D%5D
-# https://www.wolframalpha.com/input?i2d=true&i=D%5BDivide%5BPower%5Be%2C-%5C%2840%29Divide%5BPower%5Bx%2C2%5D%2C%5C%2840%292*a*t%5C%2841%29%5D%5C%2841%29+%5D%2Csqrt%5C%2840%292*pi*a*t%5C%2841%29%5D%2Ct%5D
-# a = 2 ^^
 '''
 
+
+'''
+# https://www.wolframalpha.com/input?i2d=true&i=D%5BDivide%5BPower%5Be%2C-%5C%2840%29Divide%5BPower%5Bx%2C2%5D%2C%5C%2840%292*a*t%5C%2841%29%5D%5C%2841%29+%5D%2Csqrt%5C%2840%292*pi*a*t%5C%2841%29%5D+%2C%7Bx%2C2%7D%5D
+# https://www.wolframalpha.com/input?i2d=true&i=D%5BDivide%5BPower%5Be%2C-%5C%2840%29Divide%5BPower%5Bx%2C2%5D%2C%5C%2840%292*a*t%5C%2841%29%5D%5C%2841%29+%5D%2Csqrt%5C%2840%292*pi*a*t%5C%2841%29%5D%2Ct%5D
+For å skaffe bilder hvis nødvendig ^^
+'''
+
+
+'''
+Nå går vi løs på det numeriske.
+Vi starter med å konstruere en 1-dimensjonal virrevandrer, som beveger seg ett skritt enten til høyre eller til venstre, med lik sannsynlighet. Akkurat nå lager vi en enkel kode. vi forbedrer den senere.
+'''
 
 '''1-d virrevandring (Oppgave 1b)'''
 # Importerer libraries
@@ -60,9 +59,9 @@ def virrevandring(n, høyreSannsynlighet, tilfeldigeTall, dx, dt):
     dt --> Tidsintervall \n 
     
     Output: \n
-    To matriser, 'posisjon' og 'tidsIntervaller':  \n
-    posisjon --> En 1d array med lengde 10, som viser posisjonen til virrevandreren \n
-    tidsIntervaller --> En 1d array med lengde 10 som viser tidspunktet til en posisjon,
+    To vektorer, 'posisjon' og 'tidsIntervaller':  \n
+    posisjon --> En 1d array med lengde M, som viser posisjonen til virrevandreren \n
+    tidsIntervaller --> En 1d array med lengde M som viser tidspunktet til en posisjon,
     altså at virrevandreren er i posisjon[n] ved tidspunkt tidsIntervaller[n].  
 
     """
@@ -79,24 +78,34 @@ randomnums = np.random.uniform(0,1,M-1)
 print(virrevandring(M, høyreSannsynlighet, randomnums, dx, dt))
 
 
-'''plotter p = 0.45, 0.50, og 0.55 (Oppgave 1c)'''
+
+'''
+Med denne enkle modellen, tester vi den med ulike sannsynligheter å gå til høyre eller venstre, for å sjekke om de er representative med den virkelige verden:
+'''
+
+'''plotter høyreSannsynlighet = 0.45, 0.50, og 0.55, med 10000 steg (Oppgave 1c)'''
 M = 10000
 randomnums = np.random.uniform(0,1,M-1)
 for i in range(3):
     høyreSannsynlighet = i*0.05 + 0.45
     plotterVirrevandring = virrevandring(M, høyreSannsynlighet,randomnums, dx, dt)
     #plt.plot(plotterVirrevandring[1], plotterVirrevandring[0])
+
+    
+'''
+Nå som vi har en virrevandrer, lager vi flere av dem samtidig. Vi lager den rask, og viktigst av alt, forståelig
+'''
     
 '''N virrevandrere med M-1 bevegelser (Oppgave 1d)'''
 
-def n_antall_virrevandrere(n, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
+def n_antall_virrevandrere(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
     """
     Simulererer n virrevandrer i en dimensjon
 
     ...
 
     Input: \n
-    n  --> Antall virrevandrere \n
+    N  --> Antall virrevandrere \n
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
     tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
@@ -110,8 +119,8 @@ def n_antall_virrevandrere(n, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
     altså at virrevandreren er i posisjon[n][i] ved tidspunkt tidsIntervaller[n].  
 
     """
-    posisjon = np.zeros((n,n))
-    tidsIntervaller = np.linspace(0, dt*(n-1), (n))
+    posisjon = np.zeros((N,N)) ''''<-- eh skal det ikke være nXm eller mXn?'''
+    tidsIntervaller = np.linspace(0, dt*(N-1), (N))
     for i in range(M):
         # i er raden
         for j in range(M-1):
@@ -143,11 +152,31 @@ print(time_slow_diff)
 #
 #print(N_virrevandrere)
 
-"""Oppgave 1e"""
 
 
+'''
+Nå forbedrer vi kodene slik at de kan kjøre raskere. En forklaring på hvordan de er raskere er uder denne koden
+'''
+
+'''kumulativVirrevandring = kVv. kumulativPosisjon = kP'''
+'''Raskere (muligens) versjon av forrige kode (Oppgave 1e)'''
+M = 10
+N = 5
+randomNums = np.random.uniform(0,1,(M-1)*N)
+
+def kVv(M, N, randomNums, dx, dt):
+    kP = np.copy(randomNums)
+    høyreSannsynlighet = 0.5
+    kP[kP > høyreSannsynlighet] = dx
+    kP[kP < høyreSannsynlighet] = -dx
+    kP = kP.reshape(N,M-1)
+    tidsIntervaller = np.linspace(0, dt*(M-1), (M))
+    return(kP, tidsIntervaller)
+
+print(kVv(M, N, randomNums, dx, dt))
 
 
+'''Med en forbedret kode, finner vi dens empiriske varians, slik at vi kan sammenligne den med den analytiske løsningen på første oppgave. Vi forklarer observasjonene vi får av koden, og hvordan den kan nermere bli lik det analytiske svaret.'''
 
 """Oppgave 1f"""
 
@@ -191,3 +220,9 @@ variance_pos = empirisk_varians(positions)
 
 #plt.plot(time_intervall, variance_pos)
 #plt.show()
+
+'''Skal ikke scipy brukes her?, og skal ikke variansen forklares?? (scipy.optimize.curve_fit)'''
+
+'''Hvis vi ønsker at den empiriske variansen skal samsvare mer med den analytiske resultatet i 1a, så bør vi ha større M og N.'''
+'''For M sin del, er det fordi tilfeldighet vil i løpet av uendelig tid jevne ut sine tilfeldigheter, og gi ut den ekte sannsynlighetsfordelingen; som i dette tilfellet er den analytisle empiriske variansen.'''
+'''For N sin del, er det fordi de vil gi et bedre gjennomsnittsverdi, ved at flere av den samme typen vil gi en feil proporsjonal med 1/n; så med n --> Uendelig, gir dette oss det analytiske svaret.'''
