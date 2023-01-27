@@ -343,3 +343,90 @@ Hvis vi ønsker at den empiriske variansen skal samsvare mer med den analytiske 
 For M sin del, er det fordi tilfeldighet vil i løpet av uendelig tid jevne ut sine tilfeldigheter, og gi ut den ekte sannsynlighetsfordelingen; som i dette tilfellet er den analytisle empiriske variansen.
 For N sin del, er det fordi de vil gi et bedre gjennomsnittsverdi, ved at flere av den samme typen vil gi en feil proporsjonal med 1/Sqrt(n); så med n --> Uendelig, gir dette oss det analytiske svaret.
 '''
+
+
+"""Oppgave 1g"""
+from mpl_toolkits.mplot3d import axes3d
+
+def virrevandrere_2d(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dy, dt):
+    """
+    Simulererer n virrevandrer i 2 dimensjoner
+
+    ...
+
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre i x retning pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    dy --> Hvor langtr den vil vandre i y retning  pr tidsintervall \n
+    
+    Output: \n
+    To matriser, 'posisjon' og 'tidsIntervaller': \n
+    posisjon --> En n*M matrise som viser posisjonen til virrevandreren \n
+    Posisjon[i] = [[0,0], [0,0] ...]
+    Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
+    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t \n
+    tidsIntervaller --> En 1d array med lengde m som viser tidspunktet til en posisjon, 
+    """
+    
+    # Utrolig dårlig, men rask kodet å få dette til
+    # Posisjon matrisen er basically lagt opp slik:
+    # Posisjon[i] = [[0,0], [0,0] ...]
+    # Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
+    # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
+
+    rows, cols = (N, M)
+    posisjon = [[[0,0] for i in range(cols)] for j in range(rows)]
+
+    tidsIntervaller = np.linspace(0, dt*(N-1), (M))
+    for i in range(N):
+        # i er raden
+        for j in range(M-1):
+            # j er kollonnen
+            # vi er i rad i og itererer over den med hjelp av j
+            z = np.random.uniform(0,1)
+            if(z <= 0.5):
+                # Vi går i x-retning
+                z = 0
+                if tilfeldigeTall[i][j] < høyreSannsynlighet:
+                    posisjon[i][j+1][z] = posisjon[i][j][z] + dx 
+                    posisjon[i][j+1][1] = posisjon[i][j][1]
+                else:
+                    posisjon[i][j+1][z] = posisjon[i][j][z] - dx
+                    posisjon[i][j+1][1] = posisjon[i][j][1]
+            else:
+                # Vi går i y-retning
+                z = 1
+                if tilfeldigeTall[i][j] < høyreSannsynlighet:
+                    posisjon[i][j+1][z] = posisjon[i][j][z] + dy 
+                    posisjon[i][j+1][0] = posisjon[i][j][0]
+                else:
+                    posisjon[i][j+1][z] = posisjon[i][j][z] - dy
+                    posisjon[i][j+1][0] = posisjon[i][j][0]
+    return posisjon, tidsIntervaller
+
+M = 10
+N = 4
+dy = 1
+høyreSannsynlighet = 0.5
+randomNums = np.random.uniform(0,1,(N,M-1))
+positions , tidsIntervall = virrevandrere_2d(N, M, høyreSannsynlighet, randomNums, dx, dy, dt)
+
+ax1 = plt.axes(projection="3d")
+color = ["red", "green", "blue", "gray"]
+for i in range(4):
+    y_points = np.zeros(len(positions[0]))
+    x_points = np.zeros(len(positions[0]))
+    z_points = tidsIntervall
+    for j in range(len(positions[0])):
+        x_points[j] = positions[i][j][0]
+        y_points[j] = positions[i][j][1]
+        #ax1.plot3D(x_points, y_points, z_points, color[i])
+
+#ax1.set_xlabel('x')
+#ax1.set_ylabel('y')
+#ax1.set_zlabel('t');
+#plt.show()
