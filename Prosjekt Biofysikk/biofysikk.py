@@ -377,6 +377,11 @@ def virrevandrere_2d(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dy, dt):
     # Posisjon[i] = [[0,0], [0,0] ...]
     # Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
+    # Feks: posisjon[0][0][0] vil gi x posisjonen til virrevandrer 0 på tidspunkt tidsIntervaller[0]
+
+    
+    # Bruker vanlige python lister, går kanskje treigt 
+    # men klarer ikke vri hodet mitt rundt på hvordan d skal gjøres
 
     rows, cols = (N, M)
     posisjon = [[[0,0] for i in range(cols)] for j in range(rows)]
@@ -415,6 +420,7 @@ høyreSannsynlighet = 0.5
 randomNums = np.random.uniform(0,1,(N,M-1))
 positions , tidsIntervall = virrevandrere_2d(N, M, høyreSannsynlighet, randomNums, dx, dy, dt)
 
+# Plotting av data
 ax1 = plt.axes(projection="3d")
 color = ["red", "green", "blue", "gray"]
 for i in range(4):
@@ -428,5 +434,5 @@ for i in range(4):
 
 #ax1.set_xlabel('x')
 #ax1.set_ylabel('y')
-#ax1.set_zlabel('t');
+#ax1.set_zlabel('t')
 #plt.show()
