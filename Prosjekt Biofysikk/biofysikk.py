@@ -436,3 +436,54 @@ for i in range(4):
 #ax1.set_ylabel('y')
 #ax1.set_zlabel('t')
 #plt.show()
+
+"""Annen variasjon av 1g"""
+
+N = 4
+M = 1000
+pr = 0.5
+pu = 0.5
+dx = 1
+dt = 1
+
+def annen_2d(N,M,pr,pu,dx,dt):
+    """
+    Simulererer N virrevandrere i 2 dimensjoner
+    
+    ...
+    
+    Input: \n
+    N --> Antall virrevandrere
+    M --> Antall tidssteg
+    pr --> Sjanse for å ta steg til høyre
+    pu --> Sjanse for å ta steg opp
+    dx --> størrelse på steg
+    dt --> størrelse på tidssteg
+    
+    Output: \n
+    To vektorer, 'posisjon' og 'tidsIntervaller':  \n
+    posisjon --> En 3d array med lengde M og høyde N, der hvert element er en 2d vektor (idk, kan ikke skrive...) \n
+    tidsIntervaller --> En 1d array med lengde M som viser tidspunktet til en posisjon,
+    altså at virrevandreren er i posisjon[n] ved tidspunkt tidsIntervaller[n].  
+    """
+    tidsIntervaller = np.linspace(0, dt*(M-1), (M))
+    posisjon = np.zeros((N,M,2))
+    vertOrHori = np.random.randint(0,2,(N,M-1))
+    randomDirection = np.zeros((N,M-1,2))
+    chance = (pr,pu)
+    for i in range(N):
+        for j in range(M-1):
+            randomDirection[i,j,vertOrHori[i,j]] = np.random.choice([-1,1],p=[1-chance[vertOrHori[i,j]],chance[vertOrHori[i,j]]])
+    for i in range(N):
+        for j in range(M-1):
+            posisjon[i,j+1] = posisjon[i,j] + randomDirection[i,j]
+    return posisjon, tidsIntervaller
+
+"Plotter veien de forskjellige virrevandrerne tok sammen med slutt posisjon"
+
+posisjon,t = annen_2d(N,M,pr,pu,dx,dt)
+for i in range(N):
+    plt.plot(posisjon[i,:,0],posisjon[i,:,1])
+for i in range(N):
+    plt.plot(posisjon[i,-1,0],posisjon[i,-1,1],"ko")
+plt.show()
