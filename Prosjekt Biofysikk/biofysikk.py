@@ -53,15 +53,16 @@ Vi starter med å konstruere en 1-dimensjonal virrevandrer, som beveger seg ett 
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import itertools as it
 
-# Setter konstanter og tilfeldige tall:
+# Setter konstanter og tilfeldige tall
 dx = 1
 dt = 1
 M = 10
 høyreSannsynlighet = 0.5
 randomnums = np.random.uniform(0,1,M-1)
 
-#Virrevandring funksjon
+# Virrevandring funksjon
 def virrevandring(M, høyreSannsynlighet, randomnums, dx, dt):
     """
     Simulererer en virrevandrer i en dimensjon
@@ -71,7 +72,7 @@ def virrevandring(M, høyreSannsynlighet, randomnums, dx, dt):
     Input: \n
     n  --> Virrevandreren vil bevege seg n-1 ganger \n
     høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
-    tilfeldigeTall --> En 1d array med lengde (n-1) med tilfeldige tall i intervallet [0,1] \n
+    randomnums --> En 1d array med lengde (n-1) med tilfeldige tall i intervallet [0,1] \n
     dx --> Hvor langt den vil vandre pr tidsintervall \n
     dt --> Tidsintervall \n 
     
@@ -106,11 +107,11 @@ Med denne enkle modellen, tester vi den med ulike sannsynligheter å gå til hø
 '''
 
 '''Oppgave 1c'''
-# Setter konstanter og tilfeldige tall:
+# Setter konstanter og tilfeldige tall
 M = 10000
 randomnums = np.random.uniform(0,1,M-1)
 
-#Plotter
+# Plotter
 for i in range(3):
     høyreSannsynlighet = i*0.05 + 0.45
     plotterVirrevandring = virrevandring(M, høyreSannsynlighet, randomnums, dx, dt)
@@ -132,12 +133,12 @@ Nå som vi har en virrevandrer, lager vi flere av dem samtidig. Vi lager den ras
 '''
     
 '''Oppgave 1d'''
-# Setter konstanter og tilfeldige tall:
+# Setter konstanter og tilfeldige tall
 M = 10
 N = 10
 randomNums = np.random.uniform(0,1,(N,M-1))
 
-#n_antall_virrevandrere funksjon
+# N_antall_virrevandrere funksjon
 def n_antall_virrevandrere(N, M, høyreSannsynlighet, randomNums, dx, dt):
     """
     Simulererer n virrevandrer i en dimensjon
@@ -148,7 +149,7 @@ def n_antall_virrevandrere(N, M, høyreSannsynlighet, randomNums, dx, dt):
     N  --> Antall virrevandrere \n
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
-    tilfeldigeTall --> En N*(M-1) matrise med tilfeldige tall i intervallet [0,1] \n
+    randomNums --> En N*(M-1) matrise med tilfeldige tall i intervallet [0,1] \n
     dx --> Hvor langt den vil vandre pr tidsintervall \n
     dt --> Tidsintervall \n 
     
@@ -166,14 +167,25 @@ def n_antall_virrevandrere(N, M, høyreSannsynlighet, randomNums, dx, dt):
         posisjon[i] = virrevandring(M, høyreSannsynlighet, randomNums[i], dx, dt)[0]
     return posisjon, tidsIntervaller
 
-
+# Printer resultat
 print(n_antall_virrevandrere(N, M, høyreSannsynlighet, randomNums, dx, dt))
 
+# Setter konstanter og tilfeldige tall, til å kjøre en kjøretids-test
+M = 1000
+N = 1000
+randomNums = np.random.uniform(0,1,(N,M-1))
+
+# Kjøretids-test (treg)
+time_slow_b4 = time.time()
+n_antall_virrevandrere(M,N,0.5,randomNums, 1,1)
+time_slow_after = time.time()
+time_slow_diff = time_slow_after - time_slow_b4
 
 '''
 Dette viser en N_antall_virrevandrende funkjson.
 Den lager N virrevandrere med M tidsposisjoner, satt sammen til en N*M matrise.
 dx = 1 = dt, M = 10, N = 10, høyreSannsynlighet (hS) = 0.5
+Koden kjører så en kjøretidstest med M = N = 1000, slik at den kan sammenlignes med en bedre kode senere.
 '''
 
 '''
@@ -187,7 +199,7 @@ def n_antall_virrevandrere(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
     N  --> Antall virrevandrere \n
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
-    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
+    randomNums --> En N*(M-1) matrise med tilfeldige tall i intervallet [0,1] \n
     dx --> Hvor langt den vil vandre pr tidsintervall \n
     dt --> Tidsintervall \n 
     
@@ -212,17 +224,8 @@ def n_antall_virrevandrere(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
                 posisjon[i][j+1] = posisjon[i][j] - dx
     return posisjon, tidsIntervaller
 '''
-M = 1000
-N = 1000
-randomNums = np.random.uniform(0,1,(N,M-1))
-time_slow_b4 = time.time()
-n_antall_virrevandrere(M,N,0.5,randomNums, 1,1)
-time_slow_after = time.time()
-time_slow_diff = time_slow_after - time_slow_b4
-
 '''
 posisjon = np.zeros((N,N))
-    ''''''<-- eh skal det ikke være nXm eller mXn?''''''
     tidsIntervaller = np.linspace(0, dt*(N-1), (N))
     for i in range(M):
         # i er raden
@@ -237,37 +240,69 @@ posisjon = np.zeros((N,N))
 '''
 
 
+
 '''
 Nå forbedrer vi kodene slik at de kan kjøre raskere. En forklaring på hvordan de er raskere er uder denne koden
+kumulativVirrevandring = kVv. kumulativPosisjon = kP
 '''
 
-'''kumulativVirrevandring = kVv. kumulativPosisjon = kP'''
 '''(Oppgave 1e)'''
-M = 1000
-N = 1000
-randomNums = np.random.uniform(0,1,(M-1)*N)
-
-def kVv(M, N, randomNums, dx, dt):
-    kP = np.copy(randomNums)
-    høyreSannsynlighet = 0.5
+# Kumulativ virrevandring funksjon
+def kVv(M, N, høyreSannsynlighet, randomXnums, dx, dt):
+    """
+    Simulererer n virrevandrere i en dimensjon (rask versjon)
+    
+    ...
+    
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    randomXnums --> En N*M matrise med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    
+    Output: \n
+    En Matrise 'posisjon' og en vektor 'tidsIntervaller': \n
+    posisjon --> En N*M matrise med N virrevandrere som viser posisjonen til virrevandreren ved tidssteg M \n
+    tidsIntervaller --> En 1d array med lengde M som viser tidspunktet til en posisjon,
+    altså at virrevandreren er i posisjon[n][i] ved tidspunkt tidsIntervaller[n].  
+    """
+    
+    kP = np.copy(randomXnums)
     kP[kP > høyreSannsynlighet] = dx
     kP[kP < høyreSannsynlighet] = -dx
-    kP = kP.reshape(N,M-1)
+    kP = kP.reshape(N,M)
+    kP[:,0] = 0
+    for i in range(N):
+        kP[i] = list(it.accumulate(kP[i]))
     tidsIntervaller = np.linspace(0, dt*(M-1), (M))
     return(kP, tidsIntervaller)
 
+# Setter konstanter og tilfeldige tall, til å kjøre en kjøretids-test
+M = 1000
+N = 1000
+randomXnums = np.random.uniform(0,1,(M,N))
+
+# Kjøretids-test (rask)
 time_fast_b4 = time.time()
-kVv(M, N, randomNums, dx, dt)
+kVv(M, N, 0.5, randomNums, 1, 1)
 time_fast_after = time.time()
 time_fast_diff = time_fast_after - time_fast_b4
 
+# Sammenligner kjøretidene
 print("Tid treig: " + str(time_slow_diff))
 print("Tid rask: " + str(time_fast_diff))
 print("Tid spart: " + str(time_slow_diff - time_fast_diff))
 
 '''
-Raskere (muligens) versjon av forrige kode.
-Snakk stuff her
+Koden viser en N_antall_virrevandrende funkjson, men bygd på en annen måte.
+Istedenfor å bruke mange for-løkker, starter den med å lage hele lengden av tilfeldigheter
+Så endres dem til dx eller -dx, avhengig av om den er større eller mindre enn høyreSannsynlighet
+Den gjøres til en matrise, og setter startpunktene med 0.
+Deretter brukes itertools til å regne den kumulative summen til hver virrevandrer.
+Denne delen bruker en for-løkke, men den brukes ikke så mye som i den andre koden.
+Dermed resulterer vi med en kode som er omtrent 5x ganger raskere enn den forrige.
 '''
 
 
