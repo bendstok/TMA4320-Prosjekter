@@ -595,3 +595,7 @@ def annenn_t2d(N,M):
                 n += 1
                 break
     return n
+
+'''
+Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 0,5 for en dimensjon, og P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 1/4 for to dimensjoner.
+'''
