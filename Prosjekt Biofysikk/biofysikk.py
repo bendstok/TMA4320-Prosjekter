@@ -481,37 +481,44 @@ pu = 0.5
 dx = 1
 dt = 1
 
-def annen_2d(N,M,pr,pu,dx,dt):
+def annen_2d(N,M,pr=0.5,pu=0.5,dr=1,dt=1):
     """
-    Simulererer N virrevandrere i 2 dimensjoner
-    
+    Simulererer n virrevandrer i 2 dimensjoner
     ...
-    
     Input: \n
-    N --> Antall virrevandrere
-    M --> Antall tidssteg
-    pr --> Sjanse for å ta steg til høyre
-    pu --> Sjanse for å ta steg opp
-    dx --> størrelse på steg
-    dt --> størrelse på tidssteg
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    pr --> Sannsynelighet for å ta et steg til høyre (av venstre eller høyre) \n
+    pu --> Sannsynelighet for å ta et steg opp (av opp eller ned)\n
+    dr --> Hvor langt den vil vandre i x- eller y-retning pr tidsintervall \n
+    dt --> Tidsintervall \n 
     
     Output: \n
-    To vektorer, 'posisjon' og 'tidsIntervaller':  \n
-    posisjon --> En 3d array med lengde M og høyde N, der hvert element er en 2d vektor (idk, kan ikke skrive...) \n
-    tidsIntervaller --> En 1d array med lengde M som viser tidspunktet til en posisjon,
-    altså at virrevandreren er i posisjon[n] ved tidspunkt tidsIntervaller[n].  
+    To matriser, 'posisjon' og 'tidsIntervaller': \n
+    posisjon --> En n*M matrise som viser posisjonen til virrevandreren \n
+    Posisjon[i] = [[0,0], [0,0] ...]
+    Der i er hvilken virrevandrer og da vil Posisjon[i,t] gi tilbake
+    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t \n
+    tidsIntervaller --> En 1d array med lengde m som viser tidspunktet til en posisjon, 
     """
     tidsIntervaller = np.linspace(0, dt*(M-1), (M))
     posisjon = np.zeros((N,M,2))
-    vertOrHori = np.random.randint(0,2,(N,M-1))
-    randomDirection = np.zeros((N,M-1,2))
-    chance = (pr,pu)
+    z = np.random.randint(0,2,(N,M-1))
+    randomNums = np.random.uniform(0,1,(N,M-1))
+    
     for i in range(N):
         for j in range(M-1):
-            randomDirection[i,j,vertOrHori[i,j]] = np.random.choice([-1,1],p=[1-chance[vertOrHori[i,j]],chance[vertOrHori[i,j]]])
-    for i in range(N):
-        for j in range(M-1):
-            posisjon[i,j+1] = posisjon[i,j] + randomDirection[i,j]
+            posisjon[i,j+1] += posisjon[i,j]
+            if z[i,j] == 0:
+                if randomNums[i,j] < pr:
+                    posisjon[i,j+1,z[i,j]] += dr
+                else:
+                    posisjon[i,j+1,z[i,j]] -= dr
+            else:
+                if randomNums[i,j] < pu:
+                    posisjon[i,j+1,z[i,j]] += dr
+                else:
+                    posisjon[i,j+1,z[i,j]] -= dr
     return posisjon, tidsIntervaller
 
 "Plotter veien de forskjellige virrevandrerne tok sammen med slutt posisjon"
@@ -522,3 +529,69 @@ for i in range(N):
 for i in range(N):
     plt.plot(posisjon[i,-1,0],posisjon[i,-1,1],"ko")
 plt.show()
+
+
+"""Oppgave 1h"""
+
+def n_t(N,M):
+    """
+    Optelling av hvor mange virrevandrere som krysser origo minst en gang (en dimensjon)
+    ...
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    
+    Output: \n
+    n  --> Hvor mange av de N virrevandrerne som krysset origo minst en gang
+    """
+    
+    n = 0
+    randomNums = np.random.uniform(0,1,(N,M-1))
+    posisjon, tidintervaller = n_antall_virrevandrere(N,M,0.5,randomNums,1,1)
+    for i in range(N):
+        for j in range(2,M):
+            if posisjon[i,j] == 0:
+                n += 1
+                break
+    return n
+
+def n_t2d(N,M):
+    """
+    Optelling av hvor mange virrevandrere som krysser origo minst en gang (to dimensjoner)
+    ...
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    
+    Output: \n
+    n  --> Hvor mange av de N virrevandrerne som krysset origo minst en gang
+    """
+    randomNums = np.random.uniform(0,1,(N,M-1))
+    posisjon, tidsintervaller = virrevandrere_2d(N, M, 0.5, randomNums)
+    n = 0
+    for i in range(N):
+        for j in range(1,M):
+            if posisjon[i][j][0] == 0 and posisjon[i][j][1] == 0:
+                n += 1
+                break
+    return n
+
+def annenn_t2d(N,M):
+    """
+    Optelling av hvor mange virrevandrere som krysser origo minst en gang (to dimensjoner)
+    ...
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    
+    Output: \n
+    n  --> Hvor mange av de N virrevandrerne som krysset origo minst en gang
+    """
+    posisjon, tidsintervaller = annen_2d(N,M)
+    n = 0
+    for i in range(N):
+        for j in range(1,M):
+            if posisjon[i,j,0] == 0 and posisjon[i,j,1] == 0:
+                n += 1
+                break
+    return n
