@@ -337,10 +337,10 @@ def empirisk_varians(Matrise):
 # Setter konstanter og tilfeldige tall
 M = 100
 N = 100
-randomNums = np.random.uniform(0,1,(M,N))
+randomNums = np.random.uniform(0,1,(M*N))
 
 # Kjører empirisk_varians
-positions, time_intervall = n_antall_virrevandrere(M, N, hS, randomNums, dx, dt)
+positions, time_intervall = kVv(M, N, hS, randomNums, dx, dt)
 variance_pos = empirisk_varians(positions)
 
 # Curve fitting
@@ -360,10 +360,11 @@ popt, pcov = curve_fit(linear, time_intervall, variance_pos)
 #plt.show()
 
 '''
-Forklar det vi ser her btw
-'''
+Resultatet viser oss at a ~ 1. Dette betyr at variansen til en virrevandrer øker lineært med tiden.
+Det er akkurat dette som skjer ved diffusjon, at variansen er lineært og fullstendig proporsjonal med tida.
+Ved sammenigning av oppgave 1a, ser vi at a = 2*D også er lineært, ved D = 0.5!
+Begge disse to funnene viser at vi har en modell som faktisk modellerer diffusjon.
 
-'''
 Hvis vi ønsker at den empiriske variansen skal samsvare mer med den analytiske resultatet i 1a, så bør vi ha større M og N.
 For M sin del, er det fordi tilfeldighet vil i løpet av uendelig tid jevne ut sine tilfeldigheter, og gi ut den ekte sannsynlighetsfordelingen; som i dette tilfellet er den analytisle empiriske variansen.
 For N sin del, er det fordi de vil gi et bedre gjennomsnittsverdi, ved at flere av den samme typen vil gi en feil proporsjonal med 1/Sqrt(n); så med n --> Uendelig, gir dette oss det analytiske svaret.
@@ -467,10 +468,60 @@ for j in range(2):
         plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[1][i])
     plt.show()
 
+'''
+Her lages en effektig kumulativ kode for 2d virrevandring.
+Først bestemmes om virrevandrered går horisontalt eller vertikalt
+Så bestemmer den om det er + eller - retningn den beveger seg
+Deretter lages xP og yP slik at de beveger seg i kun én retning per iterasjon
+Til slutt blir deres tilfedligheter gjort til kumulative sum, og iterert summert over, slik som i oppgave 1e.
+Tidsinterval lages, og returneres.
+'''
+
+
+
+'''
+Nå har vi en 2d virrevandrer. Vi koder en anvendelse til den
+Vi koder om virrevandreren returnerer til startpunktet, og andelen av virrenandrere som gjør det
+'''
 
 """(Oppgave 1h)"""
 
-def n_t(toD_virrevandrer):
+def n_t(M, N, hS, randomNums, dx, dt):
+    
+    """
+    Optelling av hvor mange virrevandrere som krysser origo minst en gang (to dimensjoner)
+    
+    ...
+    
+    Input: \n
+    enD_virrevandrer --> funksjonen toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+    
+    Output: \n
+    andel --> andelen av de N virrevandrerne som krysset startpunktet minst en gang.
+    """
+    
+    # Henter ut virrevandringene
+    sjekkStartpunkt = kVv(M, N, hS, randomNums, dx, dt)
+    
+    #Setter tallet for antall krysninger av startpunktet
+    ant = 0
+    
+    #itererer gjennom hver virrevandrer, uten å ha med starten; både x of y retning. legger til + 1 hvis den krysser startpunktet
+    for i in range(N):
+        Ja = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0])][i] == 0
+        if True in Ja:
+            ant += 1
+            
+    # Regnet ut forhold, og returnerer
+    andel = ant / N
+    return andel
+
+
+
+# Printer resultat
+# print(n_t(kVv(M, N, hS, randomNums, dx, dt)))
+
+def n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt):
     
     """
     Optelling av hvor mange virrevandrere som krysser origo minst en gang (to dimensjoner)
@@ -485,12 +536,12 @@ def n_t(toD_virrevandrer):
     """
     
     # Henter ut virrevandringene
-    sjekkStartpunkt = toD_virrevandrer
+    sjekkStartpunkt = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
     
     #Setter tallet for antall krysninger av startpunktet
     ant = 0
     
-    #itererer gjennom hver virrevandrer, uten å ha med starten; både x of y retning. legger til + 1 hvis den beginner seg ved startpunktet
+    #itererer gjennom hver virrevandrer, uten å ha med starten; både x of y retning. legger til + 1 hvis den krysser startpunktet
     for i in range(N):
         xJa = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0])][i] == 0
         yJa = sjekkStartpunkt[1][:, 1: len(sjekkStartpunkt[1])][i] == 0
@@ -502,26 +553,85 @@ def n_t(toD_virrevandrer):
     andel = ant / N
     return andel
 
-print(n_t(toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)))
+
+
+# Printer resultat
+# print(n_t2d(toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)))
+
+'''
+N_t og N_t2d er veldig like, og gjør omtrent det samme.
+De henter først in virrevanderen i funksjonene.
+så sjekker den om den er ved startpunktet, for bøde x-posisjon og y-posisjon.
+den teller opp hvor mange virrevandrere som gjør det, og regner ut andelen.
+
+Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 0,5 for en dimensjon, og P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 1/4 for to dimensjoner, hvis hS = oS = HogOforhold = 0.25
+Dette er fordi hS(eller oS) = 0.5, og hS(eller oS) * HogOforhold = 0.25
+'''
+
 
 
 '''
-Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 0,5 for en dimensjon, og P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 1/4 for to dimensjoner.
+Nå bruker vi koden fra forrige oppgave til å teste om n_t og n_t2d over uendelig lang tid vil gi et svar son er nerme det analytiske svaret P(x = 0, t → ∞) = 1
+'''
+
+"""(Oppgave 1i)"""
+
+# Setter konstanter og tilfeldige tall
+N = 10000
+M = 10000
+hS = 0.5
+oS = 0.5
+dx = 1
+dy = 1
+dt = 1
+HogOforhold = 0.5
+randomNums = np.random.uniform(0,1,(M*N))
+
+# Printer ut andelene for 1d of 2d virrevandrer
+print(n_t(M, N, hS, randomNums, dx, dt))
+print(n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt))
+
+'''
+Koden printer virrevandrere med normale forhold, og med 10000 av dem med 10000 steg, for å få et nermere svar.
+
+Resultatene viser oss at for 1-dimensjon, er den praktisk talt lilk 1.
+Dermed har vi vist at P(x = 0, t → ∞) for én dimensjon lik 1.
+For to dimensjoner derimot, gir den omtrent 0.75.
+Dette alene er ikke så veldig overbevisende at den vil gå til 1
+Men, ved å justere M og N fra lavt til høyt, har tallet alltid steget oppover, i lik linje med én dimensjon.
+Siden den oppfører seg akkurat som det én dimensjon gjør, men mye tregere, kan vi se at P (x = 0, t → ∞) for to dimensjoner også er lik 1
 '''
 
 
 
-"""Oppgave 1i"""
+'''
+Nå går vi over til fase 2 av rapporten; vi gjør nå anveldelsene.
+Først lager vi slik at vi kan endre på steglengdene, og tidssteglengdene
+Vi finner også Diffusjonskonstanten med de nye stegverdiene
+'''
+
+"""(Oppgave 2a)"""
+
+# Setter vilkårlig tall
+x_steglengde = 0.000004
+y_steglengde = 0.000004
+t_steglengde = 0.01
+
+# Setter de vilkårlig tallene som steglengdene
+dx = x_steglengde
+dz = y_steglengde
+dt = t_steglengde
+
+'''
+Det er bare å endre på dx, dy, og dt her, fordi vi kodet de andre kodene til å ta inn variabelen dx, dy, og dt istedenfor 1.
+med dx = 0.000004 meter, og a = dx, ser vi at D = a / 2 = 0.000002
+'''
 
 
 
-
-
-"""Oppgave 2a"""
-
-
-
-
+'''
+Sample text
+'''
 
 """Oppgave 2b"""
 # I tumor K: del_x reduseres med sqrt(t_k)
