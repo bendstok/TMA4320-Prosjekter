@@ -470,68 +470,40 @@ for j in range(2):
 
 """(Oppgave 1h)"""
 
-def n_t(N,M):
-    """
-    Optelling av hvor mange virrevandrere som krysser origo minst en gang (en dimensjon)
-    ...
-    Input: \n
-    N  --> Antall virrevandrere \n
-    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+def n_t(toD_virrevandrer):
     
-    Output: \n
-    n  --> Hvor mange av de N virrevandrerne som krysset origo minst en gang
-    """
-    
-    n = 0
-    randomNums = np.random.uniform(0,1,(N,M-1))
-    posisjon, tidintervaller = n_antall_virrevandrere(N,M,0.5,randomNums,1,1)
-    for i in range(N):
-        for j in range(2,M):
-            if posisjon[i,j] == 0:
-                n += 1
-                break
-    return n
-
-def n_t2d(N,M):
     """
     Optelling av hvor mange virrevandrere som krysser origo minst en gang (to dimensjoner)
+    
     ...
+    
     Input: \n
-    N  --> Antall virrevandrere \n
-    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    toD_virrevandrer --> funksjonen toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
     
     Output: \n
-    n  --> Hvor mange av de N virrevandrerne som krysset origo minst en gang
+    andel --> andelen av de N virrevandrerne som krysset startpunktet minst en gang.
     """
-    randomNums = np.random.uniform(0,1,(N,M-1))
-    posisjon, tidsintervaller = virrevandrere_2d(N, M, 0.5, randomNums)
-    n = 0
+    
+    # Henter ut virrevandringene
+    sjekkStartpunkt = toD_virrevandrer
+    
+    #Setter tallet for antall krysninger av startpunktet
+    ant = 0
+    
+    #itererer gjennom hver virrevandrer, uten å ha med starten; både x of y retning. legger til + 1 hvis den beginner seg ved startpunktet
     for i in range(N):
-        for j in range(1,M):
-            if posisjon[i][j][0] == 0 and posisjon[i][j][1] == 0:
-                n += 1
-                break
-    return n
+        xJa = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0])][i] == 0
+        yJa = sjekkStartpunkt[1][:, 1: len(sjekkStartpunkt[1])][i] == 0
+        beggeJa = np.logical_and(xJa, yJa)
+        if True in beggeJa:
+            ant += 1
+            
+    # Regnet ut forhold, og returnerer
+    andel = ant / N
+    return forhold
 
-def annenn_t2d(N,M):
-    """
-    Optelling av hvor mange virrevandrere som krysser origo minst en gang (to dimensjoner)
-    ...
-    Input: \n
-    N  --> Antall virrevandrere \n
-    M  --> Virrevandreren vil bevege seg M-1 ganger \n
-    
-    Output: \n
-    n  --> Hvor mange av de N virrevandrerne som krysset origo minst en gang
-    """
-    posisjon, tidsintervaller = annen_2d(N,M)
-    n = 0
-    for i in range(N):
-        for j in range(1,M):
-            if posisjon[i,j,0] == 0 and posisjon[i,j,1] == 0:
-                n += 1
-                break
-    return n
+print(n_t(toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)))
+
 
 '''
 Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 0,5 for en dimensjon, og P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 1/4 for to dimensjoner.
