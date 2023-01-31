@@ -465,7 +465,7 @@ for j in range(2):
     for i in range(N):
         plotter2dVirrevandring = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
         plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[1][i])
-   
+    plt.show()
 
 
 """(Oppgave 1h)"""
