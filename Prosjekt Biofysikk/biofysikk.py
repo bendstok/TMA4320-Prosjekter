@@ -536,3 +536,130 @@ def annenn_t2d(N,M):
 '''
 Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 0,5 for en dimensjon, og P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 1/4 for to dimensjoner.
 '''
+
+
+
+"""Oppgave 1i"""
+
+
+
+
+
+"""Oppgave 2a"""
+
+
+
+
+
+"""Oppgave 2b"""
+# I tumor K: del_x reduseres med sqrt(t_k)
+# Om tumor K og I overlapper: del_x reduseres med sqrt(t_k * t_i)
+
+
+def absolute_distance(x_1, y_1, x_2, y_2):
+    """
+    Input: To punkter (x_1,y_1) og (x_2,y_2)
+
+    Output: Returner absolutt distance
+    """
+    return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
+
+
+def tumor_del_x(space_2d, area, Antall_tumors, central_points, tumor_koeff):
+    """
+    Input: \n
+    space_2d: Et 2 dimensjonlt matrise
+
+    Area: Arealet til tumorene (Alle har likt areal)
+
+    Antall_tumors: Antallet tumors
+
+    Central_Points: Tumorene antas sirkulære, denne listen inneholder alle de sentrale punktene,
+    dvs at central_points[0] vil returnere [x,y] til sentrumet i den sirkulære tumoren
+
+    tumor_koeff: Tumor koeffisienten, se oppgavetekst for definisjon
+
+    Return:
+
+    del_x: Inneholder alle del_x til alle punkter i det 2d rommet, dvs at
+    del_x[x][y] gir del_x til det punktet
+    """
+    delta_t = 0.01
+    # I millimeter
+    friskt_vev_del_x = 0.004
+    diffus_frisk = (friskt_vev_del_x)**2/(2*delta_t)
+
+    radius = np.round(np.sqrt(area/np.pi))
+    
+    # Ideen her er som følger:
+    # hvert punkt i tumor_koeff_posisjon tilsvarer samme punkt i space_2d,
+    # men i tumor_koeff_posisjon[x][y] appender vi hvilke tumorer som er der, dvs tumor-koeffisientene
+    # Eksempel, si 2 tumorer (tumor i og tumor j) deler punkt [x,y]
+    # Da vil vi:
+    # tumor_koeff_posisjon[x][y].append(tumor_koeff[i])
+    # og
+    # tumor_koeff_posisjon[x][y].append(tumor_koeff[j])
+    # Dette er Loop 1
+
+    # Så vil vi regne ut del_x for alle punktene  ut ifra om d er noen tumorer der
+    # dette er Loop 2
+    z = len(space_2d)
+    rows, cols = (z, z)
+    tumor_koeff_posisjon = [[[] for i in range(cols)] for j in range(rows)]
+
+    # Loop 1
+    for l in range(Antall_tumors):
+        # Looper over tumorene
+        # Finner sentral punktene
+        x1 = central_points[l][0]
+        y1 = central_points[l][1]
+        
+        # Vi looper over 2d rommet
+        for x in range(z):
+            for y in range(z):
+                # Om punktet er innenfor/på radiusen er tumoren der -> Vi appenderer den spesifikke tumor_koeff
+                if(absolute_distance(x1,y1,x,y) <= radius):
+                    tumor_koeff_posisjon[x][y].append(tumor_koeff[l])
+                else:
+                    continue
+    
+    # Denne matrisen vil inneholde alle del_x
+    # som vi utregner i Loop 2 og vil returnere
+    del_x = [[[] for i in range(cols)] for j in range(rows)]
+
+    # Loop 2
+    for x in range(z):
+        # Vi setter standarverdiene
+        # og looper over rommet
+        d_x = 0.004
+        temp = 1
+        for y in range(z):
+
+            # Om der er tumor-koeffisienter i listen vil vi regne ut den nye del_x
+            # Ellers er det friskt vev
+
+            if len(tumor_koeff_posisjon[x][y]) >= 1:
+                # Vi looper over alle koeffisientene og lagrer en temp verdi som vi så trekker ifra d_x
+                # og setter in denne verdien i [x,y] punktet vi er på
+                for koeff in tumor_koeff_posisjon[x][y]:
+                    temp *= np.sqrt(koeff)
+                d_x -= temp
+                del_x[x][y] = d_x 
+
+                d_x = 0.004
+                temp = 1
+            else:
+                del_x[x][y] = friskt_vev_del_x
+
+
+    return del_x
+
+# Test Verdier
+space2d = [[[] for i in range(10)] for j in range(10)]
+area = np.pi
+Antall_TUmors = 3
+Sentral_Punkt = [[0,0], [4,4], [9,9]]
+
+tumor_koeffisients = [0.02,0.03,0.04]
+
+print(tumor_del_x(space2d, area, Antall_TUmors, Sentral_Punkt, tumor_koeffisients))
