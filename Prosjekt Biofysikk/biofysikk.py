@@ -615,7 +615,7 @@ def tumor_del_x(space_2d, area, Antall_tumors, central_points, tumor_koeff):
                 # og setter in denne verdien i [x,y] punktet vi er på
                 for koeff in tumor_koeff_posisjon[x][y]:
                     temp *= np.sqrt(koeff)
-                d_x /= temp
+                d_x *= temp
                 del_x[x][y] = d_x 
 
                 d_x = 0.004
