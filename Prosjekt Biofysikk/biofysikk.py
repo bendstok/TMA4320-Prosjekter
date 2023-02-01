@@ -23,33 +23,19 @@ Jo lavere den er, jo tregere sprer molekyler seg.
 Matematikere har vist at dispersjon følger en gaussisk sannsynlighetsfordeling, og at forventningsverdien til posisjonen av et vannmolekyls posisjon, når det går ut i det uendelige, er startpunktet selv.
 Først skal vi vise at hvis σ^2 = at, så løser dette dispersjonslikningen ved riktig valg av a:
 
-![bilde-4.png](attachment:bilde-4.png) -->
-![bilde-5.png](attachment:bilde-5.png) -->
-![bilde-2.png](attachment:bilde-2.png)
-![bilde-6.png](attachment:bilde-6.png)
-![bilde-7.png](attachment:bilde-7.png)
-![bilde-8.png](attachment:bilde-8.png)
+print("LEGG TIL MATTEBILIDE HER!")
+(LEGG TIL MATTEBILIDE HER!)
+print("LEGG TIL MATTEBILIDE HER!")
 
 Med a = 2D, løser likningen seg.
-
-Bilder er tatt fra wolfram alpha, og (Prosjektoppgavearket)
 '''
 
-
-'''
-# https://www.wolframalpha.com/input?i2d=true&i=D%5BDivide%5BPower%5Be%2C-%5C%2840%29Divide%5BPower%5Bx%2C2%5D%2C%5C%2840%292*a*t%5C%2841%29%5D%5C%2841%29+%5D%2Csqrt%5C%2840%292*pi*a*t%5C%2841%29%5D+%2C%7Bx%2C2%7D%5D
-# https://www.wolframalpha.com/input?i2d=true&i=D%5BDivide%5BPower%5Be%2C-%5C%2840%29Divide%5BPower%5Bx%2C2%5D%2C%5C%2840%292*a*t%5C%2841%29%5D%5C%2841%29+%5D%2Csqrt%5C%2840%292*pi*a*t%5C%2841%29%5D%2Ct%5D
-For å skaffe bilder hvis nødvendig ^^
-'''
 
 
 '''
 Nå går vi løs på det numeriske.
 Vi starter med å konstruere en 1-dimensjonal virrevandrer, som beveger seg ett skritt enten til høyre eller til venstre, med lik sannsynlighet. Akkurat nå lager vi en enkel kode. vi forbedrer den senere.
 '''
-
-
-høyreSannsynlighet = 0.5
 
 '''(Oppgave 1b)'''
 
@@ -318,7 +304,7 @@ def empirisk_varians(Matrise):
     variance  = np.zeros(coloumns)
 
     for j in range(coloumns):
-        # j er kollonnen
+        # j er kolonnen
 
         # Vil inneholde alle verdier i kolonne j
         coloumn_j = np.zeros(coloumns)
@@ -360,6 +346,13 @@ popt, pcov = curve_fit(linear, time_intervall, variance_pos)
 #plt.show()
 
 '''
+Funksjonen setter opp rader, kolonner, og variansvatrise til behandling
+Den henter ut hver kolonne, og så regner den ut deres gjennomsnittsverdier, og med det, variansen til hver kolonne
+Alle deres varians returneres etterpå.
+Denne funksjonen brukes for å hente inn variansene.
+Så lages en lineær funksjon, og  bruker den i scipy curve fit, for å få den beste matchen av en lineær funksjon til variansen.
+funksjonen, og variansmålingene plottes til slutt.
+
 Resultatet viser oss at a ~ 1. Dette betyr at variansen til en virrevandrer øker lineært med tiden.
 Det er akkurat dette som skjer ved diffusjon, at variansen er lineært og fullstendig proporsjonal med tida.
 Ved sammenigning av oppgave 1a, ser vi at a = 2*D også er lineært, ved D = 0.5!
