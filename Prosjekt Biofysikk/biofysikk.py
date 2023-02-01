@@ -581,8 +581,8 @@ HogOforhold = 0.5
 randomNums = np.random.uniform(0,1,(M*N))
 
 # Printer ut andelene for 1d of 2d virrevandrer
-print(n_t(M, N, hS, randomNums, dx, dt))
-print(n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt))
+#print(n_t(M, N, hS, randomNums, dx, dt))
+#print(n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt))
 
 '''
 Koden printer virrevandrere med normale forhold, og med 10000 av dem med 10000 steg, for å få et nermere svar.
@@ -732,9 +732,113 @@ def tumor_del_x(space_2d, area, Antall_tumors, central_points, tumor_koeff):
 # Test Verdier
 space2d = [[[] for i in range(10)] for j in range(10)]
 area = np.pi
-Antall_TUmors = 3
+Antall_Tumors = 3
 Sentral_Punkt = [[0,0], [4,4], [9,9]]
 
 tumor_koeffisients = [0.02,0.03,0.04]
 
-print(tumor_del_x(space2d, area, Antall_TUmors, Sentral_Punkt, tumor_koeffisients))
+print(tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients))
+
+
+"""Oppgave 2c"""
+
+# Oppstartsverdier gitt i oppgaven
+N = 2
+M = 1000
+Antall_Tumors = 15
+tumor_koeffisients = [0.1]*Antall_Tumors
+Sentral_Punkt = []
+for i in range(Antall_Tumors):
+    Sentral_Punkt.append([int(np.random.uniform(0,20)), int(np.random.uniform(0,20))])
+space2d = [[[] for i in range(20)] for j in range(20)]
+area = np.pi
+delx = tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+
+
+# Samme  gamle funksjon, bare at nå er dx avhengig av posisjon
+def virrevandrere_2d(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
+    """
+    Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
+    ...
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre i x retning pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    dy --> Hvor langtr den vil vandre i y retning  pr tidsintervall \n
+    
+    Output: \n
+    To matriser, 'posisjon' og 'tidsIntervaller': \n
+    posisjon --> En n*M matrise som viser posisjonen til virrevandreren \n
+    Posisjon[i] = [[0,0], [0,0] ...]
+    Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
+    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t \n
+    tidsIntervaller --> En 1d array med lengde m som viser tidspunktet til en posisjon, 
+    """
+
+    # Utrolig dårlig, men rask kodet å få dette til
+    # Posisjon matrisen er basically lagt opp slik:
+    # Posisjon[i] = [[0,0], [0,0] ...]
+    # Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
+    # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
+
+    rows, cols = (N, M)
+    posisjon = [[[0,0] for i in range(cols)] for j in range(rows)]
+
+    tidsIntervaller = np.linspace(0, dt*(N-1), (M))
+    for i in range(N):
+        # i er raden
+        for j in range(M-1):
+            # j er kollonnen
+            # vi er i rad i og itererer over den med hjelp av j
+            z = np.random.uniform(0,1)
+            if(z <= 0.5):
+                # Vi går i x-retning
+                z = 0
+                if tilfeldigeTall[i][j] < høyreSannsynlighet:
+                    # dx avhengig av posisjon
+                    posisjon[i][j+1][z] = posisjon[i][j][z] + dx[int(posisjon[i][j][z])][int(posisjon[i][j][1])]
+                    posisjon[i][j+1][1] = posisjon[i][j][1]
+                else:
+                    posisjon[i][j+1][z] = posisjon[i][j][z] - dx[int(posisjon[i][j][z])][int(posisjon[i][j][1])]
+                    posisjon[i][j+1][1] = posisjon[i][j][1]
+            else:
+                # Vi går i y-retning
+                z = 1
+                if tilfeldigeTall[i][j] < høyreSannsynlighet:
+                    posisjon[i][j+1][z] = posisjon[i][j][z] + dx[int(posisjon[i][j][0])][int(posisjon[i][j][z])]
+                    posisjon[i][j+1][0] = posisjon[i][j][0]
+                else:
+                    posisjon[i][j+1][z] = posisjon[i][j][z] - dx[int(posisjon[i][j][0])][int(posisjon[i][j][z])]
+                    posisjon[i][j+1][0] = posisjon[i][j][0]
+    return posisjon, tidsIntervaller
+randomNums = np.random.uniform(0,1,(N,M-1))
+
+position, timeintervall = virrevandrere_2d(N, M, 0.5, randomNums, delx, dt)
+
+# Plotting av data
+fig, (ax0, ax1) = plt.subplots(nrows=2)
+
+im = ax0.pcolormesh(delx, cmap ='Greens', vmin=0, vmax=0.004)
+ax0.set_ylabel(r"Y $10^{-6}m$")
+ax0.set_xlabel(r"X $10^{-6}m$")
+ax0.set_title(r"Posisjon til tumorer, gjennom $\Delta x$")
+
+fig.colorbar(im, ax=ax0)
+
+label = ["Virrevandrer 1", "Virrevandrer 2"]
+color = ["g",  "r"]
+for i in range(2):
+    y_points = np.zeros(len(position[0]))
+    x_points = np.zeros(len(position[0]))
+    z_points = timeintervall
+    for j in range(len(position[0])):
+        x_points[j] = position[i][j][0]
+        y_points[j] = position[i][j][1]
+    
+    ax1.plot(x_points, y_points, color[i], label=label[i])
+plt.legend()
+plt.tight_layout()
+plt.show()
