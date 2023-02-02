@@ -1,7 +1,9 @@
 '''Finne tumor med numeriske metoder
+
 Dette prosjektet angår å bruke numeriske metoder for å finne mulige tumor i kroppen.
 Rapporten går gjennom bit for bit hvordan en slik kode skal konstrueres, og går i detalj hvorfor koden blir konstruert slik.
 Prosjektet ender med en fungerende metode å finne tumor i pasienter.
+
 Vi må først forstå metoden før vi går løs på å kode en løsning.
 Metoden baserer seg på å måle vannmolekylenes bevegelse i kroppen.
 Siden mennesker har 70% vann, er dette en god tilnermelse.
@@ -11,16 +13,20 @@ Dispersjon forteller hvordan vannmolekyler sprer seg over tid, ved at vannet spr
 Dette er nyttig, siden tumorer er karakterisert ved ukontrollert celledeling, som gir høyere materialtetthet.
 Til sist kan vi måle vannets dispersjon ved å se på hvordan vannets mangetiske egenskaper retter seg opp enten ved samme sted, eller andre steder.
 Dette betyr at vi kan bruke magnetiske målinger til å finne tumorer.
+
 Først går vi nermere inn på dispersjonslikningen:
 ![bilde.png](attachment:bilde.png)
 ![bilde-9.png](attachment:bilde-9.png)
+
 konstanten D er dispersjonskonstanten.
 Jo lavere den er, jo tregere sprer molekyler seg.
 Matematikere har vist at dispersjon følger en gaussisk sannsynlighetsfordeling, og at forventningsverdien til posisjonen av et vannmolekyls posisjon, når det går ut i det uendelige, er startpunktet selv.
 Først skal vi vise at hvis σ^2 = at, så løser dette dispersjonslikningen ved riktig valg av a:
+
 print("LEGG TIL MATTEBILIDE HER!")
 (LEGG TIL MATTEBILIDE HER!)
 print("LEGG TIL MATTEBILIDE HER!")
+
 Med a = 2D, løser likningen seg.
 '''
 
@@ -120,6 +126,7 @@ for i in range(3):
 '''
 Her plottes hS = 0.45, 0.50, og 0.55.
 Vi Bruker 10000 steg for å få det mer representativt.
+
 Dette gjør at vi forventer hS = 0.45 å gi 4500 høyre og 5500 venstre, og netto verdi 4500 - 5500 = -1000
 I likhet med hS = 0.55, forventes 5500 til høyre og 4500 til venstre, så 5500 - 4500 = 1000.
 Dette er akkurat det vi ser på plotten; dermed er den representativt for hS
@@ -290,6 +297,7 @@ def empirisk_varians(Matrise):
     
     Input:
     Matrise --> MxM kvadratisk matrise
+    
     Output:
     empirisk_varians --> 1d array, som inneholder den empiriske variansen til tilhørende kollonnen i Matrise, altså er
     empirisk_varians[n] den empiriske variansen til Matrise[i,n], der i går fra 0->n
@@ -352,6 +360,7 @@ Resultatet viser oss at a ~ 1. Dette betyr at variansen til en virrevandrer øke
 Det er akkurat dette som skjer ved diffusjon, at variansen er lineært og fullstendig proporsjonal med tida.
 Ved sammenigning av oppgave 1a, ser vi at a = 2*D også er lineært, ved D = 0.5!
 Begge disse to funnene viser at vi har en modell som faktisk modellerer diffusjon.
+
 Hvis vi ønsker at den empiriske variansen skal samsvare mer med den analytiske resultatet i 1a, så bør vi ha større M og N.
 For M sin del, er det fordi tilfeldighet vil i løpet av uendelig tid jevne ut sine tilfeldigheter, og gi ut den ekte sannsynlighetsfordelingen; som i dette tilfellet er den analytisle empiriske variansen.
 For N sin del, er det fordi de vil gi et bedre gjennomsnittsverdi, ved at flere av den samme typen vil gi en feil proporsjonal med 1/Sqrt(n); så med n --> Uendelig, gir dette oss det analytiske svaret.
@@ -371,8 +380,10 @@ def toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt):
     
     """
     Simulererer n virrevandrer i 2 dimensjoner
+    
     ...
     Input: \n
+    
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     N  --> Antall virrevandrere \n
     hS --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
@@ -747,6 +758,7 @@ Sample text
 def absolute_distance(x_1, y_1, x_2, y_2):
     """
     Input: To punkter (x_1,y_1) og (x_2,y_2)
+    
     Output: Returner absolutt distance
     """
     return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
@@ -755,13 +767,19 @@ def absolute_distance(x_1, y_1, x_2, y_2):
 def tumor_del_x(space_2d, area, Antall_tumors, central_points, tumor_koeff):
     """
     Input: \n
+    
     space_2d: Et 2 dimensjonlt matrise
+    
     Area: Arealet til tumorene (Alle har likt areal)
+    
     Antall_tumors: Antallet tumors
     Central_Points: Tumorene antas sirkulære, denne listen inneholder alle de sentrale punktene,
     dvs at central_points[0] vil returnere [x,y] til sentrumet i den sirkulære tumoren
+    
     tumor_koeff: Tumor koeffisienten, se oppgavetekst for definisjon
+    
     Return:
+    
     del_x: Inneholder alle del_x til alle punkter i det 2d rommet, dvs at
     del_x[x][y] gir del_x til det punktet
     """
@@ -949,6 +967,10 @@ for i in range(2):
 plt.legend()
 plt.tight_layout()
 plt.show()
+'''
+
+'''
+kanskje ha en egen funksjon for den plotteren? ^^
 '''
 
 print("Output")
