@@ -479,15 +479,16 @@ Vi koder om virrevandreren returnerer til startpunktet, og andelen av virrenandr
 
 """(Oppgave 1h)"""
 
+# Andel kryssende virrevandrere, 1d
 def n_t(M, N, hS, randomNums, dx, dt):
     
     """
-    Optelling av hvor mange virrevandrere som krysser origo minst en gang (to dimensjoner)
+    Optelling av hvor mange virrevandrere som krysser origo minst en gang (1 dimensjon)
     
     ...
     
     Input: \n
-    enD_virrevandrer --> funksjonen toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+    enD_virrevandrer --> funksjonen kVv(M, N, hS, randomNums, dx, dt)
     
     Output: \n
     andel --> andelen av de N virrevandrerne som krysset startpunktet minst en gang.
@@ -501,7 +502,7 @@ def n_t(M, N, hS, randomNums, dx, dt):
     
     #itererer gjennom hver virrevandrer, uten å ha med starten; både x of y retning. legger til + 1 hvis den krysser startpunktet
     for i in range(N):
-        Ja = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0])][i] == 0
+        Ja = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0][i])][i] == 0
         if True in Ja:
             ant += 1
             
@@ -511,13 +512,16 @@ def n_t(M, N, hS, randomNums, dx, dt):
 
 
 
-# Printer resultat
+# Printer andel, 2d
 # print(n_t(kVv(M, N, hS, randomNums, dx, dt)))
 
+
+
+# Andel kryssende virrevandrere, 2d
 def n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt):
     
     """
-    Optelling av hvor mange virrevandrere som krysser origo minst en gang (to dimensjoner)
+    Optelling av hvor mange virrevandrere som krysser origo minst en gang (2 dimensjoner)
     
     ...
     
@@ -536,8 +540,8 @@ def n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt):
     
     #itererer gjennom hver virrevandrer, uten å ha med starten; både x of y retning. legger til + 1 hvis den krysser startpunktet
     for i in range(N):
-        xJa = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0])][i] == 0
-        yJa = sjekkStartpunkt[1][:, 1: len(sjekkStartpunkt[1])][i] == 0
+        xJa = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0][i])][i] == 0
+        yJa = sjekkStartpunkt[1][:, 1: len(sjekkStartpunkt[1][i])][i] == 0
         beggeJa = np.logical_and(xJa, yJa)
         if True in beggeJa:
             ant += 1
@@ -548,8 +552,9 @@ def n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt):
 
 
 
-# Printer resultat
+# Printer andel, 2d
 # print(n_t2d(toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)))
+
 
 '''
 N_t og N_t2d er veldig like, og gjør omtrent det samme.
@@ -557,21 +562,114 @@ De henter først in virrevanderen i funksjonene.
 så sjekker den om den er ved startpunktet, for bøde x-posisjon og y-posisjon.
 den teller opp hvor mange virrevandrere som gjør det, og regner ut andelen.
 
-Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 0,5 for en dimensjon, og P(x = 0, t = 1) = 0, og P(x = 0, t = 2) = 1/4 for to dimensjoner, hvis hS = oS = HogOforhold = 0.25
-Dette er fordi hS(eller oS) = 0.5, og hS(eller oS) * HogOforhold = 0.25
+Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, for begge dimensjoner.
+Dette er fordi den aldri ikke vil bevege seg, så den beveger seg vekk fra startpunktet.
+For t = 2, gir dette P(x = 0, t = 2) = 0,5 og P(x = 0, t = 2) = 1/4 for henholdsvis en og to dimensjoner, hvis hS = oS = HogOforhold = 0.25
+Dette er fordi det er 50% mulighet å velge den motsatte retningen for 1 dimensjon, siden det er 1 av 2 retningsmuligheter,
+og 25% mulighet å velge den motsatte retningen for 2 dimensjoner, siden det er 1 av 4 retningsmuligheter,
 '''
 
 
 
 '''
-Nå bruker vi koden fra forrige oppgave til å teste om n_t og n_t2d over uendelig lang tid vil gi et svar son er nerme det analytiske svaret P(x = 0, t → ∞) = 1
+Nå bruker vi koden fra forrige oppgave til å teste om n_t og n_t2d over uendelig lang tid vil gi et svar son er nerme det analytiske svaret P(x = 0, t → ∞) = 1.
+Vi plotter n(t) for å finne ut av dette.
 '''
 
 """(Oppgave 1i)"""
 
+# Andel kryssende virrevandrere, 1d, plottet
+def n_tPlot(M, N, hS, randomNums, dx, dt):
+    
+    """
+    Plotter optelling av hvor mange virrevandrere som krysser origo minst en gang, over tid (1 dimensjon)
+    
+    ...
+    
+    Input: \n
+    enD_virrevandrer --> funksjonen kVv(M, N, hS, randomNums, dx, dt)
+    
+    Output: \n
+    Plot av n_t --> En plot av andelen virrevandrer som har krysset startpunktet minst en gang, over tid.
+    """
+    
+    # Henter ut virrevandringene
+    sjekkStartpunkt = kVv(M, N, hS, randomNums, dx, dt)
+    
+    #Setter tallet for antall krysninger av startpunktet, og sjekker om virrevandrer er i startpunktet
+    andel = np.array([0, 0])
+    Ja = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0][0])] == 0
+    
+    #itererer gjennom hver tidssteg. sjekker om en linje har True, og sletter de linjene etterpå. legger til antall True funnet.
+    for i in range(M-1):
+        count = np.where(Ja[:,i] == True)[0]
+        Ja = np.delete(Ja, count, 0)
+        if len(count) != 0:
+            add = andel[-1] + (len(count))/N
+            andel = np.append(andel, add)
+        else:
+            andel = np.append(andel, andel[-1])
+    
+    # Fjerner ektra 0 på starten
+    andel = np.delete(andel, 0)
+    
+    # Plotter n_t over tid
+    plt.figure()
+    plt.plot(sjekkStartpunkt[1], andel)
+    plt.show()
+    return
+
+
+
+
+# Andel kryssende virrevandrere, 2d, plottet
+def n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt):
+    
+    """
+    Plotter optelling av hvor mange virrevandrere som krysser origo minst en gang, over tid (2 dimensjoner)
+    
+    ...
+    
+    Input: \n
+    toD_virrevandrer --> funksjonen toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+    
+    Output: \n
+    Plot av n_t2d --> En plot av andelen virrevandrer som har krysset startpunktet minst en gang, over tid.
+    """
+    
+    # Henter ut virrevandringene
+    sjekkStartpunkt = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+            
+    #Setter tallet for antall krysninger av startpunktet, og sjekker om virrevandrer er i startpunktet
+    andel = np.array([0, 0])
+    xJa = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0][0])] == 0
+    yJa = sjekkStartpunkt[1][:, 1: len(sjekkStartpunkt[1][0])] == 0
+    Ja = np.logical_and(xJa, yJa)
+    
+    #itererer gjennom hver tidssteg. sjekker om en linje har True, og sletter de linjene etterpå. legger til antall True funnet.
+    for i in range(M-1):
+        count = np.where(Ja[:,i] == True)[0]
+        Ja = np.delete(Ja, count, 0)
+        if len(count) != 0:
+            add = andel[-1] + (len(count))/N
+            andel = np.append(andel, add)
+        else:
+            andel = np.append(andel, andel[-1])
+    
+    # Fjerner ektra 0 på starten
+    andel = np.delete(andel, 0)
+    
+    # Plotter n_t over tid
+    plt.figure()
+    plt.plot(sjekkStartpunkt[2], andel)
+    plt.show()
+    return
+
+
+
 # Setter konstanter og tilfeldige tall
-N = 10000
-M = 10000
+M = 100
+N = 100
 hS = 0.5
 oS = 0.5
 dx = 1
@@ -581,8 +679,8 @@ HogOforhold = 0.5
 randomNums = np.random.uniform(0,1,(M*N))
 
 # Printer ut andelene for 1d of 2d virrevandrer
-#print(n_t(M, N, hS, randomNums, dx, dt))
-#print(n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt))
+n_tPlot(M, N, hS, randomNums, dx, dt)
+n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt)
 
 '''
 Koden printer virrevandrere med normale forhold, og med 10000 av dem med 10000 steg, for å få et nermere svar.
