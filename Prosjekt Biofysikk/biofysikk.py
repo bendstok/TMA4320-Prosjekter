@@ -1,9 +1,7 @@
 '''Finne tumor med numeriske metoder
-
 Dette prosjektet angår å bruke numeriske metoder for å finne mulige tumor i kroppen.
 Rapporten går gjennom bit for bit hvordan en slik kode skal konstrueres, og går i detalj hvorfor koden blir konstruert slik.
 Prosjektet ender med en fungerende metode å finne tumor i pasienter.
-
 Vi må først forstå metoden før vi går løs på å kode en løsning.
 Metoden baserer seg på å måle vannmolekylenes bevegelse i kroppen.
 Siden mennesker har 70% vann, er dette en god tilnermelse.
@@ -13,20 +11,16 @@ Dispersjon forteller hvordan vannmolekyler sprer seg over tid, ved at vannet spr
 Dette er nyttig, siden tumorer er karakterisert ved ukontrollert celledeling, som gir høyere materialtetthet.
 Til sist kan vi måle vannets dispersjon ved å se på hvordan vannets mangetiske egenskaper retter seg opp enten ved samme sted, eller andre steder.
 Dette betyr at vi kan bruke magnetiske målinger til å finne tumorer.
-
 Først går vi nermere inn på dispersjonslikningen:
 ![bilde.png](attachment:bilde.png)
 ![bilde-9.png](attachment:bilde-9.png)
-
 konstanten D er dispersjonskonstanten.
 Jo lavere den er, jo tregere sprer molekyler seg.
 Matematikere har vist at dispersjon følger en gaussisk sannsynlighetsfordeling, og at forventningsverdien til posisjonen av et vannmolekyls posisjon, når det går ut i det uendelige, er startpunktet selv.
 Først skal vi vise at hvis σ^2 = at, så løser dette dispersjonslikningen ved riktig valg av a:
-
 print("LEGG TIL MATTEBILIDE HER!")
 (LEGG TIL MATTEBILIDE HER!)
 print("LEGG TIL MATTEBILIDE HER!")
-
 Med a = 2D, løser likningen seg.
 '''
 
@@ -92,7 +86,7 @@ hS = 0.5
 randomNums = np.random.uniform(0,1,M-1)
 
 # Priner vektoren
-print(virrevandring(M, hS, randomNums, dx, dt))
+#print(virrevandring(M, hS, randomNums, dx, dt))
 
 '''
 Her har vi en kode som definerer en virrevandrende funkjson.
@@ -117,12 +111,15 @@ randomNums = np.random.uniform(0,1,M-1)
 for i in range(3):
     hS = i*0.05 + 0.45
     plotterVirrevandring = virrevandring(M, hS, randomNums, dx, dt)
-    #plt.plot(plotterVirrevandring[1], plotterVirrevandring[0])
+    #plt.plot(plotterVirrevandring[1], plotterVirrevandring[0], label = f"hS = {hS}")
+    #plt.xlabel('Tid')
+    #plt.ylabel('x-pos')
+    #plt.legend()
+    #plt.show()
 
 '''
 Her plottes hS = 0.45, 0.50, og 0.55.
 Vi Bruker 10000 steg for å få det mer representativt.
-
 Dette gjør at vi forventer hS = 0.45 å gi 4500 høyre og 5500 venstre, og netto verdi 4500 - 5500 = -1000
 I likhet med hS = 0.55, forventes 5500 til høyre og 4500 til venstre, så 5500 - 4500 = 1000.
 Dette er akkurat det vi ser på plotten; dermed er den representativt for hS
@@ -177,7 +174,7 @@ hS = 0.5
 randomNums = np.random.uniform(0,1,(N,M-1))
 
 # Printer resultat
-print(n_antall_virrevandrere(N, M, hS, randomNums, dx, dt))
+#print(n_antall_virrevandrere(N, M, hS, randomNums, dx, dt))
 
 
 
@@ -260,9 +257,9 @@ time_fast_after = time.time()
 time_fast_diff = time_fast_after - time_fast_b4
 
 # Sammenligner kjøretidene
-print("Tid treig: " + str(time_slow_diff))
-print("Tid rask: " + str(time_fast_diff))
-print("Tid spart: " + str(time_slow_diff - time_fast_diff))
+#print("Tid treig: " + str(time_slow_diff))
+#print("Tid rask: " + str(time_fast_diff))
+#print("Tid spart: " + str(time_slow_diff - time_fast_diff))
 
 '''
 Koden viser en N_antall_virrevandrende funkjson, men bygd på en annen måte.
@@ -293,7 +290,6 @@ def empirisk_varians(Matrise):
     
     Input:
     Matrise --> MxM kvadratisk matrise
-
     Output:
     empirisk_varians --> 1d array, som inneholder den empiriske variansen til tilhørende kollonnen i Matrise, altså er
     empirisk_varians[n] den empiriske variansen til Matrise[i,n], der i går fra 0->n
@@ -352,12 +348,10 @@ Alle deres varians returneres etterpå.
 Denne funksjonen brukes for å hente inn variansene.
 Så lages en lineær funksjon, og  bruker den i scipy curve fit, for å få den beste matchen av en lineær funksjon til variansen.
 funksjonen, og variansmålingene plottes til slutt.
-
 Resultatet viser oss at a ~ 1. Dette betyr at variansen til en virrevandrer øker lineært med tiden.
 Det er akkurat dette som skjer ved diffusjon, at variansen er lineært og fullstendig proporsjonal med tida.
 Ved sammenigning av oppgave 1a, ser vi at a = 2*D også er lineært, ved D = 0.5!
 Begge disse to funnene viser at vi har en modell som faktisk modellerer diffusjon.
-
 Hvis vi ønsker at den empiriske variansen skal samsvare mer med den analytiske resultatet i 1a, så bør vi ha større M og N.
 For M sin del, er det fordi tilfeldighet vil i løpet av uendelig tid jevne ut sine tilfeldigheter, og gi ut den ekte sannsynlighetsfordelingen; som i dette tilfellet er den analytisle empiriske variansen.
 For N sin del, er det fordi de vil gi et bedre gjennomsnittsverdi, ved at flere av den samme typen vil gi en feil proporsjonal med 1/Sqrt(n); så med n --> Uendelig, gir dette oss det analytiske svaret.
@@ -372,14 +366,12 @@ Vi utvider den til en 2d virrevandrer. Vi tester denne utvidelsen med systemer s
 
 """(Oppgave 1g)"""
 
-# 2d virrevandrende funksjon. R = retning, P = posisjon, V = virrevandrer. oS = oppSannsynlighet
+# 2d virrevandrende funksjon. R = retning, P = posisjon, V = virrevandrer. oS = oppSannsynlighet. Y = Ja, N = Nei
 def toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt):
     
     """
     Simulererer n virrevandrer i 2 dimensjoner
-
     ...
-
     Input: \n
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     N  --> Antall virrevandrere \n
@@ -444,23 +436,37 @@ dy = 1
 HogOforhold = 0.5
 
 
-# Plotter
-for j in range(2):
-    hS = 0.4 + 0.1*j
-    oS = 0.6 - 0.1*j
-    
-    plt.figure()   
-    for i in range(N):
-        plotter2dVirrevandring = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
-        plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[0][i])
-    plt.show()
-    
+# Plottingsfunksjon
+def plotToD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt):
     plt.figure()
-    for i in range(N):
-        plotter2dVirrevandring = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
-        plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[1][i])
+    for j in range(2):
+        hS = 0.4 + 0.1*j
+        oS = 0.6 - 0.1*j
+        
+        
+        plt.subplot(2, 2, 1 + 2*j)
+        for i in range(N):
+            plotter2dVirrevandring = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+            plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[0][i], label = f"hS = {hS}")
+        plt.xlabel('Tid')
+        plt.ylabel('x-pos')
+        plt.legend()
+        
+        plt.subplot(2, 2, 2 + 2*j)
+        for i in range(N):
+            plotter2dVirrevandring = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+            plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[1][i], label = f"oS = {oS}")
+        plt.xlabel('Tid')
+        plt.ylabel('y-pos')
+        plt.legend()   
+               
     plt.show()
-
+    return
+    
+    
+# Plotter
+#plotToD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+    
 '''
 Her lages en effektig kumulativ kode for 2d virrevandring.
 Først bestemmes om virrevandrered går horisontalt eller vertikalt
@@ -615,10 +621,12 @@ def n_tPlot(M, N, hS, randomNums, dx, dt):
     
     # Plotter n_t over tid
     plt.figure()
-    plt.plot(sjekkStartpunkt[1], andel)
+    plt.plot(sjekkStartpunkt[1], andel, label = "n_t over tid")
+    plt.xlabel('Tid')
+    plt.ylabel('n_t')
+    plt.legend()
     plt.show()
     return
-
 
 
 
@@ -656,12 +664,15 @@ def n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt):
         else:
             andel = np.append(andel, andel[-1])
     
-    # Fjerner ektra 0 på starten
+    # Fjerner ektra 0 på starten (for å fikse en bug)
     andel = np.delete(andel, 0)
     
     # Plotter n_t over tid
     plt.figure()
     plt.plot(sjekkStartpunkt[2], andel)
+    plt.xlabel('Tidssteg')
+    plt.ylabel('n_t')
+    plt.legend()
     plt.show()
     return
 
@@ -679,17 +690,21 @@ HogOforhold = 0.5
 randomNums = np.random.uniform(0,1,(M*N))
 
 # Printer ut andelene for 1d of 2d virrevandrer
-n_tPlot(M, N, hS, randomNums, dx, dt)
-n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt)
+#n_tPlot(M, N, hS, randomNums, dx, dt)
+#n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt)
 
 '''
-Koden printer virrevandrere med normale forhold, og med 10000 av dem med 10000 steg, for å få et nermere svar.
+Koden printer virrevandrere med normale forhold, og med 1000 av dem med 100000 steg, for å få et nermere svar.
+Den teller for hver kolonne om virrevandreren er tilbake til startpunktet, og noterer ned de som har gjort det.
 
-Resultatene viser oss at for 1-dimensjon, er den praktisk talt lilk 1.
+Vi har valgt M = 100000, for her er M = t, og vi ønsker å få et høyt t for å få et resultat som lingner den analytiske.
+M = 1000 er der for å gi 3 desimaler ved andelen, for å gi et mer presis tall.
+
+Resultatene viser oss at for 1-dimensjon, er den praktisk talt lik 1.
 Dermed har vi vist at P(x = 0, t → ∞) for én dimensjon lik 1.
 For to dimensjoner derimot, gir den omtrent 0.75.
 Dette alene er ikke så veldig overbevisende at den vil gå til 1
-Men, ved å justere M og N fra lavt til høyt, har tallet alltid steget oppover, i lik linje med én dimensjon.
+Men, ved å se på 2d-plotten i forhold til 1d-plotten, ser vi at de har samme tendens til å gå mot 1, bare mye tregere.
 Siden den oppfører seg akkurat som det én dimensjon gjør, men mye tregere, kan vi se at P (x = 0, t → ∞) for to dimensjoner også er lik 1
 '''
 
@@ -732,7 +747,6 @@ Sample text
 def absolute_distance(x_1, y_1, x_2, y_2):
     """
     Input: To punkter (x_1,y_1) og (x_2,y_2)
-
     Output: Returner absolutt distance
     """
     return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
@@ -742,18 +756,12 @@ def tumor_del_x(space_2d, area, Antall_tumors, central_points, tumor_koeff):
     """
     Input: \n
     space_2d: Et 2 dimensjonlt matrise
-
     Area: Arealet til tumorene (Alle har likt areal)
-
     Antall_tumors: Antallet tumors
-
     Central_Points: Tumorene antas sirkulære, denne listen inneholder alle de sentrale punktene,
     dvs at central_points[0] vil returnere [x,y] til sentrumet i den sirkulære tumoren
-
     tumor_koeff: Tumor koeffisienten, se oppgavetekst for definisjon
-
     Return:
-
     del_x: Inneholder alle del_x til alle punkter i det 2d rommet, dvs at
     del_x[x][y] gir del_x til det punktet
     """
@@ -835,7 +843,7 @@ Sentral_Punkt = [[0,0], [4,4], [9,9]]
 
 tumor_koeffisients = [0.02,0.03,0.04]
 
-print(tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients))
+# print(tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients))
 
 
 """Oppgave 2c"""
@@ -917,6 +925,7 @@ randomNums = np.random.uniform(0,1,(N,M-1))
 position, timeintervall = virrevandrere_2d(N, M, 0.5, randomNums, delx, dt)
 
 # Plotting av data
+'''
 fig, (ax0, ax1) = plt.subplots(nrows=2)
 
 im = ax0.pcolormesh(delx, cmap ='Greens', vmin=0, vmax=0.004)
@@ -940,3 +949,6 @@ for i in range(2):
 plt.legend()
 plt.tight_layout()
 plt.show()
+'''
+
+print("Output")
