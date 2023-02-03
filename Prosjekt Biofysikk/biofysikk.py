@@ -910,7 +910,9 @@ def virrevandrere_2d(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
 
     rows, cols = (N, M)
     posisjon = [[[0,0] for i in range(cols)] for j in range(rows)]
-
+    for zy in range(N):
+        posisjon[zy][0][0] = int(10)
+        posisjon[zy][0][1] = int(10)
     tidsIntervaller = np.linspace(0, dt*(N-1), (M))
     for i in range(N):
         # i er raden
@@ -937,6 +939,7 @@ def virrevandrere_2d(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
                 else:
                     posisjon[i][j+1][z] = posisjon[i][j][z] - dx[int(posisjon[i][j][0])][int(posisjon[i][j][z])]
                     posisjon[i][j+1][0] = posisjon[i][j][0]
+    
     return posisjon, tidsIntervaller
 randomNums = np.random.uniform(0,1,(N,M-1))
 
@@ -947,8 +950,8 @@ position, timeintervall = virrevandrere_2d(N, M, 0.5, randomNums, delx, dt)
 fig, (ax0, ax1) = plt.subplots(nrows=2)
 
 im = ax0.pcolormesh(delx, cmap ='Greens', vmin=0, vmax=0.004)
-ax0.set_ylabel(r"Y $10^{-6}m$")
-ax0.set_xlabel(r"X $10^{-6}m$")
+ax0.set_ylabel(r"Y [$10^{-6}m$]")
+ax0.set_xlabel(r"X [$10^{-6}m$]")
 ax0.set_title(r"Posisjon til tumorer, gjennom $\Delta x$")
 
 fig.colorbar(im, ax=ax0)
@@ -960,10 +963,10 @@ for i in range(2):
     x_points = np.zeros(len(position[0]))
     z_points = timeintervall
     for j in range(len(position[0])):
-        x_points[j] = position[i][j][0]
-        y_points[j] = position[i][j][1]
+        x_points[j] = (position[i][j][0])
+        y_points[j] = (position[i][j][1])
     
-    ax1.plot(x_points, y_points, color[i], label=label[i])
+    ax0.plot(x_points, y_points, color[i], label=label[i])
 plt.legend()
 plt.tight_layout()
 plt.show()
