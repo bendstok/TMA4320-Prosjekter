@@ -763,124 +763,49 @@ def absolute_distance(x_1, y_1, x_2, y_2):
     """
     return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
 
+def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
 
-def tumor_del_x(space_2d, area, Antall_tumors, central_points, tumor_koeff):
-    """
-    Input: \n
-    
-    space_2d: Et 2 dimensjonlt matrise
-    
-    Area: Arealet til tumorene (Alle har likt areal)
-    
-    Antall_tumors: Antallet tumors
-    Central_Points: Tumorene antas sirkulære, denne listen inneholder alle de sentrale punktene,
-    dvs at central_points[0] vil returnere [x,y] til sentrumet i den sirkulære tumoren
-    
-    tumor_koeff: Tumor koeffisienten, se oppgavetekst for definisjon
-    
-    Return:
-    
-    del_x: Inneholder alle del_x til alle punkter i det 2d rommet, dvs at
-    del_x[x][y] gir del_x til det punktet
-    """
-    delta_t = 0.01
-    # I millimeter
-    friskt_vev_del_x = 0.004
-    diffus_frisk = (friskt_vev_del_x)**2/(2*delta_t)
-
+    del_x = np.full((len(x[0]), len(y)), 4)
     radius = np.round(np.sqrt(area/np.pi))
-    
-    # Ideen her er som følger:
-    # hvert punkt i tumor_koeff_posisjon tilsvarer samme punkt i space_2d,
-    # men i tumor_koeff_posisjon[x][y] appender vi hvilke tumorer som er der, dvs tumor-koeffisientene
-    # Eksempel, si 2 tumorer (tumor i og tumor j) deler punkt [x,y]
-    # Da vil vi:
-    # tumor_koeff_posisjon[x][y].append(tumor_koeff[i])
-    # og
-    # tumor_koeff_posisjon[x][y].append(tumor_koeff[j])
-    # Dette er Loop 1
 
-    # Så vil vi regne ut del_x for alle punktene  ut ifra om d er noen tumorer der
-    # dette er Loop 2
-    z = len(space_2d)
-    rows, cols = (z, z)
-    tumor_koeff_posisjon = [[[] for i in range(cols)] for j in range(rows)]
-
-    # Loop 1
-    for l in range(Antall_tumors):
-        # Looper over tumorene
-        # Finner sentral punktene
-        x1 = central_points[l][0]
-        y1 = central_points[l][1]
-        
-        # Vi looper over 2d rommet
-        for x in range(z):
-            for y in range(z):
-                # Om punktet er innenfor/på radiusen er tumoren der -> Vi appenderer den spesifikke tumor_koeff
-                if(absolute_distance(x1,y1,x,y) <= radius):
-                    tumor_koeff_posisjon[x][y].append(tumor_koeff[l])
-                else:
-                    continue
-    
-    # Denne matrisen vil inneholde alle del_x
-    # som vi utregner i Loop 2 og vil returnere
-    del_x = [[[] for i in range(cols)] for j in range(rows)]
-
-    # Loop 2
-    for x in range(z):
-        # Vi setter standarverdiene
-        # og looper over rommet
-        d_x = 0.004
-        temp = 1
-        for y in range(z):
-
-            # Om der er tumor-koeffisienter i listen vil vi regne ut den nye del_x
-            # Ellers er det friskt vev
-
-            if len(tumor_koeff_posisjon[x][y]) >= 1:
-                # Vi looper over alle koeffisientene og lagrer en temp verdi som vi så trekker ifra d_x
-                # og setter in denne verdien i [x,y] punktet vi er på
-                for koeff in tumor_koeff_posisjon[x][y]:
-                    temp *= np.sqrt(koeff)
-                d_x *= temp
-                del_x[x][y] = d_x 
-
-                d_x = 0.004
-                temp = 1
-            else:
-                del_x[x][y] = friskt_vev_del_x
-
+    for i in range(N_tumor):
+        xcenter_tumor = Tumor_Center[i][1]
+        ycenter_tumor = Tumor_Center[i][0]
+        for v in range(len(x[0])):
+            for w in range(len(y)):
+                if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
+                        del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
 
     return del_x
 
-# Test Verdier
-space2d = [[[] for i in range(10)] for j in range(10)]
-area = np.pi
-Antall_Tumors = 3
-Sentral_Punkt = [[0,0], [4,4], [9,9]]
-
-tumor_koeffisients = [0.02,0.03,0.04]
-
-# print(tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients))
-
 
 """Oppgave 2c"""
+x = np.linspace(0,20,200)
+y = np.linspace(0,20,200)
 
-# Oppstartsverdier gitt i oppgaven
+xx, yy = np.meshgrid(x,y,sparse=True)
+
 N = 2
-M = 1000
+M = 20
 Antall_Tumors = 15
 tumor_koeffisients = [0.1]*Antall_Tumors
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
     Sentral_Punkt.append([int(np.random.uniform(0,20)), int(np.random.uniform(0,20))])
-space2d = [[[] for i in range(20)] for j in range(20)]
-area = np.pi
-delx = tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
 
+
+area = 4*np.pi
+delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+
+dt = 0.01
+
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
 
 # Samme  gamle funksjon, bare at nå er dx avhengig av posisjon
-def virrevandrere_2d(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
+def virrevandrere_2d(x,y,N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
     """
     Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
     ...
@@ -923,57 +848,71 @@ def virrevandrere_2d(N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
             if(z <= 0.5):
                 # Vi går i x-retning
                 z = 0
+                nearest_x = find_nearest(x[0],posisjon[i][j][1])
+                nearest_y = find_nearest(y,posisjon[i][j][0])
+                index_x = np.where(x[0] == nearest_x)[0]
+                index_y = np.where(y == nearest_y)[0]
+
+                step = dx[index_x[0]][index_y[0]]
                 if tilfeldigeTall[i][j] < høyreSannsynlighet:
                     # dx avhengig av posisjon
-                    posisjon[i][j+1][z] = posisjon[i][j][z] + dx[int(posisjon[i][j][z])][int(posisjon[i][j][1])]
+                    posisjon[i][j+1][z] = posisjon[i][j][z] + step
                     posisjon[i][j+1][1] = posisjon[i][j][1]
                 else:
-                    posisjon[i][j+1][z] = posisjon[i][j][z] - dx[int(posisjon[i][j][z])][int(posisjon[i][j][1])]
+                    posisjon[i][j+1][z] = posisjon[i][j][z] - step
                     posisjon[i][j+1][1] = posisjon[i][j][1]
             else:
                 # Vi går i y-retning
                 z = 1
+                nearest_x = find_nearest(x[0],posisjon[i][j][1])
+                nearest_y = find_nearest(y,posisjon[i][j][0])
+                index_x = np.where(x[0] == nearest_x)[0]
+                index_y = np.where(y == nearest_y)[0]
+
+                step = dx[index_x[0]][index_y[0]]
                 if tilfeldigeTall[i][j] < høyreSannsynlighet:
-                    posisjon[i][j+1][z] = posisjon[i][j][z] + dx[int(posisjon[i][j][0])][int(posisjon[i][j][z])]
+                    posisjon[i][j+1][z] = posisjon[i][j][z] + step
                     posisjon[i][j+1][0] = posisjon[i][j][0]
                 else:
-                    posisjon[i][j+1][z] = posisjon[i][j][z] - dx[int(posisjon[i][j][0])][int(posisjon[i][j][z])]
+                    posisjon[i][j+1][z] = posisjon[i][j][z] - step
                     posisjon[i][j+1][0] = posisjon[i][j][0]
     
     return posisjon, tidsIntervaller
 randomNums = np.random.uniform(0,1,(N,M-1))
 
-position, timeintervall = virrevandrere_2d(N, M, 0.5, randomNums, delx, dt)
+position, timeintervall = virrevandrere_2d(xx,yy,N, M, 0.5, randomNums, delx, dt)
 
 # Plotting av data
-'''
-fig, (ax0, ax1) = plt.subplots(nrows=2)
 
-im = ax0.pcolormesh(delx, cmap ='Greens', vmin=0, vmax=0.004)
-ax0.set_ylabel(r"Y [$10^{-6}m$]")
-ax0.set_xlabel(r"X [$10^{-6}m$]")
+fig, ax0 = plt.subplots()
+
+im = ax0.pcolormesh(xx,yy,delx, cmap ='Greens',shading='auto')
+ax0.set_ylabel(r"Y [$\mu m$]")
+ax0.set_xlabel(r"X [$\mu m$]")
 ax0.set_title(r"Posisjon til tumorer, gjennom $\Delta x$")
 
 fig.colorbar(im, ax=ax0)
 
 label = ["Virrevandrer 1", "Virrevandrer 2"]
 color = ["g",  "r"]
-for i in range(2):
+for i in range(N):
     y_points = np.zeros(len(position[0]))
     x_points = np.zeros(len(position[0]))
     z_points = timeintervall
     for j in range(len(position[0])):
         x_points[j] = (position[i][j][0])
         y_points[j] = (position[i][j][1])
-    
+        plt.plot(position[i][j][0],position[i][j][1], marker="x")
+        print(x_points[j], y_points[j], j)
+    print("NExt")
     ax0.plot(x_points, y_points, color[i], label=label[i])
 plt.legend()
 plt.tight_layout()
 plt.show()
-'''
 
-'''
-kanskje ha en egen funksjon for den plotteren? ^^
-'''
+# print(tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients))
 
-print("Output")
+
+"""Oppgave 2c"""
+
+
