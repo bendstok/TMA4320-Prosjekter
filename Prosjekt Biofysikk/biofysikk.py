@@ -46,8 +46,8 @@ import time
 import itertools as it
 from scipy.optimize import curve_fit
 
-# Virrevandring funksjon. hS = høyreSannsynlighet
-def virrevandring(M, hS, randomNums, dx, dt):
+# Virrevandring funksjon. pR = høyreSannsynlighet
+def virrevandring(M, pr, randomNums, dx, dt):
     
     """
     Simulererer en virrevandrer i en dimensjon
@@ -56,7 +56,7 @@ def virrevandring(M, hS, randomNums, dx, dt):
     
     Input: \n
     M  --> Virrevandreren vil bevege seg n-1 ganger \n
-    hS  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
     randomNums --> En 1d array med lengde (n-1) med tilfeldige tall i intervallet [0,1] \n
     dx --> Hvor langt den vil vandre pr tidsintervall \n
     dt --> Tidsintervall \n 
@@ -74,7 +74,7 @@ def virrevandring(M, hS, randomNums, dx, dt):
     
     # Itererer gjennom å bevege seg til høyre eller til venstre
     for i in range(M-1):
-        if randomNums[i] < hS:
+        if randomNums[i] < pR:
             posisjon[i+1] = posisjon[i] + dx 
         else:
             posisjon[i+1] = posisjon[i] - dx
@@ -88,23 +88,23 @@ def virrevandring(M, hS, randomNums, dx, dt):
 dx = 1
 dt = 1
 M = 10
-hS = 0.5
+pR = 0.5
 randomNums = np.random.uniform(0,1,M-1)
 
 # Priner vektoren
-#print(virrevandring(M, hS, randomNums, dx, dt))
+#print(virrevandring(M, pR, randomNums, dx, dt))
 
 '''
 Her har vi en kode som definerer en virrevandrende funkjson.
 For hver tidssteg beveger den seg ett hakk enten til høyre eller til venstre.
-For nå har vi dx = 1 = dt, M = 10, og hS = 0.5, der hS betegner sannsynligheten til å gå til høyre.
+For nå har vi dx = 1 = dt, M = 10, og pR = 0.5, der pR betegner sannsynligheten til å gå til høyre.
 '''
 
 
 
 '''
 Med denne enkle modellen, tester vi den med ulike sannsynligheter å gå til høyre eller venstre, for å sjekke om de er representative med den virkelige verden.
-Vi tar hS = 0.45, 0.5, og 0.55.
+Vi tar pR = 0.45, 0.5, og 0.55.
 '''
 
 '''(Oppgave 1c)'''
@@ -115,21 +115,21 @@ randomNums = np.random.uniform(0,1,M-1)
 
 # Plotter
 for i in range(3):
-    hS = i*0.05 + 0.45
-    plotterVirrevandring = virrevandring(M, hS, randomNums, dx, dt)
-    #plt.plot(plotterVirrevandring[1], plotterVirrevandring[0], label = f"hS = {hS}")
+    pR = i*0.05 + 0.45
+    plotterVirrevandring = virrevandring(M, pR, randomNums, dx, dt)
+    #plt.plot(plotterVirrevandring[1], plotterVirrevandring[0], label = f"pR = {pR}")
     #plt.xlabel('Tid')
     #plt.ylabel('x-pos')
     #plt.legend()
     #plt.show()
 
 '''
-Her plottes hS = 0.45, 0.50, og 0.55.
+Her plottes pR = 0.45, 0.50, og 0.55.
 Vi Bruker 10000 steg for å få det mer representativt.
 
-Dette gjør at vi forventer hS = 0.45 å gi 4500 høyre og 5500 venstre, og netto verdi 4500 - 5500 = -1000
-I likhet med hS = 0.55, forventes 5500 til høyre og 4500 til venstre, så 5500 - 4500 = 1000.
-Dette er akkurat det vi ser på plotten; dermed er den representativt for hS
+Dette gjør at vi forventer pR = 0.45 å gi 4500 høyre og 5500 venstre, og netto verdi 4500 - 5500 = -1000
+I likhet med pR = 0.55, forventes 5500 til høyre og 4500 til venstre, så 5500 - 4500 = 1000.
+Dette er akkurat det vi ser på plotten; dermed er den representativt for pR
 '''
 
 
@@ -141,7 +141,7 @@ Nå som vi har en virrevandrer, lager vi flere av dem samtidig. Vi lager den ras
 '''Oppgave 1d'''
 
 # N_antall_virrevandrere funksjon
-def n_antall_virrevandrere(M, N, hS, randomNums, dx, dt):
+def n_antall_virrevandrere(M, N, pR, randomNums, dx, dt):
     
     """
     Simulererer n virrevandrer i en dimensjon
@@ -151,7 +151,7 @@ def n_antall_virrevandrere(M, N, hS, randomNums, dx, dt):
     Input: \n
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     N  --> Antall virrevandrere \n
-    hS  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
     randomNums --> En N*(M-1) matrise med tilfeldige tall i intervallet [0,1] \n
     dx --> Hvor langt den vil vandre pr tidsintervall \n
     dt --> Tidsintervall \n 
@@ -169,7 +169,7 @@ def n_antall_virrevandrere(M, N, hS, randomNums, dx, dt):
     
     #Stacker N virrevandrere til en matrise, og returnerer
     for i in range(N):
-        posisjon[i] = virrevandring(M, hS, randomNums[i], dx, dt)[0]
+        posisjon[i] = virrevandring(M, pR, randomNums[i], dx, dt)[0]
     return posisjon, tidsIntervaller
 
 
@@ -177,11 +177,11 @@ def n_antall_virrevandrere(M, N, hS, randomNums, dx, dt):
 # Setter konstanter og tilfeldige tall
 M = 10
 N = 10
-hS = 0.5
+pR = 0.5
 randomNums = np.random.uniform(0,1,(N,M-1))
 
 # Printer resultat
-#print(n_antall_virrevandrere(N, M, hS, randomNums, dx, dt))
+#print(n_antall_virrevandrere(N, M, pR, randomNums, dx, dt))
 
 
 
@@ -192,14 +192,14 @@ randomNums = np.random.uniform(0,1,(N,M-1))
 
 # Kjøretids-test (treg)
 time_slow_b4 = time.time()
-n_antall_virrevandrere(N, M, hS, randomNums, dx, dt)
+n_antall_virrevandrere(N, M, pR, randomNums, dx, dt)
 time_slow_after = time.time()
 time_slow_diff = time_slow_after - time_slow_b4
 
 '''
 Dette viser en N_antall_virrevandrende funkjson.
 Den lager N virrevandrere med M tidsposisjoner, satt sammen til en N*M matrise.
-dx = 1 = dt, M = 10, N = 10, hS = 0.5
+dx = 1 = dt, M = 10, N = 10, pR = 0.5
 Koden kjører så en kjøretidstest med M = N = 1000, slik at den kan sammenlignes med en bedre kode senere.
 '''
 
@@ -213,7 +213,7 @@ kumulativVirrevandring = kVv. kumulativPosisjon = kP
 '''(Oppgave 1e)'''
 
 # Kumulativ virrevandring funksjon. k = kumulativ, P = Posisjon
-def kVv(M, N, hS, randomNums, dx, dt):
+def kVv(M, N, pR, randomNums, dx, dt):
     
     """
     Simulererer n virrevandrere i en dimensjon (rask versjon)
@@ -223,7 +223,7 @@ def kVv(M, N, hS, randomNums, dx, dt):
     Input: \n
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     N  --> Antall virrevandrere \n
-    hS --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    pR --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
     randomNums --> En N*M matrise med tilfeldige tall i intervallet [0,1] \n
     dx --> Hvor langt den vil vandre pr tidsintervall \n
     dt --> Tidsintervall \n 
@@ -235,10 +235,10 @@ def kVv(M, N, hS, randomNums, dx, dt):
     altså at virrevandreren er i posisjon[n][i] ved tidspunkt tidsIntervaller[n].  
     """
     
-    # Kopierer fra tilfeldiget tall, og deler matriseinnholdet i to mellom hS
+    # Kopierer fra tilfeldiget tall, og deler matriseinnholdet i to mellom pR
     kP = np.copy(randomNums)
-    kP[kP > hS] = dx
-    kP[kP < hS] = -dx
+    kP[kP > pR] = dx
+    kP[kP < pR] = -dx
     
     # kP gjøres om til en matrise, og setter startposisjonen på x = 0
     kP = kP.reshape(N,M)
@@ -271,7 +271,7 @@ time_fast_diff = time_fast_after - time_fast_b4
 '''
 Koden viser en N_antall_virrevandrende funkjson, men bygd på en annen måte.
 Istedenfor å bruke mange for-løkker, starter den med å lage hele lengden av tilfeldigheter
-Så endres dem til dx eller -dx, avhengig av om den er større eller mindre enn hS
+Så endres dem til dx eller -dx, avhengig av om den er større eller mindre enn pR
 Den gjøres til en matrise, og setter startpunktene med 0.
 Deretter brukes itertools til å regne den kumulative summen til hver virrevandrer.
 Denne delen bruker en for-løkke, men den brukes ikke så mye som i den andre koden.
@@ -330,7 +330,7 @@ N = 100
 randomNums = np.random.uniform(0,1,(M*N))
 
 # Kjører empirisk_varians
-positions, time_intervall = kVv(M, N, hS, randomNums, dx, dt)
+positions, time_intervall = kVv(M, N, pR, randomNums, dx, dt)
 variance_pos = empirisk_varians(positions)
 
 # Curve fitting
@@ -375,8 +375,8 @@ Vi utvider den til en 2d virrevandrer. Vi tester denne utvidelsen med systemer s
 
 """(Oppgave 1g)"""
 
-# 2d virrevandrende funksjon. R = retning, P = posisjon, V = virrevandrer. oS = oppSannsynlighet. Y = Ja, N = Nei
-def toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt):
+# 2d virrevandrende funksjon. R = retning, P = posisjon, V = virrevandrer. pU = oppSannsynlighet. Y = Ja, N = Nei
+def toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt):
     
     """
     Simulererer n virrevandrer i 2 dimensjoner
@@ -386,8 +386,8 @@ def toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt):
     
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     N  --> Antall virrevandrere \n
-    hS --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
-    oS --> Tilfeldig tall må være større enn denne for å gå opp (+dy) \n
+    pR --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    pU --> Tilfeldig tall må være større enn denne for å gå opp (+dy) \n
     HogOforhold --> Hvor sannsynlig virrevandreren vil gå horisontalt. Så (1 - HogOforhold) er vertikal sannsynlighet.
     dx --> Hvor langt den vil vandre horisontalt pr tidsintervall \n
     dy --> Hvor langt den vil vandre vertikalt pr tidsintervall \n
@@ -412,12 +412,12 @@ def toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt):
     
     # Bestemmer retning i x og y-retning
     xR = np.random.uniform(0,1,(M*N))
-    xR[xR < hS] = -dx
-    xR[xR > hS] = dx
+    xR[xR < pR] = -dx
+    xR[xR > pR] = dx
     
     yR = np.random.uniform(0,1,(M*N))
-    yR[yR < oS] = -dy
-    yR[yR > oS] = dy
+    yR[yR < pU] = -dy
+    yR[yR > pU] = dy
     
     # Lager kumulativ 2d-virrevandring
     xP = np.zeros(M*N)
@@ -448,25 +448,25 @@ HogOforhold = 0.5
 
 
 # Plottingsfunksjon
-def plotToD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt):
+def plotToD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt):
     plt.figure()
     for j in range(2):
-        hS = 0.4 + 0.1*j
-        oS = 0.6 - 0.1*j
+        pR = 0.4 + 0.1*j
+        pU = 0.6 - 0.1*j
         
         
         plt.subplot(2, 2, 1 + 2*j)
         for i in range(N):
-            plotter2dVirrevandring = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
-            plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[0][i], label = f"hS = {hS}")
+            plotter2dVirrevandring = toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
+            plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[0][i], label = f"pR = {pR}")
         plt.xlabel('Tid')
         plt.ylabel('x-pos')
         plt.legend()
         
         plt.subplot(2, 2, 2 + 2*j)
         for i in range(N):
-            plotter2dVirrevandring = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
-            plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[1][i], label = f"oS = {oS}")
+            plotter2dVirrevandring = toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
+            plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[1][i], label = f"pU = {pU}")
         plt.xlabel('Tid')
         plt.ylabel('y-pos')
         plt.legend()   
@@ -476,7 +476,7 @@ def plotToD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt):
     
     
 # Plotter
-#plotToD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+#plotToD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
     
 '''
 Her lages en effektig kumulativ kode for 2d virrevandring.
@@ -497,7 +497,7 @@ Vi koder om virrevandreren returnerer til startpunktet, og andelen av virrenandr
 """(Oppgave 1h)"""
 
 # Andel kryssende virrevandrere, 1d
-def n_t(M, N, hS, randomNums, dx, dt):
+def n_t(M, N, pR, randomNums, dx, dt):
     
     """
     Optelling av hvor mange virrevandrere som krysser origo minst en gang (1 dimensjon)
@@ -505,14 +505,14 @@ def n_t(M, N, hS, randomNums, dx, dt):
     ...
     
     Input: \n
-    enD_virrevandrer --> funksjonen kVv(M, N, hS, randomNums, dx, dt)
+    enD_virrevandrer --> funksjonen kVv(M, N, pR, randomNums, dx, dt)
     
     Output: \n
     andel --> andelen av de N virrevandrerne som krysset startpunktet minst en gang.
     """
     
     # Henter ut virrevandringene
-    sjekkStartpunkt = kVv(M, N, hS, randomNums, dx, dt)
+    sjekkStartpunkt = kVv(M, N, pR, randomNums, dx, dt)
     
     #Setter tallet for antall krysninger av startpunktet
     ant = 0
@@ -530,12 +530,12 @@ def n_t(M, N, hS, randomNums, dx, dt):
 
 
 # Printer andel, 2d
-# print(n_t(kVv(M, N, hS, randomNums, dx, dt)))
+# print(n_t(kVv(M, N, pR, randomNums, dx, dt)))
 
 
 
 # Andel kryssende virrevandrere, 2d
-def n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt):
+def n_t2d(M, N, pR, pU, HogOforhold, dx, dy, dt):
     
     """
     Optelling av hvor mange virrevandrere som krysser origo minst en gang (2 dimensjoner)
@@ -543,14 +543,14 @@ def n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt):
     ...
     
     Input: \n
-    toD_virrevandrer --> funksjonen toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+    toD_virrevandrer --> funksjonen toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
     
     Output: \n
     andel --> andelen av de N virrevandrerne som krysset startpunktet minst en gang.
     """
     
     # Henter ut virrevandringene
-    sjekkStartpunkt = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+    sjekkStartpunkt = toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
     
     #Setter tallet for antall krysninger av startpunktet
     ant = 0
@@ -570,7 +570,7 @@ def n_t2d(M, N, hS, oS, HogOforhold, dx, dy, dt):
 
 
 # Printer andel, 2d
-# print(n_t2d(toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)))
+# print(n_t2d(toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)))
 
 
 '''
@@ -581,7 +581,7 @@ den teller opp hvor mange virrevandrere som gjør det, og regner ut andelen.
 
 Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, for begge dimensjoner.
 Dette er fordi den aldri ikke vil bevege seg, så den beveger seg vekk fra startpunktet.
-For t = 2, gir dette P(x = 0, t = 2) = 0,5 og P(x = 0, t = 2) = 1/4 for henholdsvis en og to dimensjoner, hvis hS = oS = HogOforhold = 0.25
+For t = 2, gir dette P(x = 0, t = 2) = 0,5 og P(x = 0, t = 2) = 1/4 for henholdsvis en og to dimensjoner, hvis pR = pU = HogOforhold = 0.25
 Dette er fordi det er 50% mulighet å velge den motsatte retningen for 1 dimensjon, siden det er 1 av 2 retningsmuligheter,
 og 25% mulighet å velge den motsatte retningen for 2 dimensjoner, siden det er 1 av 4 retningsmuligheter,
 '''
@@ -596,7 +596,7 @@ Vi plotter n(t) for å finne ut av dette.
 """(Oppgave 1i)"""
 
 # Andel kryssende virrevandrere, 1d, plottet
-def n_tPlot(M, N, hS, randomNums, dx, dt):
+def n_tPlot(M, N, pR, randomNums, dx, dt):
     
     """
     Plotter optelling av hvor mange virrevandrere som krysser origo minst en gang, over tid (1 dimensjon)
@@ -604,14 +604,14 @@ def n_tPlot(M, N, hS, randomNums, dx, dt):
     ...
     
     Input: \n
-    enD_virrevandrer --> funksjonen kVv(M, N, hS, randomNums, dx, dt)
+    enD_virrevandrer --> funksjonen kVv(M, N, pR, randomNums, dx, dt)
     
     Output: \n
     Plot av n_t --> En plot av andelen virrevandrer som har krysset startpunktet minst en gang, over tid.
     """
     
     # Henter ut virrevandringene
-    sjekkStartpunkt = kVv(M, N, hS, randomNums, dx, dt)
+    sjekkStartpunkt = kVv(M, N, pR, randomNums, dx, dt)
     
     #Setter tallet for antall krysninger av startpunktet, og sjekker om virrevandrer er i startpunktet
     andel = np.array([0, 0])
@@ -642,7 +642,7 @@ def n_tPlot(M, N, hS, randomNums, dx, dt):
 
 
 # Andel kryssende virrevandrere, 2d, plottet
-def n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt):
+def n_t2dPlot(M, N, pR, pU, HogOforhold, dx, dy, dt):
     
     """
     Plotter optelling av hvor mange virrevandrere som krysser origo minst en gang, over tid (2 dimensjoner)
@@ -650,14 +650,14 @@ def n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt):
     ...
     
     Input: \n
-    toD_virrevandrer --> funksjonen toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+    toD_virrevandrer --> funksjonen toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
     
     Output: \n
     Plot av n_t2d --> En plot av andelen virrevandrer som har krysset startpunktet minst en gang, over tid.
     """
     
     # Henter ut virrevandringene
-    sjekkStartpunkt = toD_virrevandrer(M, N, hS, oS, HogOforhold, dx, dy, dt)
+    sjekkStartpunkt = toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
             
     #Setter tallet for antall krysninger av startpunktet, og sjekker om virrevandrer er i startpunktet
     andel = np.array([0, 0])
@@ -692,8 +692,8 @@ def n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt):
 # Setter konstanter og tilfeldige tall
 M = 100
 N = 100
-hS = 0.5
-oS = 0.5
+pR = 0.5
+pU = 0.5
 dx = 1
 dy = 1
 dt = 1
@@ -701,8 +701,8 @@ HogOforhold = 0.5
 randomNums = np.random.uniform(0,1,(M*N))
 
 # Printer ut andelene for 1d of 2d virrevandrer
-#n_tPlot(M, N, hS, randomNums, dx, dt)
-#n_t2dPlot(M, N, hS, oS, HogOforhold, dx, dy, dt)
+#n_tPlot(M, N, pR, randomNums, dx, dt)
+#n_t2dPlot(M, N, pR, pU, HogOforhold, dx, dy, dt)
 
 '''
 Koden printer virrevandrere med normale forhold, og med 1000 av dem med 100000 steg, for å få et nermere svar.
