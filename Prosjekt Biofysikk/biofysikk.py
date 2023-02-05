@@ -782,7 +782,7 @@ def absolute_distance(x_1, y_1, x_2, y_2):
 def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
     # Lager en like stor delta_x matrise som rommet vårt
     # og setter alle Delta_X lik 4 mikrometer
-    del_x = np.full((len(x[0]), len(y)), 4)
+    del_x = np.full((len(x[0]), len(y)), 4, dtype=float)
     # Utregning radius
     radius = np.round(np.sqrt(area/np.pi))
 
@@ -974,7 +974,7 @@ Antall_Tumors = 5
 tumor_koeffisients = [0.1]*Antall_Tumors
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
-    Sentral_Punkt.append([int(np.random.uniform(0,LengdeX)), int(np.random.uniform(0,lengdeY))])
+    Sentral_Punkt.append([int(np.random.uniform(0,lengdeX)), int(np.random.uniform(0,lengdeY))])
 area = 4*np.pi
 dt = 0.01
 startPosisjon = 10
@@ -1085,11 +1085,11 @@ delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
-# position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, høyreSannsynlighet, randomNums, startPosisjon, delx, dt)
+position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, høyreSannsynlighet, randomNums, startPosisjon, delx, dt)
 
 # Plotting av data
 
-# plott(position, timeintervall, xx, yy, delx, N)
+plott(position, timeintervall, xx, yy, delx, N)
 
 # print(position[:][:][0])
 
@@ -1123,7 +1123,7 @@ Antall_Tumors = 10
 tumor_koeffisients = [0.1]*Antall_Tumors
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
-    Sentral_Punkt.append([int(np.random.uniform(0,LengdeX)), int(np.random.uniform(0,lengdeY))])
+    Sentral_Punkt.append([int(np.random.uniform(0,lengdeX)), int(np.random.uniform(0,lengdeY))])
 area = 4*np.pi
 dt = 0.01
 startPosisjon = 10
@@ -1265,6 +1265,6 @@ position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, høyreSannsynli
 
 # Plotting av data
 
-plott(position, timeintervall, xx, yy, delx, N)
+#plott(position, timeintervall, xx, yy, delx, N)
 
 print(IPosisjon)
