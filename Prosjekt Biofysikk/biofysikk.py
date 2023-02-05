@@ -914,8 +914,6 @@ def plott(positions, time, x, y, delta_x, n_virre):
 
     fig.colorbar(im, ax=ax0)
 
-    label = ["Virrevandrer 1", "Virrevandrer 2"]
-    color = ["g",  "r"]
     for i in range(n_virre):
         y_points = np.zeros(len(positions[0]))
         x_points = np.zeros(len(positions[0]))
@@ -927,7 +925,7 @@ def plott(positions, time, x, y, delta_x, n_virre):
             #plt.plot(position[i][j][0],position[i][j][1], marker="x")
             #print(x_points[j], y_points[j], j)
         print("NEXT")
-        ax0.plot(x_points, y_points, color[i], label=label[i])
+        ax0.plot(x_points, y_points, label= f"Virrevandrer {i + 1}")
     plt.legend()
     plt.tight_layout()
     plt.show()
@@ -1161,11 +1159,12 @@ def v_2d_gb_ITeller(x,y,N, M, høyreSannsynlighet, tilfeldigeTall, I, dx, dt):
         
         # Tar opp startposisjonen
         posX = int(np.round((posisjon[i][0][0]) * posisjonsOppløsningX / lengdeX - 0.5))
+        if posX == (posisjonsOppløsningX):
+            posX = 0
         posY = int(np.round((posisjon[i][0][1]) * posisjonsOppløsningY / lengdeY - 0.5))
-        
-        print(IPosisjon[posY][posX])
+        if posY == (posisjonsOppløsningY):
+            posY = 0
         IPosisjon[posY][posX] += 1
-        print(IPosisjon[posY][posX])
         
         for j in range(M-1):
             # j er kollonnen
@@ -1230,19 +1229,11 @@ def v_2d_gb_ITeller(x,y,N, M, høyreSannsynlighet, tilfeldigeTall, I, dx, dt):
             # Tar opp hvor alle virrevandrenes posisjoner har vært
             posX = int(np.round((posisjon[i][j+1][0]) * posisjonsOppløsningX / lengdeX - 0.5))
             if posX == (posisjonsOppløsningX):
-                print("hiX")
                 posX = 0
             posY = int(np.round((posisjon[i][j+1][1]) * posisjonsOppløsningY / lengdeY - 0.5))
             if posY == (posisjonsOppløsningY):
                 posY = 0
-                print("hiY")
-            print(j)
-            print(posX)
-            print(posY)
-            print(posisjon[i][j+1][0])
-            print(posisjon[i][j+1][1])
-            print(IPosisjon[posY][posX])
-            IPosisjon[posY][posX] = (IPosisjon[posY][posX] + 1)
+            IPosisjon[posY][posX] += 1
     
     IPosisjon = IPosisjon / (N * M)
     return posisjon, tidsIntervaller, IPosisjon
