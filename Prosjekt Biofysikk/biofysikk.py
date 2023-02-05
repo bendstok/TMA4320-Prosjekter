@@ -764,27 +764,40 @@ def absolute_distance(x_1, y_1, x_2, y_2):
     return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
 
 def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
-
+    # Lager en like stor delta_x matrise som rommet vårt
+    # og setter alle Delta_X lik 4 mikrometer
     del_x = np.full((len(x[0]), len(y)), 4)
+    # Utregning radius
     radius = np.round(np.sqrt(area/np.pi))
 
     for i in range(N_tumor):
+        # Itererer over alle tumorer
         xcenter_tumor = Tumor_Center[i][1]
         ycenter_tumor = Tumor_Center[i][0]
         for v in range(len(x[0])):
             for w in range(len(y)):
+                # Itererer over rommet
                 if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
+                        # Setter ny Delta_X om punktet er innenfor radius
                         del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
 
     return del_x
 
 
 """Oppgave 2c"""
+
+# Lager rommet, i mikrometer
+# og deler inn i 200 punkter
 x = np.linspace(0,20,200)
 y = np.linspace(0,20,200)
 
+# Lager en meshgrid
+# der x er en horisontal matrise
+# y er en vertikal matrise
+# Altså: xx[0][i] og y[i] posisjon (x_i, y_i)
 xx, yy = np.meshgrid(x,y,sparse=True)
 
+# Oppgave konstanter
 N = 2
 M = 20
 Antall_Tumors = 15
@@ -792,14 +805,15 @@ tumor_koeffisients = [0.1]*Antall_Tumors
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
     Sentral_Punkt.append([int(np.random.uniform(0,20)), int(np.random.uniform(0,20))])
-
-
 area = 4*np.pi
-delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
-
 dt = 0.01
 
+# Finner Delta_X
+delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+
 def find_nearest(array, value):
+    # Må brukes for å finne nærmeste (x,y) til virrevandreren i meshgriden
+    # og så finne tilhørende dx
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx]
@@ -848,11 +862,16 @@ def virrevandrere_2d(x,y,N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
             if(z <= 0.5):
                 # Vi går i x-retning
                 z = 0
+                # Finner nærmeste tilhørende (x,y) i meshgriden til posisjonen tilvirrevandreren
+                # MERK AT DESS MINDRE TETTHET PUNKTENE I MESHGRIDEN HAR, DESS MER SANNSYNLIG BLIR FEIL
+                # LANGS RADIUSEN TIL TUMOREN
                 nearest_x = find_nearest(x[0],posisjon[i][j][1])
                 nearest_y = find_nearest(y,posisjon[i][j][0])
+                # Finner indexen til den nærmeste verdien
                 index_x = np.where(x[0] == nearest_x)[0]
                 index_y = np.where(y == nearest_y)[0]
 
+                # Finner så step
                 step = dx[index_x[0]][index_y[0]]
                 if tilfeldigeTall[i][j] < høyreSannsynlighet:
                     # dx avhengig av posisjon
@@ -902,9 +921,8 @@ for i in range(N):
     for j in range(len(position[0])):
         x_points[j] = (position[i][j][0])
         y_points[j] = (position[i][j][1])
-        plt.plot(position[i][j][0],position[i][j][1], marker="x")
-        print(x_points[j], y_points[j], j)
-    print("NExt")
+        # "Un-comment" denne under om du vil se de ulike steppene markert med  en x
+        #plt.plot(position[i][j][0],position[i][j][1], marker="x")
     ax0.plot(x_points, y_points, color[i], label=label[i])
 plt.legend()
 plt.tight_layout()
@@ -913,6 +931,5 @@ plt.show()
 # print(tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients))
 
 
-"""Oppgave 2c"""
 
 
