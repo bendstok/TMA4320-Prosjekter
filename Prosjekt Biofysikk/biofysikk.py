@@ -489,6 +489,16 @@ Så bestemmer den om det er + eller - retningn den beveger seg
 Deretter lages xP og yP slik at de beveger seg i kun én retning per iterasjon
 Til slutt blir deres tilfedligheter gjort til kumulative sum, og iterert summert over, slik som i oppgave 1e.
 Tidsinterval lages, og returneres.
+
+Vi lager også funksjonen plotToD_virrevandrer for å teste toD_virrevandrer.
+Denne funksjonen kjører toD_virrevandrer med forskjellige verdier for pR og pU og plotter dem.
+Fra plottene kan vi se at når vi har pR = 0.4 så beveger virrevandrerne seg som oftest i negativ x retning (venstre).
+Vi kan også se at distansen de beveger seg er omtrent 100.
+Dette kan forklares ved at vi har M = 1000, delt på to dimensjoner gir oss omtrent 500 skrit horisontalt.
+Forskjellen 0.4*500-0.6*500 gir oss -100, dvs. 100 skritt mot venstre som vi ser i figuern
+Det samme kan sies for for figuren med pU = 0.6
+Til slutt kan vi også se når vi har et isotrpot system, så beveger ikke virrevandrerne seg langt vekk fra startsposisjonen.
+Dette er forventet ettersom virrevandrere i to dimensjoner er forventet å være i origo når M blir stor.
 '''
 
 
@@ -640,6 +650,7 @@ def n_tPlot(M, N, pR, randomNums, dx, dt):
     plt.xlabel('Tid')
     plt.ylabel('n_t')
     plt.legend()
+    plt.title("Andel virrevandrere som krysset origo, 1d")
     plt.show()
     return
 
@@ -684,10 +695,11 @@ def n_t2dPlot(M, N, pR, pU, HogOforhold, dx, dy, dt):
     
     # Plotter n_t over tid
     plt.figure()
-    plt.plot(sjekkStartpunkt[2], andel)
+    plt.plot(sjekkStartpunkt[2], andel, label = "n_t over tid")
     plt.xlabel('Tidssteg')
     plt.ylabel('n_t')
     plt.legend()
+    plt.title("Andel virrevandrere som krysset origo, 2d")
     plt.show()
     return
 
