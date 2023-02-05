@@ -410,6 +410,10 @@ def toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt):
     rRN = np.copy(randomNums)
     rRN = rRN > HogOforhold
     
+    #Fikser på sannsynligheter
+    pR = 1-pR
+    pU = 1-pU
+    
     # Bestemmer retning i x og y-retning
     xR = np.random.uniform(0,1,(M*N))
     xR[xR < pR] = -dx
