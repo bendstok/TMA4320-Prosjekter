@@ -940,8 +940,12 @@ def plott(positions, time, x, y, delta_x, n_virre):
 """Oppgave 2d"""
 # Lager rommet, i mikrometer
 # og deler inn i 200 punkter
-x = np.linspace(0,20,200)
-y = np.linspace(0,20,200)
+
+lengdeX = 20
+lengdeY = 20
+
+x = np.linspace(0,lengdeX,200)
+y = np.linspace(0,lengdeY,200)
 
 # Lager en meshgrid
 # der x er en horisontal matrise
@@ -951,16 +955,18 @@ xx, yy = np.meshgrid(x,y,sparse=True)
 
 # Oppgave konstanter
 N = 2
-M = 1000
-Antall_Tumors = 1
+M = 30
+Antall_Tumors = 5
 tumor_koeffisients = [0.1]*Antall_Tumors
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
-    Sentral_Punkt.append([int(np.random.uniform(0,20)), int(np.random.uniform(0,20))])
+    Sentral_Punkt.append([int(np.random.uniform(0,LengdeX)), int(np.random.uniform(0,lengdeY))])
 area = 4*np.pi
 dt = 0.01
+startPosisjon = 10
+høyreSannsynlighet = 0.5
 
-def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTall, dx, dt):
+def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTall, startPosisjon, dx, dt):
     """
     Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
     ...
@@ -969,6 +975,7 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTa
     M  --> Virrevandreren vil bevege seg M-1 ganger \n
     høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
     tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
+    startPosisjon --> Posisjonen der virrevandrerne starter \n
     dx --> Hvor langt den vil vandre i x retning pr tidsintervall \n
     dt --> Tidsintervall \n 
     dy --> Hvor langtr den vil vandre i y retning  pr tidsintervall \n
@@ -991,8 +998,8 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTa
     rows, cols = (N, M)
     posisjon = [[[0,0] for i in range(cols)] for j in range(rows)]
     for zy in range(N):
-        posisjon[zy][0][0] = int(10)
-        posisjon[zy][0][1] = int(10)
+        posisjon[zy][0][0] = int(startPosisjon)
+        posisjon[zy][0][1] = int(startPosisjon)
     tidsIntervaller = np.linspace(0, dt*(N-1), (M))
     for i in range(N):
         # i er raden
@@ -1014,19 +1021,23 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTa
 
                 # Finner så step
                 step = dx[index_x[0]][index_y[0]]
-                if(posisjon[i][j][z] + step > x[0][-1]):
-                    posisjon[i][j+1][z] = posisjon[i][j][z]
-                    posisjon[i][j+1][1] = posisjon[i][j][1]
-                elif(posisjon[i][j][z] - step < x[0][0]):
-                    posisjon[i][j+1][z] = posisjon[i][j][z]
-                    posisjon[i][j+1][1] = posisjon[i][j][1]                    
-                elif tilfeldigeTall[i][j] < høyreSannsynlighet:
+                if tilfeldigeTall[i][j] < høyreSannsynlighet:
                     # dx avhengig av posisjon
-                    posisjon[i][j+1][z] = posisjon[i][j][z] + step
-                    posisjon[i][j+1][1] = posisjon[i][j][1]
+                    
+                    if(posisjon[i][j][z] + step > x[0][-1]):
+                        posisjon[i][j+1][z] = posisjon[i][j][z]
+                        posisjon[i][j+1][1] = posisjon[i][j][1]
+                    else:
+                        posisjon[i][j+1][z] = posisjon[i][j][z] + step
+                        posisjon[i][j+1][1] = posisjon[i][j][1]
+                    
                 else:
-                    posisjon[i][j+1][z] = posisjon[i][j][z] - step
-                    posisjon[i][j+1][1] = posisjon[i][j][1]
+                    if(posisjon[i][j][z] - step < x[0][0]):
+                        posisjon[i][j+1][z] = posisjon[i][j][z]
+                        posisjon[i][j+1][1] = posisjon[i][j][1]
+                    else:    
+                        posisjon[i][j+1][z] = posisjon[i][j][z] - step
+                        posisjon[i][j+1][1] = posisjon[i][j][1]
             else:
                 # Vi går i y-retning
                 z = 1
@@ -1036,18 +1047,20 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTa
                 index_y = np.where(y == nearest_y)[0]
 
                 step = dx[index_x[0]][index_y[0]]
-                if(posisjon[i][j][z] + step > y[-1][0]):
-                    posisjon[i][j+1][z] = posisjon[i][j][z]
-                    posisjon[i][j+1][0] = posisjon[i][j][0]
-                elif(posisjon[i][j][z] - step < y[0][0]):
-                    posisjon[i][j+1][z] = posisjon[i][j][z]
-                    posisjon[i][j+1][0] = posisjon[i][j][0]
-                elif tilfeldigeTall[i][j] < høyreSannsynlighet:
-                    posisjon[i][j+1][z] = posisjon[i][j][z] + step
-                    posisjon[i][j+1][0] = posisjon[i][j][0]
+                if tilfeldigeTall[i][j] < høyreSannsynlighet:
+                    if(posisjon[i][j][z] + step > y[-1][0]):
+                        posisjon[i][j+1][z] = posisjon[i][j][z]
+                        posisjon[i][j+1][0] = posisjon[i][j][0]
+                    else:
+                        posisjon[i][j+1][z] = posisjon[i][j][z] + step
+                        posisjon[i][j+1][0] = posisjon[i][j][0]
                 else:
-                    posisjon[i][j+1][z] = posisjon[i][j][z] - step
-                    posisjon[i][j+1][0] = posisjon[i][j][0]
+                    if(posisjon[i][j][z] - step < y[0][0]):
+                        posisjon[i][j+1][z] = posisjon[i][j][z]
+                        posisjon[i][j+1][0] = posisjon[i][j][0]
+                    else:
+                        posisjon[i][j+1][z] = posisjon[i][j][z] - step
+                        posisjon[i][j+1][0] = posisjon[i][j][0]
     
     return posisjon, tidsIntervaller
 
@@ -1058,8 +1071,10 @@ delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
-position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, 0.5, randomNums, delx, dt)
+position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, høyreSannsynlighet, randomNums, startPosisjon, delx, dt)
 
 # Plotting av data
 
 plott(position, timeintervall, xx, yy, delx, 2)
+
+print(position)
