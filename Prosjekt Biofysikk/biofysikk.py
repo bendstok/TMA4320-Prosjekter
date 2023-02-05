@@ -996,7 +996,7 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTa
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
 
     rows, cols = (N, M)
-    posisjon = [[[0,0] for i in range(cols)] for j in range(rows)]
+    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)])
     for zy in range(N):
         posisjon[zy][0][0] = int(startPosisjon)
         posisjon[zy][0][1] = int(startPosisjon)
@@ -1006,6 +1006,171 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTa
         for j in range(M-1):
             # j er kollonnen
             # vi er i rad i og itererer over den med hjelp av j
+            z = np.random.uniform(0,1)
+            if(z <= 0.5):
+                # Vi går i x-retning
+                z = 0
+                # Finner nærmeste tilhørende (x,y) i meshgriden til posisjonen tilvirrevandreren
+                # MERK AT DESS MINDRE TETTHET PUNKTENE I MESHGRIDEN HAR, DESS MER SANNSYNLIG BLIR FEIL
+                # LANGS RADIUSEN TIL TUMOREN
+                nearest_x = find_nearest(x[0],posisjon[i][j][1])
+                nearest_y = find_nearest(y,posisjon[i][j][0])
+                # Finner indexen til den nærmeste verdien
+                index_x = np.where(x[0] == nearest_x)[0]
+                index_y = np.where(y == nearest_y)[0]
+
+                # Finner så step
+                step = dx[index_x[0]][index_y[0]]
+                if tilfeldigeTall[i][j] < høyreSannsynlighet:
+                    # dx avhengig av posisjon
+                    
+                    if(posisjon[i][j][z] + step > x[0][-1]):
+                        posisjon[i][j+1][z] = posisjon[i][j][z] + step - lengdeX
+                        posisjon[i][j+1][1] = posisjon[i][j][1]
+                    else:
+                        posisjon[i][j+1][z] = posisjon[i][j][z] + step
+                        posisjon[i][j+1][1] = posisjon[i][j][1]
+                    
+                else:
+                    if(posisjon[i][j][z] - step < x[0][0]):
+                        posisjon[i][j+1][z] = posisjon[i][j][z] - step + lengdeX
+                        posisjon[i][j+1][1] = posisjon[i][j][1]
+                    else:    
+                        posisjon[i][j+1][z] = posisjon[i][j][z] - step
+                        posisjon[i][j+1][1] = posisjon[i][j][1]
+            else:
+                # Vi går i y-retning
+                z = 1
+                nearest_x = find_nearest(x[0],posisjon[i][j][1])
+                nearest_y = find_nearest(y,posisjon[i][j][0])
+                index_x = np.where(x[0] == nearest_x)[0]
+                index_y = np.where(y == nearest_y)[0]
+
+                step = dx[index_x[0]][index_y[0]]
+                if tilfeldigeTall[i][j] < høyreSannsynlighet:
+                    if(posisjon[i][j][z] + step > y[-1][0]):
+                        posisjon[i][j+1][z] = posisjon[i][j][z] + step - lengdeY
+                        posisjon[i][j+1][0] = posisjon[i][j][0]
+                    else:
+                        posisjon[i][j+1][z] = posisjon[i][j][z] + step
+                        posisjon[i][j+1][0] = posisjon[i][j][0]
+                else:
+                    if(posisjon[i][j][z] - step < y[0][0]):
+                        posisjon[i][j+1][z] = posisjon[i][j][z] - step + lengdeY
+                        posisjon[i][j+1][0] = posisjon[i][j][0]
+                    else:
+                        posisjon[i][j+1][z] = posisjon[i][j][z] - step
+                        posisjon[i][j+1][0] = posisjon[i][j][0]
+    
+    return posisjon, tidsIntervaller
+
+# Finner Delta_X
+print(yy[0][0], yy[-1])
+print(xx[0][0], xx[0][-1])
+delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+
+randomNums = np.random.uniform(0,1,(N,M-1))
+
+# position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, høyreSannsynlighet, randomNums, startPosisjon, delx, dt)
+
+# Plotting av data
+
+# plott(position, timeintervall, xx, yy, delx, N)
+
+# print(position[:][:][0])
+
+
+"""oppgave 2e"""
+# Lager rommet, i mikrometer
+# og deler inn i 200 punkter
+
+lengdeX = 20
+lengdeY = 20
+
+posisjonsOppløsningX = 20
+posisjonsOppløsningY = 20
+
+xLinjeOppløsning = 200
+yLinjeOppløsning = 200
+
+x = np.linspace(0,lengdeX,xLinjeOppløsning)
+y = np.linspace(0,lengdeY,yLinjeOppløsning)
+
+# Lager en meshgrid
+# der x er en horisontal matrise
+# y er en vertikal matrise
+# Altså: xx[0][i] og yy[i] posisjon (x_i, y_i)
+xx, yy = np.meshgrid(x,y,sparse=True)
+
+# Oppgave konstanter
+N = 3
+M = 100
+Antall_Tumors = 10
+tumor_koeffisients = [0.1]*Antall_Tumors
+Sentral_Punkt = []
+for i in range(Antall_Tumors):
+    Sentral_Punkt.append([int(np.random.uniform(0,LengdeX)), int(np.random.uniform(0,lengdeY))])
+area = 4*np.pi
+dt = 0.01
+startPosisjon = 10
+høyreSannsynlighet = 0.5
+
+I = np.zeros((posisjonsOppløsningX, posisjonsOppløsningY))
+
+def v_2d_gb_ITeller(x,y,N, M, høyreSannsynlighet, tilfeldigeTall, I, dx, dt):
+    """
+    Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
+    ...
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    høyreSannsynlighet  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre i x retning pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    dy --> Hvor langtr den vil vandre i y retning  pr tidsintervall \n
+    
+    Output: \n
+    To matriser, 'posisjon' og 'tidsIntervaller': \n
+    posisjon --> En n*M matrise som viser posisjonen til virrevandreren \n
+    Posisjon[i] = [[0,0], [0,0] ...]
+    Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
+    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t \n
+    tidsIntervaller --> En 1d array med lengde m som viser tidspunktet til en posisjon, 
+    """
+
+    # Utrolig dårlig, men rask kodet å få dette til
+    # Posisjon matrisen er basically lagt opp slik:
+    # Posisjon[i] = [[0,0], [0,0] ...]
+    # Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
+    # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
+
+    rows, cols = (N, M)
+    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)])
+    
+    IPosisjon = I
+    
+    # velger startposisjon til hver virrevandrer
+    for zy in range(N):
+        posisjon[zy][0][0] = int(np.random.randint(0, 20) + 0.5)
+        posisjon[zy][0][1] = int(np.random.randint(0, 20) + 0.5)
+        
+    tidsIntervaller = np.linspace(0, dt*(N-1), (M))
+    for i in range(N):
+        # i er raden
+        
+        # Tar opp startposisjonen
+        posX = int(np.round((posisjon[i][0][0]) * posisjonsOppløsningX / lengdeX - 0.5))
+        posY = int(np.round((posisjon[i][0][1]) * posisjonsOppløsningY / lengdeY - 0.5))
+        
+        print(IPosisjon[posY][posX])
+        IPosisjon[posY][posX] += 1
+        print(IPosisjon[posY][posX])
+        
+        for j in range(M-1):
+            # j er kollonnen
+            # vi er i rad i og itererer over den med hjelp av j
+            
             z = np.random.uniform(0,1)
             if(z <= 0.5):
                 # Vi går i x-retning
@@ -1061,8 +1226,26 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, høyreSannsynlighet, tilfeldigeTa
                     else:
                         posisjon[i][j+1][z] = posisjon[i][j][z] - step
                         posisjon[i][j+1][0] = posisjon[i][j][0]
+            
+            # Tar opp hvor alle virrevandrenes posisjoner har vært
+            posX = int(np.round((posisjon[i][j+1][0]) * posisjonsOppløsningX / lengdeX - 0.5))
+            if posX == (posisjonsOppløsningX):
+                print("hiX")
+                posX = 0
+            posY = int(np.round((posisjon[i][j+1][1]) * posisjonsOppløsningY / lengdeY - 0.5))
+            if posY == (posisjonsOppløsningY):
+                posY = 0
+                print("hiY")
+            print(j)
+            print(posX)
+            print(posY)
+            print(posisjon[i][j+1][0])
+            print(posisjon[i][j+1][1])
+            print(IPosisjon[posY][posX])
+            IPosisjon[posY][posX] = (IPosisjon[posY][posX] + 1)
     
-    return posisjon, tidsIntervaller
+    IPosisjon = IPosisjon / (N * M)
+    return posisjon, tidsIntervaller, IPosisjon
 
 # Finner Delta_X
 print(yy[0][0], yy[-1])
@@ -1071,10 +1254,10 @@ delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
-position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, høyreSannsynlighet, randomNums, startPosisjon, delx, dt)
+position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, høyreSannsynlighet, randomNums, I, delx, dt)
 
 # Plotting av data
 
-plott(position, timeintervall, xx, yy, delx, 2)
+plott(position, timeintervall, xx, yy, delx, N)
 
-print(position)
+print(IPosisjon)
