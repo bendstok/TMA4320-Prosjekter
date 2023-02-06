@@ -779,35 +779,42 @@ def absolute_distance(x_1, y_1, x_2, y_2):
     """
     return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
 
-def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
-    # Lager en like stor delta_x matrise som rommet vårt
-    # og setter alle Delta_X lik 4 mikrometer
-    del_x = np.full((len(x[0]), len(y)), 4, dtype=float)
-    # Utregning radius
-    radius = np.round(np.sqrt(area/np.pi))
+# def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
+#     # Lager en like stor delta_x matrise som rommet vårt
+#     # og setter alle Delta_X lik 4 mikrometer
+#     del_x = np.full((len(x[0]), len(y)), 4, dtype=float)
+#     # Utregning radius
+#     radius = np.round(np.sqrt(area/np.pi))
 
-    for i in range(N_tumor):
-        # Itererer over alle tumorer
-        xcenter_tumor = Tumor_Center[i][1]
-        ycenter_tumor = Tumor_Center[i][0]
-        for v in range(len(x[0])):
-            for w in range(len(y)):
-                # Itererer over rommet
-                if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
-                        # Setter ny Delta_X om punktet er innenfor radius
-                        del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
+#     for i in range(N_tumor):
+#         # Itererer over alle tumorer
+#         xcenter_tumor = Tumor_Center[i][1]
+#         ycenter_tumor = Tumor_Center[i][0]
+#         for v in range(len(x[0])):
+#             for w in range(len(y)):
+#                 # Itererer over rommet
+#                 if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
+#                         # Setter ny Delta_X om punktet er innenfor radius
+#                         del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
 
-    return del_x
+#     return del_x
 
-    def annendelta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,dx):
-    del_x = np.zeros((x,y))
+def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):    
+    dx = yy[1]-yy[0]
+    del_x = np.full((len(x[0]),len(y)),t_f,dtype=float)
     radius = (areal/np.pi)**(1/2)
     radiusN = int(np.round(radius/dx))
     tumor = np.zeros((2*radiusN+1,2*radiusN+1))
+    tumorliste = []
     for i in range(len(tumor)):
         for j in range(len(tumor)):
             if (((i-radiusN)**2+(radiusN-j)**2)**(1/2)<=radiusN):
                 tumor[i,j] = 1
+    for i in range(antallTumor):
+        temp = np.copy(tumor)
+        temp *= t_k[i]
+        temp = np.where(temp!=0,temp,1)
+        tumorliste.append(temp)
     for i in range(antallTumor):
         xSenter = tumorSenter[i,0]
         ySenter = tumorSenter[i,1]
@@ -825,9 +832,8 @@ def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
         if ySenter+radiusN+1>len(del_x):
             tempYMax = ySenter
             tumorYMax = radiusN+len(del_x)-ySenter
-        del_x[ySenter-tempYMin:ySenter+tempYMax+1,xSenter-tempXMin:xSenter+tempXMax+1] += tumor[tumorYMin:tumorYMax,tumorXMin:tumorXMax]
+        del_x[ySenter-tempYMin:ySenter+tempYMax+1,xSenter-tempXMin:xSenter+tempXMax+1] *= tumorliste[i][tumorYMin:tumorYMax,tumorXMin:tumorXMax]
     return del_x
-
 
 """Oppgave 2c"""
 
