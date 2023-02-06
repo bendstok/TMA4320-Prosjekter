@@ -799,6 +799,35 @@ def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
 
     return del_x
 
+    def annendelta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,dx):
+    del_x = np.zeros((x,y))
+    radius = (areal/np.pi)**(1/2)
+    radiusN = int(np.round(radius/dx))
+    tumor = np.zeros((2*radiusN+1,2*radiusN+1))
+    for i in range(len(tumor)):
+        for j in range(len(tumor)):
+            if (((i-radiusN)**2+(radiusN-j)**2)**(1/2)<=radiusN):
+                tumor[i,j] = 1
+    for i in range(antallTumor):
+        xSenter = tumorSenter[i,0]
+        ySenter = tumorSenter[i,1]
+        tempXMin,tempYMin,tempXMax,tempYMax = (radiusN,radiusN,radiusN,radiusN)
+        tumorXMin,tumorYMin,tumorXMax,tumorYMax = (0,0,len(tumor),len(tumor))
+        if xSenter-radiusN<0:
+            tempXMin = xSenter
+            tumorXMin = radiusN-xSenter
+        if xSenter+radiusN+1>len(del_x):
+            tempXMax = len(del_x)-2
+            tumorXMax = radiusN+len(del_x)-xSenter
+        if ySenter-radiusN<0:
+            tempYMin = ySenter
+            tumorYMin = radiusN-ySenter
+        if ySenter+radiusN+1>len(del_x):
+            tempYMax = ySenter
+            tumorYMax = radiusN+len(del_x)-ySenter
+        del_x[ySenter-tempYMin:ySenter+tempYMax+1,xSenter-tempXMin:xSenter+tempXMax+1] += tumor[tumorYMin:tumorYMax,tumorXMin:tumorXMax]
+    return del_x
+
 
 """Oppgave 2c"""
 
