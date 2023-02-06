@@ -796,8 +796,6 @@ def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
                 if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
                         # Setter ny Delta_X om punktet er innenfor radius
                         del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
-                        #if(del_x[v][w] == 0.4):
-                            #print("HEY")
 
     return del_x
 
@@ -827,7 +825,7 @@ area = 4*np.pi
 dt = 0.01
 
 # Finner Delta_X
-delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+# delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
 
 def find_nearest(array, value):
     # Må brukes for å finne nærmeste (x,y) til virrevandreren i meshgriden
@@ -866,7 +864,7 @@ def virrevandrere_2d(x,y,N, M, pR, tilfeldigeTall, dx, dt):
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
 
     rows, cols = (N, M)
-    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)],dtype=float)
+    posisjon = [[[0,0] for i in range(cols)] for j in range(rows)]
     for zy in range(N):
         posisjon[zy][0][0] = int(10)
         posisjon[zy][0][1] = int(10)
@@ -919,7 +917,7 @@ randomNums = np.random.uniform(0,1,(N,M-1))
 
 
 
-position, timeintervall = virrevandrere_2d(xx,yy,N, M, 0.5, randomNums, delx, dt)
+# position, timeintervall = virrevandrere_2d(xx,yy,N, M, 0.5, randomNums, delx, dt)
 
 # Plotting av data
 def plott(positions, time, x, y, delta_x, n_virre):
@@ -940,10 +938,12 @@ def plott(positions, time, x, y, delta_x, n_virre):
             x_points[j] = (positions[i][j][0])
             y_points[j] = (positions[i][j][1])
             # "Un-comment" denne under om du vil se de ulike steppene markert med  en x
-            plt.plot(positions[i][j][0],positions[i][j][1], marker="x")
+            #plt.plot(position[i][j][0],position[i][j][1], marker="x")
             #print(x_points[j], y_points[j], j)
-        #print("NEXT")
-        ax0.plot(x_points, y_points, label= f"Virrevandrer {i + 1}")
+        if N < 6:
+            ax0.plot(x_points, y_points, label = f"Virrevandrer {i + 1}")
+        else:
+            ax0.plot(x_points, y_points)
     plt.legend()
     plt.tight_layout()
     plt.show()
@@ -1081,15 +1081,15 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, pR, tilfeldigeTall, startPosisjon
     return posisjon, tidsIntervaller
 
 # Finner Delta_X
-delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+# delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
-position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, pR, randomNums, startPosisjon, delx, dt)
+# position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, pR, randomNums, startPosisjon, delx, dt)
 
 # Plotting av data
 
-plott(position, timeintervall, xx, yy, delx, N)
+# plott(position, timeintervall, xx, yy, delx, N)
 
 # print(position[:][:][0])
 
@@ -1163,7 +1163,7 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
 
     rows, cols = (N, M)
-    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)],dtype=float)
+    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)],dtype=float)    
     
     IPosisjon = I
     
@@ -1175,12 +1175,12 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     tidsIntervaller = np.linspace(0, dt*(N-1), (M))
     for i in range(N):
         # i er raden
-        
+                
         # Tar opp startposisjonen
-        posX = int(np.round((posisjon[i][0][0]) * nX / LX - 0.5))
+        posX = int(np.round((posisjon[i][0][0]) * nX / LX - 0.500001))
         if posX == (nX):
             posX = 0
-        posY = int(np.round((posisjon[i][0][1]) * nY / LY - 0.5))
+        posY = int(np.round((posisjon[i][0][1]) * nY / LY - 0.500001))
         if posY == (nY):
             posY = 0
         IPosisjon[posY][posX] += 1
@@ -1204,7 +1204,9 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
 
                 # Finner så step
                 step = dx[index_x[0]][index_y[0]]
+                
                 #print(step)
+                
                 if tilfeldigeTall[i][j] < pR:
                     # dx avhengig av posisjon
                     
@@ -1247,10 +1249,10 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
                         posisjon[i][j+1][0] = posisjon[i][j][0]
             
             # Tar opp hvor alle virrevandrenes posisjoner har vært
-            posX = int(np.round((posisjon[i][j+1][0]) * nX / LX - 0.5))
+            posX = int(np.round((posisjon[i][j+1][0]) * nX / LX - 0.500001))
             if posX == (nX):
                 posX = 0
-            posY = int(np.round((posisjon[i][j+1][1]) * nY / LY - 0.5))
+            posY = int(np.round((posisjon[i][j+1][1]) * nY / LY - 0.500001))
             if posY == (nY):
                 posY = 0
             IPosisjon[posY][posX] += 1
@@ -1259,22 +1261,45 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     return posisjon, tidsIntervaller, IPosisjon
 
 # Finner Delta_X
-delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+# delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
-position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
+# position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
 
 # Plotting av data
 
 #plott(position, timeintervall, xx, yy, delx, N)
 
-print(IPosisjon)
-
 """oppgave 2f"""
 
-N = 3
+print("true start")
+
+nX = 40
+nY = 40
+
+I = np.zeros((nX, nY))
+
+LX = 20
+LY = 20
+
+xLinjeOppløsning = 200
+yLinjeOppløsning = 200
+
+x = np.linspace(0,LX,xLinjeOppløsning)
+y = np.linspace(0,LY,yLinjeOppløsning)
+
+# Lager en meshgrid
+# der x er en horisontal matrise
+# y er en vertikal matrise
+# Altså: xx[0][i] og yy[i] posisjon (x_i, y_i)
+xx, yy = np.meshgrid(x,y,sparse=True)
+
+N = 100
 M = 100
+
+
+
 Antall_Tumors = np.random.randint(10, 25)
 tumor_koeffisients = np.random.uniform(0.3,0.45,(Antall_Tumors))
 Sentral_Punkt = []
@@ -1291,12 +1316,9 @@ delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients
 randomNums = np.random.uniform(0,1,(N,M-1))
 
 position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
-
 # Plotting av data
 
 plott(position, timeintervall, xx, yy, delx, N)
-
-
 
 
 
