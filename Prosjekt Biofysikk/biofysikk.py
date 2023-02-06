@@ -1204,7 +1204,7 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
 
                 # Finner så step
                 step = dx[index_x[0]][index_y[0]]
-                print(step)
+                #print(step)
                 if tilfeldigeTall[i][j] < pR:
                     # dx avhengig av posisjon
                     
