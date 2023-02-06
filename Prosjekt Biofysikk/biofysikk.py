@@ -974,19 +974,20 @@ def plott(positions, time, x, y, delta_x, n_virre):
             # "Un-comment" denne under om du vil se de ulike steppene markert med  en x
             #plt.plot(position[i][j][0],position[i][j][1], marker="x")
             #print(x_points[j], y_points[j], j)
-        if N < 6:
-            ax0.plot(x_points, y_points, label = f"Virrevandrer {i + 1}")
-        else:
-            ax0.plot(x_points, y_points)
+
+        ax0.plot(x_points, y_points, label = f"Virrevandrer {i + 1}")
+
     plt.legend()
     plt.tight_layout()
     plt.show()
 
-# plott(position, timeintervall, xx, yy, delx, 2)
-# h = plt.contourf(x, y, delx)
-# plt.axis('scaled')
-# plt.colorbar()
-# plt.show()
+
+plott(position, timeintervall, xx, yy, delx, 2)
+#h = plt.contourf(x, y, delx)
+#plt.axis('scaled')
+#plt.colorbar()
+#print("2c")
+#plt.show()
 
 #print(tumor_del_x(space2d, areal, antallTumor, tumorSenter, t_k))
 
