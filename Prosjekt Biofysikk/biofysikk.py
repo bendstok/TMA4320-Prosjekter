@@ -767,31 +767,17 @@ Sample text
 '''
 
 """Oppgave 2b"""
+
+'''
+Ned disse nye steglengdene og tidssteglengdene, simulerer vi tumorene i kroppen.
+De gir en redusering av steglengden ved sqrt(t_k), og antas å vøre sirkulære.
+I tumor K: del_x reduseres med sqrt(t_k).
+Om tumor K og I overlapper: del_x reduseres med sqrt(t_k * t_i).
+Det er også i dette tidspunktet vi går over til å lage mer kompatible koder, slik at framgangen blir enklere.
+'''
+
 # I tumor K: del_x reduseres med sqrt(t_k)
 # Om tumor K og I overlapper: del_x reduseres med sqrt(t_k * t_i)
-
-def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,f_k=4):
-    """
-    Lager en matrise med friskt vev og srikulære tumorer. Returnerer en 2d matrise med effektive delta_x for systemet.
-    
-    ...
-    Input: \n
-    
-    x  --> x liste fra meshgrid
-    y  --> y liste fra meshgrid
-    areal --> arealet til alle tumorene (float)
-    antallTumor  --> Antall tumor (int)
-    tumorSenter  --> Indexer i matrisen som representerer tumorenes sentrum (antallTumor*2 numpy array)
-    t_k  --> Tumor koeffisient. Liste med tumor koeffisient for hver tumor
-    f_k  --> Friskt vev koeffisient (int). Standard verdi = 4
-    
-    Output: \n
-    del_x  --> En 2d matrise med effektive delta_x for meshgrid satt inn. Indexer representerer koordinater.
-    """
-    
-    return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
-
-
 
 # Lager en dx kart
 def delta_x_eff(x, y, areal, antallTumor, tumorSenter, t_k, t_f=4):
@@ -855,8 +841,21 @@ def delta_x_eff(x, y, areal, antallTumor, tumorSenter, t_k, t_f=4):
         #Her blir tumorene faktisk satt på matrisen
         del_x[ySenter-tempYMin:ySenter+tempYMax+1,xSenter-tempXMin:xSenter+tempXMax+1] *= tumorliste[i][tumorYMin:tumorYMax,tumorXMin:tumorXMax]
     return del_x
+"""
+Denne funksjonen lager effektene av tumoren ved å lage en steglengdekart virrevandrerne følger.
+Den lager først verdier til videre kalukasjoner.
+Så lager den en tumor-avatar
+Deretter lages det individuelle tumorer med sine egne koeffisienter
+Disse impleneteres til sist inn
+Ekstra kode er der for å implementere den i sider og hjørner.
+"""
+
 
 """Oppgave 2c"""
+
+"""
+Nå bruker vi denne steglengdekartet til å illustrere hvordan de påvirker virrevandrerne, og til å sjekke om de går tregere der det er tumorer
+"""
 
 # Lager rommet, i mikrometer
 # og deler inn i 200 punkter
@@ -889,7 +888,7 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-# Samme  gamle funksjon, bare at nå er dx avhengig av posisjon
+# Kompatibel versjon av 2d-virrevandring
 def virrevandrere_2d(x,y,N, M, pR, tilfeldigeTall, dx, dt):
     """
     Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
@@ -1013,9 +1012,27 @@ plott(position, timeintervall, xx, yy, delx, 2)
 #plt.show()
 
 #print(tumor_del_x(space2d, areal, antallTumor, tumorSenter, t_k))
+"""
+Kodens forklaring står inni kodene selv.
+
+Her får vi en kart over kroppen, der det finnes tumorer, og virrevandrere.
+Et problem er at virrevandrene går utenfor området. Dette kan rote opp med beregningene våre, og plotten vår.
+Likevel ser vi ting.
+Vi ser at virrevandrerne går tregere der det er tumorer, akkurat det vi ville skulle skje.
+Den går enda tregere når den er over flere tumorer, som er også det vi ville skal skje, ettersom flere tumorer got større materialtetthet.
+"""
+
+
 
 
 """Oppgave 2d"""
+
+"""
+Nå legger vi til grensebetingelser, slik at det fikser problemet med at virrevandrene unnslipper området vårt
+Vi legger til periodiske grensebetingelser.
+Disse er mye kopiert fra forrige kode.
+"""
+
 # Lager rommet, i mikrometer
 # og deler inn i 200 punkter
 
@@ -1044,7 +1061,7 @@ startPosisjon = 10
 pR = 0.5
 
 
-
+# Kompatibel versjon av 2d-virrevandring, med grensebetingelser
 def virrevandrere_2d_grense_betinget(x,y,N, M, pR, tilfeldigeTall, startPosisjon, dx, dt):
     """
     Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
@@ -1156,7 +1173,30 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, pR, tilfeldigeTall, startPosisjon
 
 # print(position[:][:][0])
 
+"""
+Her har vi lagt til periodiske grensebetingelser
+
+Vi bruker periodiske betingelser, siden de er det mest realistiske.
+En fordel med dette, mot ingen grensebetingelser, er at vi holder alle virrevandrerne inne i et spesifikt område
+En fordel som dette har, som harde vegger ikke har, er at partikler ikke samler seg opp ved veggene,
+men de går istedenfor til den andre siden, slik at de alltid vil bevege seg
+
+Før hadde vi harde vegger, fordi vi tenkte at periodiske grensebetingelser var vansleig å implementere, men de er egentlig ganske like.
+Derfor ser vi ikke noen ulemper med å ha periodiske grensebetingelser.
+"""
+
+
+
+
+
 """oppgave 2e"""
+
+"""
+Nå som vi har en fungerende modell av tumorene, og dens effekter på virrevandrerne, anvdender vi den
+Vi lager en funksjon som teller opp hvor mange ganger virrevandreren har vørt i et begrenset område.
+Dette vil til slutt bli brukt til å finne tumorene i siste del av rapporten.
+Disse er mye kopiert fra forrige kode.
+"""
 # Lager rommet, i mikrometer
 # og deler inn i 200 punkter
 
@@ -1164,7 +1204,8 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, pR, tilfeldigeTall, startPosisjon
 
 LX = 20
 LY = 20
-
+# Setter verdier for oppgaven
+# nx og ny er oppløsningene av I(i, j)
 nX = 20
 nY = 20
 
@@ -1193,6 +1234,7 @@ pR = 0.5
 
 I = np.zeros((nX, nY))
 
+# Kompatibel versjon av 2d-virrevandring, med grensebetingelser, og I-teller
 def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     """
     Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
@@ -1321,6 +1363,19 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     IPosisjon = IPosisjon / (N * M)
     return posisjon, tidsIntervaller, IPosisjon
 
+"""
+Her har vi lagt til I(i, j).
+Kodens forklaring står inni kodene selv.
+"""
+
+
+
+"""
+Nå kan vi begynne å simulere alt arbeidet vi har gjort så langt
+Vi simulerer med 10 til 25 tumorer, med en I-ooppløsning på nx = ny = 40, 40 X 40,
+og med selvvalgte M, N, LX, LX, og L = LX * LY
+"""
+
 # Finner Delta_X
 #delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
@@ -1387,9 +1442,35 @@ plt.show()
 plott(position, timeintervall, xx, yy, delx, N)
 """Oppgave 2g"""
 
+"""
+Vi plotter ut en simulering med våre valgte verdier
+Vi ser at virrevandrerne går tregere jo flere tumorer den er inni.
+Dette kan brukes til å finne ut hvor tumorene er, basert på hvordan virrevandrene beveger seg
+
+Vi kan øke denne muligheten ved å øke vøre valgte verdier
+for Lx, Ly, og L, gir dette oss et større rom der virrevandrerne vil mer tydelig gå saktere.
+for M, er det fordi flere virrevandrere gir et mer tydelig signal, siden de oppholder seg mest ved tumorene.
+for N, er det fordi det gir hver virrevandrer mer tid, som i gjennomsnitt betyr mer tid i tumprene, som gir et sterkere signal.
+"""
+
+"""
+Til slutt implementerer vi en funksjon som bruker virrevandrernes bevegelser og posisjoner til å finne tumorene indirekte
+"""
 
 
 def Sobel_filter(nxm_matrix):
+    """
+    Finner hvor tumorene er, ved hjelp av virrevandrern,e og ved hjelp av Sobel_filter.
+    
+    ...
+    
+    Input:
+    nxm matrix --> en nxm matrise. Denne er I(i, j)
+    
+    Output:
+    
+    X_norm, Y_norm, S_norm --> Der S_ nxm matrisen, men påført et Sobel filter og normalisert 
+    """
     n = len(nxm_matrix)
     m = len(nxm_matrix[0])
 
@@ -1481,3 +1562,22 @@ fig.set_size_inches(14.5, 6.5)
 plt.legend()
 plt.tight_layout()
 plt.show()
+"""
+
+
+
+"""
+"""
+Diskusjon
+"""
+
+
+"""
+Da har vi nådd målet vårt.
+Vi har laget en program som kan numerisk funne tumorer ved å bruke vannets virrevandrende egenskaper.
+Slike koder som dette kan brukes i det praktiske, og hjelpe mennesker med å finne tumorer i deres kropper.
+
+Akkurat denne versjonen kan bli optimisert og forbedret,
+men poenget med den var å vise en mulig løsning av å kode en slik kode.
+Så for nå, sier vi oss ferdige.
+"""
