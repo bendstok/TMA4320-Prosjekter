@@ -866,7 +866,7 @@ def virrevandrere_2d(x,y,N, M, pR, tilfeldigeTall, dx, dt):
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
 
     rows, cols = (N, M)
-    posisjon = [[[0,0] for i in range(cols)] for j in range(rows)]
+    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)],dtype=float)
     for zy in range(N):
         posisjon[zy][0][0] = int(10)
         posisjon[zy][0][1] = int(10)
@@ -1012,7 +1012,7 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, pR, tilfeldigeTall, startPosisjon
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
 
     rows, cols = (N, M)
-    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)])
+    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)],dtype=float)
     for zy in range(N):
         posisjon[zy][0][0] = int(startPosisjon)
         posisjon[zy][0][1] = int(startPosisjon)
@@ -1163,7 +1163,7 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
 
     rows, cols = (N, M)
-    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)])
+    posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)],dtype=float)
     
     IPosisjon = I
     
