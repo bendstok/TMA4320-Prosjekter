@@ -1256,7 +1256,6 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
             if posY == (nY):
                 posY = 0
             IPosisjon[posY][posX] += 1
-    IPosisjon = np.flip(IPosisjon, axis=1)
     IPosisjon = IPosisjon / (N * M)
     return posisjon, tidsIntervaller, IPosisjon
 
