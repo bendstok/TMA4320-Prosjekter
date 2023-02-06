@@ -1,39 +1,31 @@
-'''
-Finne tumor med numeriske metoder.
+'''Finne tumor med numeriske metoder
 
-Av Lasse Matias Dragsjø, Bendik Kvamme Stokland, og Thomas Olaussen.
+Dette prosjektet angår å bruke numeriske metoder for å finne mulige tumor i kroppen.
+Rapporten går gjennom bit for bit hvordan en slik kode skal konstrueres, og går i detalj hvorfor koden blir konstruert slik.
+Prosjektet ender med en fungerende metode å finne tumor i pasienter.
 
-Dette prosjektet angår å bruke numeriske metoder for å finne mulige tumorer i kroppen.
-Rapporten går gjennom bit for bit hvordan en slik kode skal konstrueres, og forklarer hvordan de fungerer.
-Prosjektet ender med en fungerende metode å finne tumorer numerisk.
-
-Vi må først forstå teorien bak metoden før vi går løs på å kode en løsning.
+Vi må først forstå metoden før vi går løs på å kode en løsning.
 Metoden baserer seg på å måle vannmolekylenes bevegelse i kroppen.
-Siden mennesker har 70% van i segn, kan vi måle mange av dem.
+Siden mennesker har 70% vann, er dette en god tilnermelse.
 De måles i den virkelige verden ved å bruke deres magnetiske egenskaper, og deres måter å bevege seg i kroppen.
-Denne bevegenlsen er kalt for diffusjon.
-Diffusjon forteller hvordan vannmolekyler sprer seg over tid, ved at vannet sprer seg tregere i områder med høyere materialtetthet.
+Denne bevegenlsen er kalt for dispersjon.
+Dispersjon forteller hvordan vannmolekyler sprer seg over tid, ved at vannet sprer seg tregere i områder med høyere materialtetthet.
 Dette er nyttig, siden tumorer er karakterisert ved ukontrollert celledeling, som gir høyere materialtetthet.
-Så vi kan måle vannets diffusjon ved å se på hvordan vannets mangetiske egenskaper retter seg opp enten ved samme sted, eller andre steder.
-Dette betyr at vi kan bruke dens magnetiske målinger til å finne tumorer.
+Til sist kan vi måle vannets dispersjon ved å se på hvordan vannets mangetiske egenskaper retter seg opp enten ved samme sted, eller andre steder.
+Dette betyr at vi kan bruke magnetiske målinger til å finne tumorer.
 
-Først går vi nermere inn på diffusjonslikningen:
-𝜕𝜑(x, t) / 𝜕t = D * 𝜕^2 𝜑(x, t) / 𝜕x^2},     D = (Δx)^2 / 2Δt}
+Først går vi nermere inn på dispersjonslikningen:
+![bilde.png](attachment:bilde.png)
+![bilde-9.png](attachment:bilde-9.png)
 
-konstanten D er diffusjonskonstanten.
+konstanten D er dispersjonskonstanten.
 Jo lavere den er, jo tregere sprer molekyler seg.
-Matematikere har vist at diffusjon følger en gaussisk sannsynlighetsfordeling, og at forventningsverdien til posisjonen av et vannmolekyls posisjon, når det går ut i det uendelige, er startpunktet selv.
-Først skal vi vise at hvis σ^2 = at, så løser dette diffusjonslikningen ved riktig valg av a:
+Matematikere har vist at dispersjon følger en gaussisk sannsynlighetsfordeling, og at forventningsverdien til posisjonen av et vannmolekyls posisjon, når det går ut i det uendelige, er startpunktet selv.
+Først skal vi vise at hvis σ^2 = at, så løser dette dispersjonslikningen ved riktig valg av a:
 
-
-
-𝜑 = [e^-((x - 𝜇)/σ)^2 / 2})] / [σ * sqrt(2𝜋),     𝜇 = 0,     σ\power{2} = at 
-𝜑 = [e^-(x^2 / 2at)] / [sqrt(2𝜋at)]
-(𝜕^2 / 𝜕x^2) [[e^-(x^2 / 2at)] / [sqrt(2𝜋at)]]     =     [e^-(x^2 / 2at)] * [x^2 - at] / [sqrt(2𝜋) * (at)^(5/2)]
-(𝜕 / 𝜕t) [[e^-(x^2 / 2at)] / [sqrt(2𝜋at)]]     =     a * [e^-(x^2 / 2at)] * [x^2 - at] / [2 * sqrt(2𝜋) * (at)^(5/2)]
-a * [e^-(x^2 / 2at)] * [x^2 - at] / [2 * sqrt(2𝜋) * (at)^(5/2)]     =     D * [e^-(x^2 / 2at)] * [x^2 - at] / [sqrt(2𝜋) * (at)^(5/2)]
-a/2 = D
-
+print("LEGG TIL MATTEBILIDE HER!")
+(LEGG TIL MATTEBILIDE HER!)
+print("LEGG TIL MATTEBILIDE HER!")
 
 Med a = 2D, løser likningen seg.
 '''
@@ -42,10 +34,10 @@ Med a = 2D, løser likningen seg.
 
 '''
 Nå går vi løs på det numeriske.
-Vi starter med å konstruere en 1-dimensjonal virrevandrer, som beveger seg ett skritt enten til høyre eller til venstre, med lik sannsynlighet.
-Akkurat nå lager vi en enkel kode. Vi forbedrer den senere.
+Vi starter med å konstruere en 1-dimensjonal virrevandrer, som beveger seg ett skritt enten til høyre eller til venstre, med lik sannsynlighet. Akkurat nå lager vi en enkel kode. vi forbedrer den senere.
 '''
 
+'''(Oppgave 1b)'''
 
 # Importerer biblioteker (libraries)
 import numpy as np
@@ -54,24 +46,24 @@ import time
 import itertools as it
 from scipy.optimize import curve_fit
 
-# Virrevandring funksjon
-def virrevandring(M, pR, randomnums, dx, dt):
+# Virrevandring funksjon. pR = høyreSannsynlighet
+def virrevandring(M, pr, randomNums, dx, dt):
     
     """
     Simulererer en virrevandrer i en dimensjon
     
     ...
     
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx)
-    randomnums --> En 1d array med lengde (n-1) med tilfeldige tall i intervallet [0,1]
-    dx --> Hvor langt den vil vandre horisontalt pr tidsintervall
-    dt --> Tidsintervall
+    Input: \n
+    M  --> Virrevandreren vil bevege seg n-1 ganger \n
+    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    randomNums --> En 1d array med lengde (n-1) med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre pr tidsintervall \n
+    dt --> Tidsintervall \n 
     
-    Output:
-    To vektorer, 'posisjon' og 'tidsIntervaller':
-    posisjon --> En 1d array med lengde M, som viser posisjonen til virrevandreren
+    Output: \n
+    To vektorer, 'posisjon' og 'tidsIntervaller':  \n
+    posisjon --> En 1d array med lengde M, som viser posisjonen til virrevandreren \n
     tidsIntervaller --> En 1d array med lengde M som viser tidspunktet til en posisjon,
     altså at virrevandreren er i posisjon[n] ved tidspunkt tidsIntervaller[n].  
     """
@@ -82,7 +74,7 @@ def virrevandring(M, pR, randomnums, dx, dt):
     
     # Itererer gjennom å bevege seg til høyre eller til venstre
     for i in range(M-1):
-        if randomnums[i] < pR:
+        if randomNums[i] < pR:
             posisjon[i+1] = posisjon[i] + dx 
         else:
             posisjon[i+1] = posisjon[i] - dx
@@ -97,13 +89,15 @@ dx = 1
 dt = 1
 M = 10
 pR = 0.5
-randomnums = np.random.uniform(0,1,M-1)
+randomNums = np.random.uniform(0,1,M-1)
 
+# Priner vektoren
+#print(virrevandring(M, pR, randomNums, dx, dt))
 
 '''
 Her har vi en kode som definerer en virrevandrende funkjson.
 For hver tidssteg beveger den seg ett hakk enten til høyre eller til venstre.
-For nå har vi dx = 1 = dt, M = 10, og pR = 0.5.
+For nå har vi dx = 1 = dt, M = 10, og pR = 0.5, der pR betegner sannsynligheten til å gå til høyre.
 '''
 
 
@@ -113,48 +107,21 @@ Med denne enkle modellen, tester vi den med ulike sannsynligheter å gå til hø
 Vi tar pR = 0.45, 0.5, og 0.55.
 '''
 
-
+'''(Oppgave 1c)'''
 
 # Setter konstanter og tilfeldige tall
 M = 10000
-randomnums = np.random.uniform(0,1,M-1)
-
-# Plottefunksjon
-def simplePlott(M, pR, randomnums, dx, dt):
-    
-    """
-    Plotter tre virrevandrere med ulike pR
-    
-    ...
-    
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx)
-    randomnums --> En 1d array med lengde (n-1) med tilfeldige tall i intervallet [0,1]
-    dx --> Hvor langt den vil vandre horisontalt pr tidsintervall
-    dt --> Tidsintervall
-    
-    Output:
-    Tre plots, med hver sin virrevandrer med ulike pR lik henholdsvis 0.45, 0.5, og 0.55
-    """
-    
-    for i in range(3):
-        pR = i*0.05 + 0.45
-        plotterVirrevandring = virrevandring(M, pR, randomnums, dx, dt)
-        plt.plot(plotterVirrevandring[1], plotterVirrevandring[0], label = f"pR = {pR}")
-        plt.xlabel('Tid')
-        plt.ylabel('x-pos')
-        plt.legend()
-        plt.show()
-
-'''
-Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av rapporten.
-Flere slike vil være tilgjengelig ved de andre delen av rapporten.
-'''
+randomNums = np.random.uniform(0,1,M-1)
 
 # Plotter
-#simplePlott(M, pR, randomNums, dx, dt)
-
+for i in range(3):
+    pR = i*0.05 + 0.45
+    plotterVirrevandring = virrevandring(M, pR, randomNums, dx, dt)
+    #plt.plot(plotterVirrevandring[1], plotterVirrevandring[0], label = f"pR = {pR}")
+    #plt.xlabel('Tid')
+    #plt.ylabel('x-pos')
+    #plt.legend()
+    #plt.show()
 
 '''
 Her plottes pR = 0.45, 0.50, og 0.55.
@@ -168,49 +135,59 @@ Dette er akkurat det vi ser på plotten; dermed er den representativt for pR
 
 
 '''
-Nå som vi har en virrevandrer, lager vi flere av dem samtidig. Vi lager den lesbar og forståelig
+Nå som vi har en virrevandrer, lager vi flere av dem samtidig. Vi lager den rask, og viktigst av alt, forståelig
 '''
-
-
+    
+'''Oppgave 1d'''
 
 # N_antall_virrevandrere funksjon
 def n_antall_virrevandrere(M, N, pR, randomNums, dx, dt):
     
     """
-    Simulererer n virrevandrere i en dimensjon
+    Simulererer n virrevandrer i en dimensjon
     
     ...
     
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    N  --> Antall virrevandrere
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx)
-    randomNums --> En N*(M-1) matrise med tilfeldige tall i intervallet [0,1]
-    dx --> Hvor langt den vil vandre horisontalt pr tidsintervall
-    dt --> Tidsintervall
+    Input: \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    N  --> Antall virrevandrere \n
+    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    randomNums --> En N*(M-1) matrise med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre pr tidsintervall \n
+    dt --> Tidsintervall \n 
     
-    Output:
-    En matrise 'posisjon' og en vektor 'tidsIntervaller':
-    posisjon --> En N*M matrise med N virrevandrere som viser posisjonen til virrevandreren ved tidssteg M
+    Output: \n
+    En matrise 'posisjon' og en vektor 'tidsIntervaller': \n
+    posisjon --> En N*M matrise med N virrevandrere som viser posisjonen til virrevandreren ved tidssteg M \n
     tidsIntervaller --> En 1d array med lengde M som viser tidspunktet til en posisjon,
-    altså at virrevandreren er i posisjon[n] ved tidspunkt tidsIntervaller[n].  
+    altså at virrevandreren er i posisjon[n][i] ved tidspunkt tidsIntervaller[n].  
     """
     
     # Setter tidsintervaller, og en posisjonsmatrise
     tidsIntervaller = np.linspace(0, dt*(M-1), (M))
     posisjon = np.zeros((N, M))
     
-    #Stacker N virrevandrere fra koden over til en matrise, og returnerer
+    #Stacker N virrevandrere til en matrise, og returnerer
     for i in range(N):
         posisjon[i] = virrevandring(M, pR, randomNums[i], dx, dt)[0]
     return posisjon, tidsIntervaller
 
 
 
+# Setter konstanter og tilfeldige tall
+M = 10
+N = 10
+pR = 0.5
+randomNums = np.random.uniform(0,1,(N,M-1))
+
+# Printer resultat
+#print(n_antall_virrevandrere(N, M, pR, randomNums, dx, dt))
+
+
+
 # Setter konstanter og tilfeldige tall, til å kjøre en kjøretids-test
 M = 1000
 N = 1000
-pR = 0.5
 randomNums = np.random.uniform(0,1,(N,M-1))
 
 # Kjøretids-test (treg)
@@ -222,19 +199,20 @@ time_slow_diff = time_slow_after - time_slow_b4
 '''
 Dette viser en N_antall_virrevandrende funkjson.
 Den lager N virrevandrere med M tidsposisjoner, satt sammen til en N*M matrise.
-
+dx = 1 = dt, M = 10, N = 10, pR = 0.5
 Koden kjører så en kjøretidstest med M = N = 1000, slik at den kan sammenlignes med en bedre kode senere.
 '''
 
 
 
 '''
-Nå forbedrer vi kodene slik at de kan kjøre raskere.
+Nå forbedrer vi kodene slik at de kan kjøre raskere. En forklaring på hvordan de er raskere er uder denne koden
+kumulativVirrevandring = kVv. kumulativPosisjon = kP
 '''
 
+'''(Oppgave 1e)'''
 
-
-# Kumulativ virrevandring funksjon. k = kumulativ, P = Posisjon, Vv = virrevandring
+# Kumulativ virrevandring funksjon. k = kumulativ, P = Posisjon
 def kVv(M, N, pR, randomNums, dx, dt):
     
     """
@@ -242,31 +220,31 @@ def kVv(M, N, pR, randomNums, dx, dt):
     
     ...
     
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    N  --> Antall virrevandrere
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx)
-    randomNums --> En N*(M-1) matrise med tilfeldige tall i intervallet [0,1]
-    dx --> Hvor langt den vil vandre horisontalt pr tidsintervall
-    dt --> Tidsintervall
+    Input: \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    N  --> Antall virrevandrere \n
+    pR --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    randomNums --> En N*M matrise med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre pr tidsintervall \n
+    dt --> Tidsintervall \n 
     
-    Output:
-    En matrise 'posisjon' og en vektor 'tidsIntervaller':
-    posisjon --> En N*M matrise med N virrevandrere som viser posisjonen til virrevandreren ved tidssteg M
+    Output: \n
+    En matrise 'posisjon' og en vektor 'tidsIntervaller': \n
+    posisjon --> En N*M matrise med N virrevandrere som viser posisjonen til virrevandreren ved tidssteg M \n
     tidsIntervaller --> En 1d array med lengde M som viser tidspunktet til en posisjon,
-    altså at virrevandreren er i posisjon[n] ved tidspunkt tidsIntervaller[n].  
+    altså at virrevandreren er i posisjon[n][i] ved tidspunkt tidsIntervaller[n].  
     """
     
-    # Kopierer fra tilfeldiget tall, og deler matriseinnholdet i to mellom pR. Verdiene over pR får dx, mens de under pR får -dx
+    # Kopierer fra tilfeldiget tall, og deler matriseinnholdet i to mellom pR
     kP = np.copy(randomNums)
     kP[kP > pR] = dx
     kP[kP < pR] = -dx
     
-    # kP gjøres om til en matrise, og setter startposisjonen på x = 0. Den er nå en kumulativ sum av virrevandrenes bevegelser
+    # kP gjøres om til en matrise, og setter startposisjonen på x = 0
     kP = kP.reshape(N,M)
     kP[:,0] = 0
     
-    # Akkumulerer gjennom kumulasjonsradene, slik at vi får den samme matrisen som i forrige kode
+    # Akkumulerer gjennom kumulasjonsradene
     for i in range(N):
         kP[i] = list(it.accumulate(kP[i]))
         
@@ -285,35 +263,29 @@ kVv(M, N, 0.5, randomNums, 1, 1)
 time_fast_after = time.time()
 time_fast_diff = time_fast_after - time_fast_b4
 
-'''
-Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av rapporten.
-'''
-
 # Sammenligner kjøretidene
 #print("Tid treig: " + str(time_slow_diff))
 #print("Tid rask: " + str(time_fast_diff))
 #print("Tid spart: " + str(time_slow_diff - time_fast_diff))
 
-
 '''
 Koden viser en N_antall_virrevandrende funkjson, men bygd på en annen måte.
 Istedenfor å bruke mange for-løkker, starter den med å lage hele lengden av tilfeldigheter
 Så endres dem til dx eller -dx, avhengig av om den er større eller mindre enn pR
-Den gjøres til en matrise, og setter startpunktene på 0.
+Den gjøres til en matrise, og setter startpunktene med 0.
 Deretter brukes itertools til å regne den kumulative summen til hver virrevandrer.
-Denne delen bruker en for-løkke, men det er den eneste stedet den gjør det.
-Den andre koden bruker en for-løkke oppå en for-løkke.
+Denne delen bruker en for-løkke, men den brukes ikke så mye som i den andre koden.
 Dermed resulterer vi med en kode som er omtrent 5x ganger raskere enn den forrige.
 '''
 
 
 
 '''
-Med en forbedret kode, finner vi dens empiriske varians, slik at vi kan sammenligne den med den analytiske løsningen, som vi fant ved den første delen av rapporten.
+Med en forbedret kode, finner vi dens empiriske varians, slik at vi kan sammenligne den med den analytiske løsningen på første oppgave.
 Vi forklarer observasjonene vi får av koden, og hvordan den kan nermere bli lik det analytiske svaret.
 '''
 
-
+"""(Oppgave 1f)"""
 
 # Empirisk_varians funksjon
 def empirisk_varians(Matrise):
@@ -327,32 +299,27 @@ def empirisk_varians(Matrise):
     Matrise --> MxM kvadratisk matrise
     
     Output:
-    Virrevandrernes empiriske varians
     empirisk_varians --> 1d array, som inneholder den empiriske variansen til tilhørende kollonnen i Matrise, altså er
     empirisk_varians[n] den empiriske variansen til Matrise[i,n], der i går fra 0->n
     """
-    
-    # henter ut verdier for frentidlige beregninger
+
     coloumns = len(Matrise) 
     rows = coloumns
     variance  = np.zeros(coloumns)
-    
-    # itererer gjennom kolonnene
+
     for j in range(coloumns):
         # j er kolonnen
 
         # Vil inneholde alle verdier i kolonne j
         coloumn_j = np.zeros(coloumns)
-        
-        # Lager en matrise av verdiene
+
         for i in range(rows):
             coloumn_j[i] = Matrise[i][j]
         
-        # Utregning av forventet verdi og varians til kolonne j
+        #Utregning av mean og variansen til kolonne j
         mean = np.sum(coloumn_j)/coloumns
         variance[j] += sum((coloumn_j  - mean)**2)/coloumns
-    
-    # Returnerer
+
     return variance
 
 
@@ -371,15 +338,10 @@ def linear(x, a, b):
     return a*x + b
 
 # Scipy magi skjer under
-# Vi er kun interresert i popt, som inneholder hva den beste verdien av a og b er
+# Vi  er kun interresert i popt, som inneholder hva den beste verdien av a og b er
 popt, pcov = curve_fit(linear, time_intervall, variance_pos)
 
-'''
-Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av rapporten.
-'''
-
 # Plotting
-#plt.figure()
 #plt.plot(time_intervall, linear(time_intervall, *popt), 'r--', label='fit: a=%5.3f, b=%5.3f' % tuple(popt))
 #plt.plot(time_intervall, variance_pos, label="Empirisk Varians")
 #plt.xlabel('Tid')
@@ -387,21 +349,19 @@ Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av ra
 #plt.legend()
 #plt.show()
 
-
 '''
-Funksjonen setter opp rader, kolonner, og variansmatrise til behandling
+Funksjonen setter opp rader, kolonner, og variansvatrise til behandling
 Den henter ut hver kolonne, og så regner den ut deres gjennomsnittsverdier, og med det, variansen til hver kolonne
 Alle deres varians returneres etterpå.
 Denne funksjonen brukes for å hente inn variansene.
-Så lages en lineær funksjon, og bruker den i scipy curve fit, for å få den beste matchen av en lineær funksjon til variansen.
+Så lages en lineær funksjon, og  bruker den i scipy curve fit, for å få den beste matchen av en lineær funksjon til variansen.
 funksjonen, og variansmålingene plottes til slutt.
-
 Resultatet viser oss at a ~ 1. Dette betyr at variansen til en virrevandrer øker lineært med tiden.
 Det er akkurat dette som skjer ved diffusjon, at variansen er lineært og fullstendig proporsjonal med tida.
 Ved sammenigning av oppgave 1a, ser vi at a = 2*D også er lineært, ved D = 0.5!
 Begge disse to funnene viser at vi har en modell som faktisk modellerer diffusjon.
 
-Men hvis vi ønsker at den empiriske variansen skal samsvare mer med den analytiske resultatet i 1a, så bør vi ha større M og N.
+Hvis vi ønsker at den empiriske variansen skal samsvare mer med den analytiske resultatet i 1a, så bør vi ha større M og N.
 For M sin del, er det fordi tilfeldighet vil i løpet av uendelig tid jevne ut sine tilfeldigheter, og gi ut den ekte sannsynlighetsfordelingen; som i dette tilfellet er den analytisle empiriske variansen.
 For N sin del, er det fordi de vil gi et bedre gjennomsnittsverdi, ved at flere av den samme typen vil gi en feil proporsjonal med 1/Sqrt(n); så med n --> Uendelig, gir dette oss det analytiske svaret.
 '''
@@ -409,38 +369,39 @@ For N sin del, er det fordi de vil gi et bedre gjennomsnittsverdi, ved at flere 
 
 
 '''
-Med en empirisk varians som matcher virrevandringene vi vil ha, kan vi fortsette uten å bekymre oss for at vi har gjort feil.
+Med en empirisk varians som matcher virrevandringene vi vil ha, kan vi fortsette uten å bekymre off for at vi har gjort feil.
 Vi utvider den til en 2d virrevandrer. Vi tester denne utvidelsen med systemer som enten er isotrope, eller ikke.
-Mye er kopiert fra kVv-funksjonen
 '''
 
+"""(Oppgave 1g)"""
 
-
-# 2d virrevandrende funksjon. R = retning, P = posisjon, V = Virrevandrer, Y = Ja, N = Nei
+# 2d virrevandrende funksjon. R = retning, P = posisjon, V = virrevandrer. pU = oppSannsynlighet. Y = Ja, N = Nei
 def toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt):
     
     """
     Simulererer n virrevandrer i 2 dimensjoner
     
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    N  --> Antall virrevandrere
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx)
-    pU --> Tilfeldig tall må være større enn denne for å gå opp (+dy)
-    HogOforhold --> Hvor sannsynlig virrevandreren vil gå horisontalt. Så (1 - HogOforhold) er vertikal sannsynlighet.
-    dx --> Hvor langt den vil vandre horisontalt pr tidsintervall
-    dy --> Hvor langt den vil vandre vertikalt pr tidsintervall
-    dt --> Tidsintervall
+    ...
+    Input: \n
     
-    Output:
-    To matriser, 'xP' og 'xY' og en vektor 'tidsIntervaller':
-    xP --> En N*M matrise med N virrevandrere som viser den horisontale posisjonen til virrevandreren ved tidssteg M
-    yP --> En N*M matrise med N virrevandrere som viser den vertikale posisjonen til virrevandreren ved tidssteg M
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    N  --> Antall virrevandrere \n
+    pR --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx) \n
+    pU --> Tilfeldig tall må være større enn denne for å gå opp (+dy) \n
+    HogOforhold --> Hvor sannsynlig virrevandreren vil gå horisontalt. Så (1 - HogOforhold) er vertikal sannsynlighet.
+    dx --> Hvor langt den vil vandre horisontalt pr tidsintervall \n
+    dy --> Hvor langt den vil vandre vertikalt pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    
+    Output: \n
+    To matriser, 'xP' og 'xY' og en vektor 'tidsIntervaller': \n
+    xP --> En N*M matrise med N virrevandrere som viser den horisontale posisjonen til virrevandreren ved tidssteg M \n
+    yP --> En N*M matrise med N virrevandrere som viser den vertikale posisjonen til virrevandreren ved tidssteg M \n
     tidsIntervaller --> En 1d array med lengde M som viser tidspunktet til en posisjon,
     altså at virrevandreren er i posisjon[n][i] ved tidspunkt tidsIntervaller[n]. 
     """
-
-    # Kopierer fra tilfeldiget tall, og bestemmer om å bevege seg i x eller y-retning
+    
+    # Bestemmer om å bevege seg i x eller y-retning
     randomNums = np.random.uniform(0,1,(M*N))
     
     rRY = np.copy(randomNums)
@@ -453,7 +414,7 @@ def toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt):
     pR = 1-pR
     pU = 1-pU
     
-    # Bestemmer retning i x og y-retning, ved å dele matriseinnholdet i to mellom pR. Verdiene over pR får dx, mens de under pR får -dx. det samme skjer med y-retningen
+    # Bestemmer retning i x og y-retning
     xR = np.random.uniform(0,1,(M*N))
     xR[xR < pR] = -dx
     xR[xR > pR] = dx
@@ -465,21 +426,15 @@ def toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt):
     # Lager kumulativ 2d-virrevandring
     xP = np.zeros(M*N)
     xP[rRN] = xR[rRN]
-    
-    yP = np.zeros(M*N)
-    yP[rRY] = yR[rRY]
-    
-    # xP og yP gjøres om til en matrise, og setter startposisjonen på x = 0, y = 0. Den er nå en kumulativ sum av virrevandrenes bevegelser
     xP = xP.reshape(N,M)
     xP[:,0] = 0
-    
-    yP = yP.reshape(N,M)
-    yP[:,0] = 0
-    
-    # Akkumulerer gjennom kumulasjonsradene, slik at vi får virrevandrervatrisene i x og y-retning
     for i in range(N):
         xP[i] = list(it.accumulate(xP[i]))
     
+    yP = np.zeros(M*N)
+    yP[rRY] = yR[rRY]
+    yP = yP.reshape(N,M)
+    yP[:,0] = 0
     for i in range(N):
         yP[i] = list(it.accumulate(yP[i]))
     
@@ -495,94 +450,55 @@ M = 1000
 dy = 1
 HogOforhold = 0.5
 
+
 # Plottingsfunksjon
-def plotToD_virrevandrer(M, N, HogOforhold, dx, dy, dt):
-    
-    """
-    Plotter fire virrevandrere med ulike pR og pU, for å illustrere forskjellen med isotropi og anisotropi
-    
-    ...
-    
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    N  --> Antall virrevandrere
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx)
-    pU --> Tilfeldig tall må være større enn denne for å gå opp (+dy)
-    HogOforhold --> Hvor sannsynlig virrevandreren vil gå horisontalt. Så (1 - HogOforhold) er vertikal sannsynlighet.
-    dx --> Hvor langt den vil vandre horisontalt pr tidsintervall
-    dy --> Hvor langt den vil vandre vertikalt pr tidsintervall
-    dt --> Tidsintervall
-    
-    Output:
-    Fire plots, med hver sin virrevandrer med ulike pR og pU
-    """
-    
-    # Lager ny figur
+def plotToD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt):
     plt.figure()
-    
-    # tar pR og pU lik henholdsvis 0.4 og 0.6 den første gange, og 0.5 og 0.5 den andre gangen
     for j in range(2):
         pR = 0.4 + 0.1*j
         pU = 0.6 - 0.1*j
         
-        # Lager nye subplots
-        plt.subplot(2, 2, 1 + 2*j)
         
-        # plotter for x-retning
+        plt.subplot(2, 2, 1 + 2*j)
         for i in range(N):
             plotter2dVirrevandring = toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
             plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[0][i], label = f"pR = {pR}")
-            
-        # Labeler
         plt.xlabel('Tid')
         plt.ylabel('x-pos')
         plt.legend()
         
-        # Lager nye subplots
         plt.subplot(2, 2, 2 + 2*j)
-        
-        # plotter for y-retning
         for i in range(N):
             plotter2dVirrevandring = toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
             plt.plot(plotter2dVirrevandring[2], plotter2dVirrevandring[1][i], label = f"pU = {pU}")
-        
-        # Labeler
         plt.xlabel('Tid')
         plt.ylabel('y-pos')
         plt.legend()   
-    
-    # Plotter
+               
     plt.show()
     return
-
-
-
-'''
-Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av rapporten.
-'''
-
+    
+    
 # Plotter
-#plotToD_virrevandrer(M, N, HogOforhold, dx, dy, dt)
-
-
+#plotToD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
+    
 '''
 Her lages en effektig kumulativ kode for 2d virrevandring.
-Først bestemmes om virrevandreren går horisontalt eller vertikalt
-Så bestemmer den om det er + eller - retning den beveger seg
+Først bestemmes om virrevandrered går horisontalt eller vertikalt
+Så bestemmer den om det er + eller - retningn den beveger seg
 Deretter lages xP og yP slik at de beveger seg i kun én retning per iterasjon
 Til slutt blir deres tilfedligheter gjort til kumulative sum, og iterert summert over, slik som i oppgave 1e.
 Tidsinterval lages, og returneres.
 
-Vi lager også funksjonen plotToD_virrevandrer for å teste toD_virrevandrer-funksjonen.
-Denne funksjonen kjører toD_virrevandrer med forskjellige verdier for pR og pU, og plotter dem.
+Vi lager også funksjonen plotToD_virrevandrer for å teste toD_virrevandrer.
+Denne funksjonen kjører toD_virrevandrer med forskjellige verdier for pR og pU og plotter dem.
 Fra plottene kan vi se at når vi har pR = 0.4 så beveger virrevandrerne seg som oftest i negativ x retning (venstre).
 Vi kan også se at distansen de beveger seg er omtrent 100.
 Dette kan forklares ved at vi har M = 1000, delt på to dimensjoner gir oss omtrent 500 skrit horisontalt.
 Forskjellen 0.4*500-0.6*500 gir oss -100, dvs. 100 skritt mot venstre som vi ser i figuern
 Det samme kan sies for for figuren med pU = 0.6
-
 Til slutt kan vi også se når vi har et isotrpot system, så beveger ikke virrevandrerne seg langt vekk fra startsposisjonen.
-Dette er forventet ettersom virrevandrere i to dimensjoner er forventet å være i origo.
+Dette er forventet ettersom virrevandrere i to dimensjoner er forventet å være i origo når M blir stor.
 '''
 
 
@@ -592,7 +508,7 @@ Nå har vi en 2d virrevandrer. Vi koder en anvendelse til den
 Vi koder om virrevandreren returnerer til startpunktet, og andelen av virrenandrere som gjør det
 '''
 
-
+"""(Oppgave 1h)"""
 
 # Andel kryssende virrevandrere, 1d
 def n_t(M, N, pR, randomNums, dx, dt):
@@ -602,11 +518,11 @@ def n_t(M, N, pR, randomNums, dx, dt):
     
     ...
     
-    Input:
+    Input: \n
     enD_virrevandrer --> funksjonen kVv(M, N, pR, randomNums, dx, dt)
     
-    Output:
-    andel --> andelen av de N virrevandrerne som krysset origo minst en gang.
+    Output: \n
+    andel --> andelen av de N virrevandrerne som krysset startpunktet minst en gang.
     """
     
     # Henter ut virrevandringene
@@ -615,7 +531,7 @@ def n_t(M, N, pR, randomNums, dx, dt):
     #Setter tallet for antall krysninger av startpunktet
     ant = 0
     
-    #itererer gjennom hver virrevandrer, uten å ha med starten, i x-retning. legger til + 1 hvis den krysser startpunktet, og fjerner virrevandrene som gjør det
+    #itererer gjennom hver virrevandrer, uten å ha med starten; både x of y retning. legger til + 1 hvis den krysser startpunktet
     for i in range(N):
         Ja = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0][i])][i] == 0
         if True in Ja:
@@ -627,6 +543,11 @@ def n_t(M, N, pR, randomNums, dx, dt):
 
 
 
+# Printer andel, 2d
+# print(n_t(kVv(M, N, pR, randomNums, dx, dt)))
+
+
+
 # Andel kryssende virrevandrere, 2d
 def n_t2d(M, N, pR, pU, HogOforhold, dx, dy, dt):
     
@@ -635,11 +556,11 @@ def n_t2d(M, N, pR, pU, HogOforhold, dx, dy, dt):
     
     ...
     
-    Input:
+    Input: \n
     toD_virrevandrer --> funksjonen toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
     
-    Output:
-    andel --> andelen av de N virrevandrerne som krysset origo minst en gang.
+    Output: \n
+    andel --> andelen av de N virrevandrerne som krysset startpunktet minst en gang.
     """
     
     # Henter ut virrevandringene
@@ -648,7 +569,7 @@ def n_t2d(M, N, pR, pU, HogOforhold, dx, dy, dt):
     #Setter tallet for antall krysninger av startpunktet
     ant = 0
     
-    #itererer gjennom hver virrevandrer, uten å ha med starten, i både x of y-retning. legger til + 1 hvis den krysser startpunktet, og fjerner virrevandrene som gjør det
+    #itererer gjennom hver virrevandrer, uten å ha med starten; både x of y retning. legger til + 1 hvis den krysser startpunktet
     for i in range(N):
         xJa = sjekkStartpunkt[0][:, 1: len(sjekkStartpunkt[0][i])][i] == 0
         yJa = sjekkStartpunkt[1][:, 1: len(sjekkStartpunkt[1][i])][i] == 0
@@ -662,15 +583,19 @@ def n_t2d(M, N, pR, pU, HogOforhold, dx, dy, dt):
 
 
 
+# Printer andel, 2d
+# print(n_t2d(toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)))
+
+
 '''
 N_t og N_t2d er veldig like, og gjør omtrent det samme.
-De henter først inn virrevanderen i funksjonene.
-så sjekker den om den er ved startpunktet, for både x-posisjon og y-posisjon.
+De henter først in virrevanderen i funksjonene.
+så sjekker den om den er ved startpunktet, for bøde x-posisjon og y-posisjon.
 den teller opp hvor mange virrevandrere som gjør det, og regner ut andelen.
 
 Enkel kombinatorikk gir at P(x = 0, t = 1) = 0, for begge dimensjoner.
 Dette er fordi den aldri ikke vil bevege seg, så den beveger seg vekk fra startpunktet.
-For t = 2, gir dette P(x = 0, t = 2) = 0,5 og P(x = 0, t = 2) = 1/4 for henholdsvis en og to dimensjoner, hvis pR = pU = 0.25, og HogOforhold = 0.5
+For t = 2, gir dette P(x = 0, t = 2) = 0,5 og P(x = 0, t = 2) = 1/4 for henholdsvis en og to dimensjoner, hvis pR = pU = HogOforhold = 0.25
 Dette er fordi det er 50% mulighet å velge den motsatte retningen for 1 dimensjon, siden det er 1 av 2 retningsmuligheter,
 og 25% mulighet å velge den motsatte retningen for 2 dimensjoner, siden det er 1 av 4 retningsmuligheter,
 '''
@@ -680,10 +605,9 @@ og 25% mulighet å velge den motsatte retningen for 2 dimensjoner, siden det er 
 '''
 Nå bruker vi koden fra forrige oppgave til å teste om n_t og n_t2d over uendelig lang tid vil gi et svar son er nerme det analytiske svaret P(x = 0, t → ∞) = 1.
 Vi plotter n(t) for å finne ut av dette.
-Disse er mye kopiert fra forrige kode.
 '''
 
-
+"""(Oppgave 1i)"""
 
 # Andel kryssende virrevandrere, 1d, plottet
 def n_tPlot(M, N, pR, randomNums, dx, dt):
@@ -693,10 +617,10 @@ def n_tPlot(M, N, pR, randomNums, dx, dt):
     
     ...
     
-    Input:
+    Input: \n
     enD_virrevandrer --> funksjonen kVv(M, N, pR, randomNums, dx, dt)
     
-    Output:
+    Output: \n
     Plot av n_t --> En plot av andelen virrevandrer som har krysset startpunktet minst en gang, over tid.
     """
     
@@ -740,10 +664,10 @@ def n_t2dPlot(M, N, pR, pU, HogOforhold, dx, dy, dt):
     
     ...
     
-    Input:
+    Input: \n
     toD_virrevandrer --> funksjonen toD_virrevandrer(M, N, pR, pU, HogOforhold, dx, dy, dt)
     
-    Output:
+    Output: \n
     Plot av n_t2d --> En plot av andelen virrevandrer som har krysset startpunktet minst en gang, over tid.
     """
     
@@ -782,10 +706,14 @@ def n_t2dPlot(M, N, pR, pU, HogOforhold, dx, dy, dt):
 
 
 # Setter konstanter og tilfeldige tall
-M = 100000
-N = 1000
+M = 100
+N = 100
 pR = 0.5
 pU = 0.5
+dx = 1
+dy = 1
+dt = 1
+HogOforhold = 0.5
 randomNums = np.random.uniform(0,1,(M*N))
 
 # Printer ut andelene for 1d of 2d virrevandrer
@@ -793,14 +721,14 @@ randomNums = np.random.uniform(0,1,(M*N))
 #n_t2dPlot(M, N, pR, pU, HogOforhold, dx, dy, dt)
 
 '''
-Koden printer virrevandrere med normale forhold, med 1000 av dem med 100000 steg, for å få et nermere svar.
+Koden printer virrevandrere med normale forhold, og med 1000 av dem med 100000 steg, for å få et nermere svar.
 Den teller for hver kolonne om virrevandreren er tilbake til startpunktet, og noterer ned de som har gjort det.
 
-Vi har valgt M = 100000, for her er M = t, og vi ønsker å få et høyt t som mulig for å få et resultat som lingner den analytiske.
-N = 1000 er der for å gi 3 desimaler ved andelen, for å gi et mer presis tall.
+Vi har valgt M = 100000, for her er M = t, og vi ønsker å få et høyt t for å få et resultat som lingner den analytiske.
+M = 1000 er der for å gi 3 desimaler ved andelen, for å gi et mer presis tall.
 
 Resultatene viser oss at for 1-dimensjon, er den praktisk talt lik 1.
-Dermed har vi vist at P(x = 0, t → ∞) for én dimensjon er lik 1.
+Dermed har vi vist at P(x = 0, t → ∞) for én dimensjon lik 1.
 For to dimensjoner derimot, gir den omtrent 0.75.
 Dette alene er ikke så veldig overbevisende at den vil gå til 1
 Men, ved å se på 2d-plotten i forhold til 1d-plotten, ser vi at de har samme tendens til å gå mot 1, bare mye tregere.
@@ -810,12 +738,12 @@ Siden den oppfører seg akkurat som det én dimensjon gjør, men mye tregere, ka
 
 
 '''
-Nå går vi over til fase 2 av rapporten; vi gjør nå de reelle anveldelsene.
-Først lager vi kode slik at vi kan endre på steglengdene, og tidssteglengdene
-Vi finner også diffusjonskonstanten med de nye stegverdiene
+Nå går vi over til fase 2 av rapporten; vi gjør nå anveldelsene.
+Først lager vi slik at vi kan endre på steglengdene, og tidssteglengdene
+Vi finner også Diffusjonskonstanten med de nye stegverdiene
 '''
 
-
+"""(Oppgave 2a)"""
 
 # Setter vilkårlig tall
 x_steglengde = 0.000004
@@ -827,38 +755,38 @@ dx = x_steglengde
 dz = y_steglengde
 dt = t_steglengde
 
-
 '''
 Det er bare å endre på dx, dy, og dt her, fordi vi kodet de andre kodene til å ta inn variabelen dx, dy, og dt istedenfor 1.
-med dx = 0.000004 meter, og t = 0.01, ser vi at D = (0.000004)^2 / (2 * 0.01) = 8 * 10^-10.
-Dette skal være en realistisk diffusjonskonstant for vannmolekylene i kroppen.
+med dx = 0.000004 meter, og a = dx, ser vi at D = a / 2 = 0.000002
 '''
 
 
 
 '''
-Ned disse nye steglengdene og tidssteglengdene, simulerer vi tumorene i kroppen.
-De gir en redusering av steglengden ved sqrt(t_k), og antas å vøre sirkulære.
-I tumor K: del_x reduseres med sqrt(t_k).
-Om tumor K og I overlapper: del_x reduseres med sqrt(t_k * t_i).
-Det er også i dette tidspunktet vi går over til å lage mer kompatible koder, slik at framgangen blir enklere.
+Sample text
 '''
 
+"""Oppgave 2b"""
+# I tumor K: del_x reduseres med sqrt(t_k)
+# Om tumor K og I overlapper: del_x reduseres med sqrt(t_k * t_i)
 
-
-# Lager en distansefunksjon
-def absolute_distance(x_1, y_1, x_2, y_2):
-    
+def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,f_k=4):
     """
-    Finner ut avstanden mellom to punkter
+    Lager en matrise med friskt vev og srikulære tumorer. Returnerer en 2d matrise med effektive delta_x for systemet.
     
     ...
+    Input: \n
     
-    Input:
-    To punkter (x_1,y_1) og (x_2,y_2)
+    x  --> x liste fra meshgrid
+    y  --> y liste fra meshgrid
+    areal --> arealet til alle tumorene (float)
+    antallTumor  --> Antall tumor (int)
+    tumorSenter  --> Indexer i matrisen som representerer tumorenes sentrum (antallTumor*2 numpy array)
+    t_k  --> Tumor koeffisient. Liste med tumor koeffisient for hver tumor
+    f_k  --> Friskt vev koeffisient (int). Standard verdi = 4
     
-    Output:
-    Returner absolutt distance
+    Output: \n
+    del_x  --> En 2d matrise med effektive delta_x for meshgrid satt inn. Indexer representerer koordinater.
     """
     
     return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
@@ -867,7 +795,6 @@ def absolute_distance(x_1, y_1, x_2, y_2):
 
 # Lager en dx kart
 def delta_x_eff(x, y, areal, antallTumor, tumorSenter, t_k, t_f=4):
-    
     """
     Lager en steglengdekart som simulerer tumorenes effekt på virrevandrerne.
     
@@ -888,31 +815,29 @@ def delta_x_eff(x, y, areal, antallTumor, tumorSenter, t_k, t_f=4):
     
     # Får verdier til videre kalkulasjoner
     dx = yy[1]-yy[0]
-    del_x = np.full((len(x[0]),len(y)),t_f,dtype=float)
+    del_x = np.full((len(x[0]),len(y)),f_k,dtype=float)
     radius = (areal/np.pi)**(1/2)
     radiusN = int(np.round(radius/dx))
+    
+    #Lager en tumor
     tumor = np.zeros((2*radiusN+1,2*radiusN+1))
     tumorliste = []
-    
-    # Lager en tumor-avatar, slik at den kan brukes til andre kalulasjoner
     for i in range(len(tumor)):
         for j in range(len(tumor)):
             if (((i-radiusN)**2+(radiusN-j)**2)**(1/2)<=radiusN):
                 tumor[i,j] = 1
-    
-    # Lager de individuelle tumorene med sine egne koeffisienter
+    #Lager liste med tumorer med forskjellig t_k
     for i in range(antallTumor):
         temp = np.copy(tumor)
         temp *= t_k[i]
         temp = np.where(temp!=0,temp,1)
         tumorliste.append(temp)
         
-    # Implementerer tumor-effektene
+    #Setter tumorene på tumor senterene
     for i in range(antallTumor):
         xSenter = tumorSenter[i,0]
         ySenter = tumorSenter[i,1]
-        
-        # Fikser problemer med å implementere dem i sider og hjørner av kartet
+        #Må passe på at tumorene ikke blir satt utenfor matrisen
         tempXMin,tempYMin,tempXMax,tempYMax = (radiusN,radiusN,radiusN,radiusN)
         tumorXMin,tumorYMin,tumorXMax,tumorYMax = (0,0,len(tumor),len(tumor))
         if xSenter-radiusN<0:
@@ -927,35 +852,17 @@ def delta_x_eff(x, y, areal, antallTumor, tumorSenter, t_k, t_f=4):
         if ySenter+radiusN+1>len(del_x):
             tempYMax = ySenter
             tumorYMax = radiusN+len(del_x)-ySenter
+        #Her blir tumorene faktisk satt på matrisen
         del_x[ySenter-tempYMin:ySenter+tempYMax+1,xSenter-tempXMin:xSenter+tempXMax+1] *= tumorliste[i][tumorYMin:tumorYMax,tumorXMin:tumorXMax]
     return del_x
 
-"""
-Denne funksjonen lager effektene av tumoren ved å lage en steglengdekart virrevandrerne følger.
-Den lager først verdier til videre kalukasjoner.
-Så lager den en tumor-avatar
-Deretter lages det individuelle tumorer med sine egne koeffisienter
-Disse impleneteres til sist inn
-Ekstra kode er der for å implementere den i sider og hjørner.
-"""
+"""Oppgave 2c"""
 
-
-
-"""
-Nå bruker vi denne steglengdekartet til å illustrere hvordan de påvirker virrevandrerne, og til å sjekke om de går tregere der det er tumorer
-"""
-
-
-
-# Oppgave konstanter og tilfeldige verdier
 # Lager rommet, i mikrometer
 # og deler inn i 200 punkter
-LX = 20
-LY = 20
-
 antallPunkter = 200
-x = np.linspace(0,LX,antallPunkter)
-y = np.linspace(0,LY,antallPunkter)
+x = np.linspace(0,20,antallPunkter)
+y = np.linspace(0,20,antallPunkter)
 
 # Lager en meshgrid
 # der x er en horisontal matrise
@@ -963,6 +870,7 @@ y = np.linspace(0,LY,antallPunkter)
 # Altså: xx[0][i] og yy[i] posisjon (x_i, y_i)
 xx, yy = np.meshgrid(x,y,sparse=True)
 
+# Oppgave konstanter
 N = 2
 M = 1000
 antallTumor = 15
@@ -970,7 +878,6 @@ t_k = np.full(antallTumor,0.1,dtype=float)
 tumorSenter = np.random.randint(0,antallPunkter,(antallTumor,2))
 areal = 4*np.pi
 dt = 0.01
-randomNums = np.random.uniform(0,1,(N,M-1))
 
 # Finner Delta_X
 delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
@@ -982,32 +889,31 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-# Kompatibel versjon av 2d-virrevandring
-def virrevandrere_2d(x, y, N, M, pR, tilfeldigeTall, dx, dt):
-    
+# Samme  gamle funksjon, bare at nå er dx avhengig av posisjon
+def virrevandrere_2d(x,y,N, M, pR, tilfeldigeTall, dx, dt):
     """
     Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
-    
     ...
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx). Er det samme som pU her \n
+    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
+    dx --> Hvor langt den vil vandre i x retning pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    dy --> Hvor langtr den vil vandre i y retning  pr tidsintervall \n
     
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    N  --> Antall virrevandrere
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx). Er det samme som pU her
-    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1]
-    dx --> Hvor langt den vil vandre i en retning pr tidsintervall
-    dt --> Tidsintervall 
-    
-    Output:
-    To matriser, 'posisjon' og 'tidsIntervaller':
-    posisjon --> En n*M matrise som viser posisjonen til virrevandreren
+    Output: \n
+    To matriser, 'posisjon' og 'tidsIntervaller': \n
+    posisjon --> En n*M matrise som viser posisjonen til virrevandreren \n
     Posisjon[i] = [[0,0], [0,0] ...]
     Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
-    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
+    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t \n
     tidsIntervaller --> En 1d array med lengde m som viser tidspunktet til en posisjon, 
     """
 
-    # Posisjon matrisen er lagt opp slik:
+    # Utrolig dårlig, men rask kodet å få dette til
+    # Posisjon matrisen er basically lagt opp slik:
     # Posisjon[i] = [[0,0], [0,0] ...]
     # Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
@@ -1062,11 +968,11 @@ def virrevandrere_2d(x, y, N, M, pR, tilfeldigeTall, dx, dt):
                     posisjon[i][j+1][0] = posisjon[i][j][0]
     
     return posisjon, tidsIntervaller
+randomNums = np.random.uniform(0,1,(N,M-1))
 
 
 
-# Henter inn verdiene
-position, timeintervall = virrevandrere_2d(xx, yy, N, M, 0.5, randomNums, delx, dt)
+position, timeintervall = virrevandrere_2d(xx,yy,N, M, 0.5, randomNums, delx, dt)
 
 # Plotting av data
 def plott(positions, time, x, y, delta_x, n_virre):
@@ -1089,73 +995,81 @@ def plott(positions, time, x, y, delta_x, n_virre):
             # "Un-comment" denne under om du vil se de ulike steppene markert med  en x
             #plt.plot(position[i][j][0],position[i][j][1], marker="x")
             #print(x_points[j], y_points[j], j)
-
-        ax0.plot(x_points, y_points, label = f"Virrevandrer {i + 1}")
+        if(i <= 5):
+            ax0.plot(x_points, y_points, label = f"Virrevandrer {i + 1}")
+        else:
+            ax0.plot(x_points, y_points)
 
     plt.legend()
     plt.tight_layout()
     plt.show()
 
 
-    
-'''
-Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av rapporten.
-'''    
-    
-# plotter
-#plott(position, timeintervall, xx, yy, delx, 2)
+plott(position, timeintervall, xx, yy, delx, 2)
+#h = plt.contourf(x, y, delx)
 #plt.axis('scaled')
 #plt.colorbar()
 #print("2c")
 #plt.show()
 
-
-"""
-Kodens forklaring står inni kodene selv.
-
-Her får vi en kart over kroppen, der det finnes tumorer, og virrevandrere.
-Et problem er at virrevandrene går utenfor området. Dette kan rote opp med beregningene våre, og plotten vår.
-Likevel ser vi ting.
-Vi ser at virrevandrerne går tregere der det er tumorer, akkurat det vi ville skulle skje.
-Den går enda tregere når den er over flere tumorer, som er også det vi ville skal skje, ettersom flere tumorer got større materialtetthet.
-"""
+#print(tumor_del_x(space2d, areal, antallTumor, tumorSenter, t_k))
 
 
+"""Oppgave 2d"""
+# Lager rommet, i mikrometer
+# og deler inn i 200 punkter
 
-"""
-Nå legger vi til grensebetingelser, slik at det fikser problemet med at virrevandrene unnslipper området vårt
-Vi legger til periodiske grensebetingelser.
-Disse er mye kopiert fra forrige kode.
-"""
+LX = 20
+LY = 20
+
+antallPunkter = 200
+x = np.linspace(0,LX,antallPunkter)
+y = np.linspace(0,LY,antallPunkter)
+
+# Lager en meshgrid
+# der x er en horisontal matrise
+# y er en vertikal matrise
+# Altså: xx[0][i] og yy[i] posisjon (x_i, y_i)
+xx, yy = np.meshgrid(x,y,sparse=True)
+
+# Oppgave konstanter
+N = 2
+M = 1000
+antallTumor = 5
+t_k = np.full(antallTumor,0.1,dtype=float)
+tumorSenter = np.random.randint(0,antallPunkter,(antallTumor,2))
+areal = 4*np.pi
+dt = 0.01
+startPosisjon = 10
+pR = 0.5
 
 
 
-# Kompatibel versjon av 2d-virrevandring, med grensebetingelser
-def virrevandrere_2d_grense_betinget(x, y, N, M, pR, tilfeldigeTall, dx, dt):
-    
+def virrevandrere_2d_grense_betinget(x,y,N, M, pR, tilfeldigeTall, startPosisjon, dx, dt):
     """
     Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
-    
     ...
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx). Er det samme som pU her \n
+    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
+    startPosisjon --> Posisjonen der virrevandrerne starter \n
+    dx --> Hvor langt den vil vandre i x retning pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    dy --> Hvor langtr den vil vandre i y retning  pr tidsintervall \n
     
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    N  --> Antall virrevandrere
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx). Er det samme som pU her
-    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1]
-    dx --> Hvor langt den vil vandre i en retning pr tidsintervall
-    dt --> Tidsintervall 
-    
-    Output:
-    To matriser, 'posisjon' og 'tidsIntervaller':
-    posisjon --> En n*M matrise som viser posisjonen til virrevandreren
+    Output: \n
+    To matriser, 'posisjon' og 'tidsIntervaller': \n
+    posisjon --> En n*M matrise som viser posisjonen til virrevandreren \n
     Posisjon[i] = [[0,0], [0,0] ...]
     Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
-    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
+    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t \n
     tidsIntervaller --> En 1d array med lengde m som viser tidspunktet til en posisjon, 
     """
 
-    # Posisjon matrisen er lagt opp slik:
+    # Utrolig dårlig, men rask kodet å få dette til
+    # Posisjon matrisen er basically lagt opp slik:
     # Posisjon[i] = [[0,0], [0,0] ...]
     # Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
@@ -1163,8 +1077,8 @@ def virrevandrere_2d_grense_betinget(x, y, N, M, pR, tilfeldigeTall, dx, dt):
     rows, cols = (N, M)
     posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)],dtype=float)
     for zy in range(N):
-        posisjon[zy][0][0] = int(10)
-        posisjon[zy][0][1] = int(10)
+        posisjon[zy][0][0] = int(startPosisjon)
+        posisjon[zy][0][1] = int(startPosisjon)
     tidsIntervaller = np.linspace(0, dt*(N-1), (M))
     for i in range(N):
         # i er raden
@@ -1229,62 +1143,81 @@ def virrevandrere_2d_grense_betinget(x, y, N, M, pR, tilfeldigeTall, dx, dt):
     
     return posisjon, tidsIntervaller
 
-"""
-Her har vi lagt til periodiske grensebetingelser
+# Finner Delta_X
+#delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
-Vi bruker periodiske betingelser, siden de er det mest realistiske.
-En fordel med dette, mot ingen grensebetingelser, er at vi holder alle virrevandrerne inne i et spesifikt område
-En fordel som dette har, som harde vegger ikke har, er at partikler ikke samler seg opp ved veggene,
-men de går istedenfor til den andre siden, slik at de alltid vil bevege seg
+#randomNums = np.random.uniform(0,1,(N,M-1))
 
-Før hadde vi harde vegger, fordi vi tenkte at periodiske grensebetingelser var vansleig å implementere, men de er egentlig ganske like.
-Derfor ser vi ikke noen ulemper med å ha periodiske grensebetingelser.
-"""
+#position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, pR, randomNums, startPosisjon, delx, dt)
 
+# Plotting av data
 
+#plott(position, timeintervall, xx, yy, delx, N)
 
-"""
-Nå som vi har en fungerende modell av tumorene, og dens effekter på virrevandrerne, anvdender vi den
-Vi lager en funksjon som teller opp hvor mange ganger virrevandreren har vørt i et begrenset område.
-Dette vil til slutt bli brukt til å finne tumorene i siste del av rapporten.
-Disse er mye kopiert fra forrige kode.
-"""
+# print(position[:][:][0])
 
+"""oppgave 2e"""
+# Lager rommet, i mikrometer
+# og deler inn i 200 punkter
 
+#nx og ny er oppløsningene av I(i, j)
 
-# Setter verdier for oppgaven
-# nx og ny er oppløsningene av I(i, j)
+LX = 20
+LY = 20
+
 nX = 20
 nY = 20
 
+xLinjeOppløsning = 200
+yLinjeOppløsning = 200
+
+x = np.linspace(0,LX,xLinjeOppløsning)
+y = np.linspace(0,LY,yLinjeOppløsning)
+
+# Lager en meshgrid
+# der x er en horisontal matrise
+# y er en vertikal matrise
+# Altså: xx[0][i] og yy[i] posisjon (x_i, y_i)
+xx, yy = np.meshgrid(x,y,sparse=True)
+
+# Oppgave konstanter
+N = 3
+M = 100
+antallTumor = 10
+t_k = np.full(antallTumor,0.1,dtype=float)
+tumorSenter = np.random.randint(0,antallPunkter,(antallTumor,2))
+areal = 4*np.pi
+dt = 0.01
+startPosisjon = 10
+pR = 0.5
+
 I = np.zeros((nX, nY))
 
-# Kompatibel versjon av 2d-virrevandring, med grensebetingelser, og I-teller
 def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
-    
     """
     Simulererer n virrevandrer i 2 dimensjoner, modifisert for dx avhengig av posisjonen
-    
     ...
+    Input: \n
+    N  --> Antall virrevandrere \n
+    M  --> Virrevandreren vil bevege seg M-1 ganger \n
+    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx). Er det samme som pU her \n
+    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1] \n
+    I --> En nx * ny matrise med nuller; den sjekker hvor virrevandrene har vært \n
+    dx --> Hvor langt den vil vandre i x retning pr tidsintervall \n
+    dt --> Tidsintervall \n 
+    dy --> Hvor langtr den vil vandre i y retning  pr tidsintervall \n
     
-    Input:
-    M  --> Virrevandreren vil bevege seg n-1 ganger, og har et startpunkt
-    N  --> Antall virrevandrere
-    pR  --> Tilfeldig tall må være større enn denne for å gå til høyre (+dx). Er det samme som pU her
-    tilfeldigeTall --> En n*n matrise med tilfeldige tall i intervallet [0,1]
-    dx --> Hvor langt den vil vandre i en retning pr tidsintervall
-    dt --> Tidsintervall 
-    
-    Output:
-    To matriser, 'posisjon' og 'tidsIntervaller':
-    posisjon --> En n*M matrise som viser posisjonen til virrevandreren
+    Output: \n
+    To matriser, 'posisjon' og 'tidsIntervaller': \n
+    posisjon --> En n*M matrise som viser posisjonen til virrevandreren \n
     Posisjon[i] = [[0,0], [0,0] ...]
     Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
-    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
+    [x,y], som viser posisjonen til virrevandrer i på tidspunkt t \n
     tidsIntervaller --> En 1d array med lengde m som viser tidspunktet til en posisjon, 
     """
 
-    # Posisjon matrisen er lagt opp slik:
+    # Utrolig dårlig, men rask kodet å få dette til
+    # Posisjon matrisen er basically lagt opp slik:
     # Posisjon[i] = [[0,0], [0,0] ...]
     # Der i er hvilken virrevandrer og da vil Posisjon[i][t] gi tilbake
     # [x,y], som viser posisjonen til virrevandrer i på tidspunkt t
@@ -1292,7 +1225,6 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     rows, cols = (N, M)
     posisjon = np.array([[[0,0] for i in range(cols)] for j in range(rows)],dtype=float)    
     
-    # Henter inn I-matrisen
     IPosisjon = I
     
     # velger startposisjon til hver virrevandrer
@@ -1389,61 +1321,58 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     IPosisjon = IPosisjon / (N * M)
     return posisjon, tidsIntervaller, IPosisjon
 
+# Finner Delta_X
+#delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
-"""
-Her har vi lagt til I(i, j).
-Kodens forklaring står inni kodene selv.
-"""
+#randomNums = np.random.uniform(0,1,(N,M-1))
 
+#position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
 
+# Plotting av data
 
-"""
-Nå kan vi begynne å simulere alt arbeidet vi har gjort så langt
-Vi simulerer med 10 til 25 tumorer, med en I-ooppløsning på nx = ny = 40, 40 X 40,
-og med selvvalgte M, N, LX, LX, og L = LX * LY
-"""
+#plott(position, timeintervall, xx, yy, delx, N)
 
+"""oppgave 2f"""
 
-
-# Setter verdier for oppgaven
-antallTumor = np.random.randint(10, 25)
-t_k = np.random.uniform(0.3,0.45,(antallTumor))
-Sentral_Punkt = []
-tumorSenter = np.random.randint(0,LX,(antallTumor,2))
-
-M = 800
-N = 3
 
 nX = 40
 nY = 40
 
 I = np.zeros((nX, nY))
-# Finner Delta_X
-#delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
-randomNums = np.random.uniform(0,1,(N,M-1))
+LX = 20
+LY = 20
 
-#position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx, yy, N, M, pR, randomNums, I, delx, dt)
-# Plotting av data
+xLinjeOppløsning = 200
+yLinjeOppløsning = 200
 
+x = np.linspace(0,LX,xLinjeOppløsning)
+y = np.linspace(0,LY,yLinjeOppløsning)
 
+# Lager en meshgrid
+# der x er en horisontal matrise
+# y er en vertikal matrise
+# Altså: xx[0][i] og yy[i] posisjon (x_i, y_i)
+xx, yy = np.meshgrid(x,y,sparse=True)
 
 N = 10
 M = 100
 
 
-"""
-Vi plotter ut en simulering med våre valgte verdier
-Vi ser at virrevandrerne går tregere jo flere tumorer den er inni.
-Dette kan brukes til å finne ut hvor tumorene er, basert på hvordan virrevandrene beveger seg
 
-Vi kan øke denne muligheten ved å øke vøre valgte verdier
-for Lx, Ly, og L, gir dette oss et større rom der virrevandrerne vil mer tydelig gå saktere.
-for M, er det fordi flere virrevandrere gir et mer tydelig signal, siden de oppholder seg mest ved tumorene.
-for N, er det firdi det gir hver virrevandrer mer tid, som i gjennomsnitt betyr mer tid i tumprene, som gir et sterkere signal.
-"""
+antallTumor = np.random.randint(10, 25)
+t_k = np.random.uniform(0.3,0.45,(antallTumor))
+Sentral_Punkt = []
+tumorSenter = np.random.randint(0,xLinjeOppløsning,(antallTumor,2))
+areal = 4*np.pi
+dt = 0.01
+startPosisjon = 10
+pR = 0.5
 
+# Finner Delta_X
+delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
+randomNums = np.random.uniform(0,1,(N,M-1))
 
 position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
 # Plotting av data
@@ -1493,28 +1422,25 @@ nX = 40
 nY = 40
 I = np.zeros((nX, nY))
 
-
-# Setter verdier for oppgaven
+N = 3
+M = 800
 antallTumor = np.random.randint(10, 25)
 t_k = np.random.uniform(0.3,0.45,antallTumor)
-tumorSenter = np.random.randint(0,LX,(antallTumor,2))
-
-'''
-Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av rapporten.
-'''
+tumorSenter = np.random.randint(0,xLinjeOppløsning,(antallTumor,2))
+areal = 4*np.pi
+dt = 0.01
+startPosisjon = 10
+pR = 0.5
 
 # Finner Delta_X
-#delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
+delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
-#position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx, yy, N, M, pR, randomNums, I, delx, dt)
+position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
 
-#X_, Y_, S_ = Sobel_filter(IPosisjon)
+X_, Y_, S_ = Sobel_filter(IPosisjon)
 
-
-"what is this plot"
-'''
 fig = plt.figure()
 #fig, (ax0, ax1,ax2) = plt.subplots(nrows=3)
 ax0 = plt.subplot(212)
@@ -1555,20 +1481,3 @@ fig.set_size_inches(14.5, 6.5)
 plt.legend()
 plt.tight_layout()
 plt.show()
-'''
-
-
-"""
-Diskusjon
-"""
-
-
-"""
-Da har vi nådd målet vårt.
-Vi har laget en program som kan numerisk funne tumorer ved å bruke vannets virrevandrende egenskaper.
-Slike koder som dette kan brukes i det praktiske, og hjelpe mennesker med å finne tumorer i deres kropper.
-
-Akkurat denne versjonen kan bli optimisert og forbedret,
-men poenget med den var å vise en mulig løsning av å kode en slik kode.
-Så for nå, sier vi oss ferdige.
-"""
