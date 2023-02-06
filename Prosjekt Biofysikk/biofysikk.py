@@ -1330,7 +1330,7 @@ y = np.linspace(0,LY,yLinjeOppløsning)
 # Altså: xx[0][i] og yy[i] posisjon (x_i, y_i)
 xx, yy = np.meshgrid(x,y,sparse=True)
 
-N = 40
+N = 10
 M = 100
 
 
@@ -1351,14 +1351,17 @@ randomNums = np.random.uniform(0,1,(N,M-1))
 
 position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
 # Plotting av data
-
-print("2f")
+fig, ax0 = plt.subplots(nrows=1)
+im = ax0.pcolormesh(IPosisjon, cmap ='Greens',shading='auto')
+fig.colorbar(im,ax=ax0, label=r"$Tetthet$")
+ax0.set_ylabel(r"$n_y$")
+ax0.set_xlabel(r"$n_x$")
+plt.legend()
+plt.tight_layout()
+plt.show()
 plott(position, timeintervall, xx, yy, delx, N)
-
-
-
-
 """Oppgave 2g"""
+
 
 
 def Sobel_filter(nxm_matrix):
@@ -1389,6 +1392,10 @@ def Sobel_filter(nxm_matrix):
     S_norm = S / np.linalg.norm(S)
 
     return X_norm, Y_norm, S_norm
+
+nX = 40
+nY = 40
+I = np.zeros((nX, nY))
 
 N = 3
 M = 800
