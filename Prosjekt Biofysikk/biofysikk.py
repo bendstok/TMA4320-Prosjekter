@@ -1412,7 +1412,11 @@ position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums,
 
 X_, Y_, S_ = Sobel_filter(IPosisjon)
 
-fig, ((ax0, ax2), (ax1, ax3)) = plt.subplots(2,2)
+fig = plt.figure()
+#fig, (ax0, ax1,ax2) = plt.subplots(nrows=3)
+ax0 = plt.subplot(212)
+ax1 = plt.subplot(222)
+ax2 = plt.subplot(221)
 
 ax0.set_title(r"I(i,j), uten  Sobel-filter")
 ax1.set_title(r"I(i,j), med  Sobel-filter")
@@ -1439,11 +1443,12 @@ for i in range(N):
 im3 = ax2.pcolormesh(x,y,delx, cmap ='Greens',shading='auto')
 ax2.set_ylabel(r"Y [$\mu m$]")
 ax2.set_xlabel(r"X [$\mu m$]")
-ax2.set_title(r"Posisjon til tumorer, gjennom $\Delta x$, og virrevandrer")
+ax2.set_title("Posisjon til tumorer, gjennom $\Delta x$, \n og virrevandrer")
 
 fig.colorbar(im3,ax=ax2, label=r"$\Delta x$ [$\mu m$]")
 fig.colorbar(im2,ax=ax1, label=r"Tetthet")
 fig.colorbar(im, ax=ax0, label=r"Tetthet")
+fig.set_size_inches(14.5, 6.5)
 plt.legend()
 plt.tight_layout()
 plt.show()
