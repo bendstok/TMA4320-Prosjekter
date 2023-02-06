@@ -770,54 +770,51 @@ Sample text
 # I tumor K: del_x reduseres med sqrt(t_k)
 # Om tumor K og I overlapper: del_x reduseres med sqrt(t_k * t_i)
 
-
-def absolute_distance(x_1, y_1, x_2, y_2):
-    """
-    Input: To punkter (x_1,y_1) og (x_2,y_2)
+def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,f_k=4):
     
-    Output: Returner absolutt distance
+     """
+    Lager en matrise med friskt vev og srikulære tumorer. Returnerer en 2d matrise med effektive delta_x for systemet.
+    
+    ...
+    Input: \n
+    
+    x  --> x liste fra meshgrid
+    y  --> y liste fra meshgrid
+    areal --> arealet til alle tumorene (float)
+    antallTumor  --> Antall tumor (int)
+    tumorSenter  --> Indexer i matrisen som representerer tumorenes sentrum (antallTumor*2 numpy array)
+    t_k  --> Tumor koeffisient. Liste med tumor koeffisient for hver tumor
+    f_k  --> Friskt vev koeffisient (int). Standard verdi = 4
+    
+    Output: \n
+    del_x  --> En 2d matrise med effektive delta_x for meshgrid satt inn. Indexer representerer koordinater.
     """
-    return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
-
-""" def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
-    # Lager en like stor delta_x matrise som rommet vårt
-    # og setter alle Delta_X lik 4 mikrometer
-    del_x = np.full((len(x[0]), len(y)), 4, dtype=float)
-    # Utregning radius
-    radius = np.round(np.sqrt(area/np.pi))
-
-    for i in range(N_tumor):
-        # Itererer over alle tumorer
-        xcenter_tumor = Tumor_Center[i][1]
-        ycenter_tumor = Tumor_Center[i][0]
-        for v in range(len(x[0])):
-            for w in range(len(y)):
-                # Itererer over rommet
-                if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
-                        # Setter ny Delta_X om punktet er innenfor radius
-                        del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
-
-    return del_x
- """
-def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):    
+     
+    #Finner avstand mellom hvert punkt, lager en frist vev matrise, og finner radius som passer med "indexkoordinatene"
     dx = yy[1]-yy[0]
-    del_x = np.full((len(x[0]),len(y)),t_f,dtype=float)
+    del_x = np.full((len(x[0]),len(y)),f_k,dtype=float)
     radius = (areal/np.pi)**(1/2)
     radiusN = int(np.round(radius/dx))
+    
+    #Lager en tumor
     tumor = np.zeros((2*radiusN+1,2*radiusN+1))
     tumorliste = []
     for i in range(len(tumor)):
         for j in range(len(tumor)):
             if (((i-radiusN)**2+(radiusN-j)**2)**(1/2)<=radiusN):
                 tumor[i,j] = 1
+    #Lager liste med tumorer med forskjellig t_k
     for i in range(antallTumor):
         temp = np.copy(tumor)
         temp *= t_k[i]
         temp = np.where(temp!=0,temp,1)
         tumorliste.append(temp)
+        
+    #Setter tumorene på tumor senterene
     for i in range(antallTumor):
         xSenter = tumorSenter[i,0]
         ySenter = tumorSenter[i,1]
+        #Må passe på at tumorene ikke blir satt utenfor matrisen
         tempXMin,tempYMin,tempXMax,tempYMax = (radiusN,radiusN,radiusN,radiusN)
         tumorXMin,tumorYMin,tumorXMax,tumorYMax = (0,0,len(tumor),len(tumor))
         if xSenter-radiusN<0:
@@ -832,6 +829,7 @@ def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):
         if ySenter+radiusN+1>len(del_x):
             tempYMax = ySenter
             tumorYMax = radiusN+len(del_x)-ySenter
+        #Her blir tumorene faktisk satt på matrisen
         del_x[ySenter-tempYMin:ySenter+tempYMax+1,xSenter-tempXMin:xSenter+tempXMax+1] *= tumorliste[i][tumorYMin:tumorYMax,tumorXMin:tumorXMax]
     return del_x
 
