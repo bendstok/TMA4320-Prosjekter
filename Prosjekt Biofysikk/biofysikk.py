@@ -816,8 +816,8 @@ def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):
         temp = np.where(temp!=0,temp,1)
         tumorliste.append(temp)
     for i in range(antallTumor):
-        xSenter = tumorSenter[i,0]
-        ySenter = tumorSenter[i,1]
+        xSenter = tumorSenter[i][0]
+        ySenter = tumorSenter[i][1]
         tempXMin,tempYMin,tempXMax,tempYMax = (radiusN,radiusN,radiusN,radiusN)
         tumorXMin,tumorYMin,tumorXMax,tumorYMax = (0,0,len(tumor),len(tumor))
         if xSenter-radiusN<0:
@@ -1411,6 +1411,13 @@ X_, Y_, S_ = Sobel_filter(IPosisjon)
 
 fig, (ax0, ax1,ax2) = plt.subplots(nrows=3)
 
+ax0.set_title(r"I(i,j), uten  Sobel-filter")
+ax1.set_title(r"I(i,j), med  Sobel-filter")
+ax1.set_ylabel(r"$n_y$")
+ax1.set_xlabel(r"$n_x$")
+
+ax0.set_ylabel(r"$n_y$")
+ax0.set_xlabel(r"$n_x$")
 im = ax0.pcolormesh(IPosisjon, cmap ='Greens',shading='auto')
 im2 = ax1.pcolormesh(S_, cmap="Greens", shading="auto")
 for i in range(N):
