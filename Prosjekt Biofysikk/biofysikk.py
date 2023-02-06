@@ -802,7 +802,7 @@ def absolute_distance(x_1, y_1, x_2, y_2):
 def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):    
     dx = yy[1]-yy[0]
     del_x = np.full((len(x[0]),len(y)),t_f,dtype=float)
-    radius = int((areal/np.pi)**(1/2))
+    radius = (areal/np.pi)**(1/2)
     radiusN = int(np.round(radius/dx))
     tumor = np.zeros((2*radiusN+1,2*radiusN+1))
     tumorliste = []
@@ -816,8 +816,8 @@ def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):
         temp = np.where(temp!=0,temp,1)
         tumorliste.append(temp)
     for i in range(antallTumor):
-        xSenter = tumorSenter[i][1]*10
-        ySenter = tumorSenter[i][0]*10
+        xSenter = tumorSenter[i,0]
+        ySenter = tumorSenter[i,1]
         tempXMin,tempYMin,tempXMax,tempYMax = (radiusN,radiusN,radiusN,radiusN)
         tumorXMin,tumorYMin,tumorXMax,tumorYMax = (0,0,len(tumor),len(tumor))
         if xSenter-radiusN<0:
@@ -839,8 +839,9 @@ def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):
 
 # Lager rommet, i mikrometer
 # og deler inn i 200 punkter
-x = np.linspace(0,20,200)
-y = np.linspace(0,20,200)
+antallPunkter = 200
+x = np.linspace(0,20,antallPunkter)
+y = np.linspace(0,20,antallPunkter)
 
 # Lager en meshgrid
 # der x er en horisontal matrise
@@ -850,18 +851,15 @@ xx, yy = np.meshgrid(x,y,sparse=True)
 
 # Oppgave konstanter
 N = 2
-M = 20
-Antall_Tumors = 15
-tumor_koeffisients = [0.1]*Antall_Tumors
-Sentral_Punkt = []
-for i in range(Antall_Tumors):
-    Sentral_Punkt.append([int(np.random.uniform(0,20)), int(np.random.uniform(0,20))])
-Sentral_Punkt = np.array(Sentral_Punkt)
-area = 4*np.pi
+M = 1000
+antallTumor = 15
+t_k = np.full(antallTumor,0.1,dtype=float)
+tumorSenter = np.random.randint(0,antallPunkter,(antallTumor,2))
+areal = 4*np.pi
 dt = 0.01
 
 # Finner Delta_X
-# delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
 def find_nearest(array, value):
     # Må brukes for å finne nærmeste (x,y) til virrevandreren i meshgriden
@@ -953,7 +951,7 @@ randomNums = np.random.uniform(0,1,(N,M-1))
 
 
 
-# position, timeintervall = virrevandrere_2d(xx,yy,N, M, 0.5, randomNums, delx, dt)
+position, timeintervall = virrevandrere_2d(xx,yy,N, M, 0.5, randomNums, delx, dt)
 
 # Plotting av data
 def plott(positions, time, x, y, delta_x, n_virre):
@@ -962,9 +960,9 @@ def plott(positions, time, x, y, delta_x, n_virre):
     im = ax0.pcolormesh(x,y,delta_x, cmap ='Greens',shading='auto')
     ax0.set_ylabel(r"Y [$\mu m$]")
     ax0.set_xlabel(r"X [$\mu m$]")
-    ax0.set_title(r"Posisjon til tumorer, gjennom $\Delta x$, og virrevandrer")
+    ax0.set_title(r"Posisjon til tumorer, gjennom $\Delta x$")
 
-    fig.colorbar(im, ax=ax0,label=r"$\Delta x$ [$\mu m$]")
+    fig.colorbar(im, ax=ax0)
 
     for i in range(n_virre):
         y_points = np.zeros(len(positions[0]))
@@ -984,9 +982,13 @@ def plott(positions, time, x, y, delta_x, n_virre):
     plt.tight_layout()
     plt.show()
 
-#plott(position, timeintervall, xx, yy, delx, 2)
+# plott(position, timeintervall, xx, yy, delx, 2)
+# h = plt.contourf(x, y, delx)
+# plt.axis('scaled')
+# plt.colorbar()
+# plt.show()
 
-# print(tumor_del_x(space2d, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients))
+#print(tumor_del_x(space2d, areal, antallTumor, tumorSenter, t_k))
 
 
 """Oppgave 2d"""
@@ -996,8 +998,9 @@ def plott(positions, time, x, y, delta_x, n_virre):
 LX = 20
 LY = 20
 
-x = np.linspace(0,LX,200)
-y = np.linspace(0,LY,200)
+antallPunkter = 200
+x = np.linspace(0,LX,antallPunkter)
+y = np.linspace(0,LY,antallPunkter)
 
 # Lager en meshgrid
 # der x er en horisontal matrise
@@ -1007,17 +1010,16 @@ xx, yy = np.meshgrid(x,y,sparse=True)
 
 # Oppgave konstanter
 N = 2
-M = 30
-Antall_Tumors = 5
-tumor_koeffisients = [0.1]*Antall_Tumors
-Sentral_Punkt = []
-for i in range(Antall_Tumors):
-    Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
-Sentral_Punkt = np.array(Sentral_Punkt)
-area = 4*np.pi
+M = 1000
+antallTumor = 5
+t_k = np.full(antallTumor,0.1,dtype=float)
+tumorSenter = np.random.randint(0,antallPunkter,(antallTumor,2))
+areal = 4*np.pi
 dt = 0.01
 startPosisjon = 10
 pR = 0.5
+
+
 
 def virrevandrere_2d_grense_betinget(x,y,N, M, pR, tilfeldigeTall, startPosisjon, dx, dt):
     """
@@ -1118,18 +1120,17 @@ def virrevandrere_2d_grense_betinget(x,y,N, M, pR, tilfeldigeTall, startPosisjon
     return posisjon, tidsIntervaller
 
 # Finner Delta_X
-# delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+#delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
-randomNums = np.random.uniform(0,1,(N,M-1))
+#randomNums = np.random.uniform(0,1,(N,M-1))
 
-# position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, pR, randomNums, startPosisjon, delx, dt)
+#position, timeintervall = virrevandrere_2d_grense_betinget(xx,yy,N, M, pR, randomNums, startPosisjon, delx, dt)
 
 # Plotting av data
 
-# plott(position, timeintervall, xx, yy, delx, N)
+#plott(position, timeintervall, xx, yy, delx, N)
 
 # print(position[:][:][0])
-
 
 """oppgave 2e"""
 # Lager rommet, i mikrometer
@@ -1158,13 +1159,10 @@ xx, yy = np.meshgrid(x,y,sparse=True)
 # Oppgave konstanter
 N = 3
 M = 100
-Antall_Tumors = 10
-tumor_koeffisients = [0.1]*Antall_Tumors
-Sentral_Punkt = []
-for i in range(Antall_Tumors):
-    Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
-Sentral_Punkt = np.array(Sentral_Punkt)
-area = 4*np.pi
+antallTumor = 10
+t_k = np.full(antallTumor,0.1,dtype=float)
+tumorSenter = np.random.randint(0,antallPunkter,(antallTumor,2))
+areal = 4*np.pi
 dt = 0.01
 startPosisjon = 10
 pR = 0.5
@@ -1300,11 +1298,11 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
     return posisjon, tidsIntervaller, IPosisjon
 
 # Finner Delta_X
-# delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+#delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
-randomNums = np.random.uniform(0,1,(N,M-1))
+#randomNums = np.random.uniform(0,1,(N,M-1))
 
-# position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
+#position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
 
 # Plotting av data
 
@@ -1333,24 +1331,22 @@ y = np.linspace(0,LY,yLinjeOppløsning)
 # Altså: xx[0][i] og yy[i] posisjon (x_i, y_i)
 xx, yy = np.meshgrid(x,y,sparse=True)
 
-N = 100
+N = 40
 M = 100
 
 
 
-Antall_Tumors = np.random.randint(10, 25)
-tumor_koeffisients = np.random.uniform(0.3,0.45,(Antall_Tumors))
+antallTumor = np.random.randint(10, 25)
+t_k = np.random.uniform(0.3,0.45,(antallTumor))
 Sentral_Punkt = []
-for i in range(Antall_Tumors):
-    Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
-Sentral_Punkt = np.array(Sentral_Punkt)
-area = 4*np.pi
+tumorSenter = np.random.randint(0,xLinjeOppløsning,(antallTumor,2))
+areal = 4*np.pi
 dt = 0.01
 startPosisjon = 10
 pR = 0.5
 
 # Finner Delta_X
-delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
