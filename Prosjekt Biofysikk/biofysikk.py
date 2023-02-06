@@ -1229,13 +1229,6 @@ def virrevandrere_2d_grense_betinget(x, y, N, M, pR, tilfeldigeTall, dx, dt):
     
     return posisjon, tidsIntervaller
 
-
-
-'''
-Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av rapporten.
-'''
-
-
 """
 Her har vi lagt til periodiske grensebetingelser
 
@@ -1425,11 +1418,6 @@ nX = 40
 nY = 40
 
 I = np.zeros((nX, nY))
-
-'''
-Her kan leseren fjerne # under, for å printe ut resultatet av denne delen av rapporten.
-'''
-
 # Finner Delta_X
 #delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
