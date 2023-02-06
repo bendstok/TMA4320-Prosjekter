@@ -796,6 +796,8 @@ def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
                 if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
                         # Setter ny Delta_X om punktet er innenfor radius
                         del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
+                        #if(del_x[v][w] == 0.4):
+                            #print("HEY")
 
     return del_x
 
@@ -938,9 +940,9 @@ def plott(positions, time, x, y, delta_x, n_virre):
             x_points[j] = (positions[i][j][0])
             y_points[j] = (positions[i][j][1])
             # "Un-comment" denne under om du vil se de ulike steppene markert med  en x
-            #plt.plot(position[i][j][0],position[i][j][1], marker="x")
+            plt.plot(positions[i][j][0],positions[i][j][1], marker="x")
             #print(x_points[j], y_points[j], j)
-        print("NEXT")
+        #print("NEXT")
         ax0.plot(x_points, y_points, label= f"Virrevandrer {i + 1}")
     plt.legend()
     plt.tight_layout()
@@ -959,7 +961,7 @@ LX = 20
 LY = 20
 
 x = np.linspace(0,LX,200)
-y = np.linspace(0,lY,200)
+y = np.linspace(0,LY,200)
 
 # Lager en meshgrid
 # der x er en horisontal matrise
@@ -1202,6 +1204,7 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
 
                 # Finner så step
                 step = dx[index_x[0]][index_y[0]]
+                print(step)
                 if tilfeldigeTall[i][j] < pR:
                     # dx avhengig av posisjon
                     
@@ -1305,28 +1308,23 @@ def Sobel_filter(nxm_matrix):
     n = len(nxm_matrix)
     m = len(nxm_matrix[0])
 
-    g_x = np.array([[1,0,-1],
-                    [2,0,-2],
-                    [1,0-1]])
+    g_x = np.array([[1,0,-1],[2,0,-2],[1,0,-1]],dtype=float)
 
-    g_y = np.array([[1,2,1],
-                    [0,0,0]
-                    [-1,-2,-1]])
+    g_y = np.array([[1,2,1],[0,0,0],[-1,-2,-1]],dtype=float)
 
-    X = np.zeroes((n-2,m-2))
-    Y = np.zeroes((n-2,m-2))
-    S = np.zeroes((n-2,m-2))
-    local_pixels = [[0,0,0],
-                    [0,0,0],
-                    [0,0,0]]
+    X = np.zeros((n-2,m-2))
+    Y = np.zeros((n-2,m-2))
+    S = np.zeros((n-2,m-2))
+    local_pixels = np.array([[0,0,0],[0,0,0],[0,0,0]],dtype=float)
 
     for i in range(2,n-1):
         for j in range(2,m-1):
             for x in range(3):
                 for y in range(3):
                     local_pixels[x][y] = nxm_matrix[i][j]
-            X[i-1][j-1] = sum(g_x*local_pixels)
-            Y[i-1][j-1] = sum(g_y*local_pixels)
+            #print(g_x, local_pixels)
+            X[i-1][j-1] = np.sum(np.multiply(g_x,local_pixels, dtype=float))
+            Y[i-1][j-1] = np.sum(np.multiply(g_y,local_pixels, dtype=float))
             S[i-1][j-1] = np.sqrt((X[i-1][j-1])**2 + (Y[i-1][j-1])**2)
 
     X_norm = X / np.linalg.norm(X)
@@ -1334,3 +1332,51 @@ def Sobel_filter(nxm_matrix):
     S_norm = S / np.linalg.norm(S)
 
     return X_norm, Y_norm, S_norm
+
+N = 3
+M = 100
+Antall_Tumors = np.random.randint(10, 25)
+tumor_koeffisients = np.random.uniform(0.3,0.45,(Antall_Tumors))
+Sentral_Punkt = []
+for i in range(Antall_Tumors):
+    Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
+area = 4*np.pi
+dt = 0.01
+startPosisjon = 10
+pR = 0.5
+
+# Finner Delta_X
+delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+
+randomNums = np.random.uniform(0,1,(N,M-1))
+
+position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
+
+X_, Y_, S_ = Sobel_filter(IPosisjon)
+
+fig, (ax0, ax1,ax2) = plt.subplots(nrows=3)
+
+im = ax0.pcolormesh(IPosisjon, cmap ='Greens',shading='auto')
+im2 = ax1.pcolormesh(S_, cmap="Greens", shading="auto")
+for i in range(N):
+        y_points = np.zeros(len(position[0]))
+        x_points = np.zeros(len(position[0]))
+        z_points = time
+        for j in range(len(position[0])):
+            x_points[j] = (position[i][j][0])
+            y_points[j] = (position[i][j][1])
+            # "Un-comment" denne under om du vil se de ulike steppene markert med  en x
+            ax2.plot(position[i][j][0],position[i][j][1], marker="x")
+            #print(x_points[j], y_points[j], j)
+        #print("NEXT")
+        ax2.plot(x_points, y_points, label= f"Virrevandrer {i + 1}")
+
+im3 = ax2.pcolormesh(x,y,delx, cmap ='Greens',shading='auto')
+ax2.set_ylabel(r"Y [$\mu m$]")
+ax2.set_xlabel(r"X [$\mu m$]")
+ax2.set_title(r"Posisjon til tumorer, gjennom $\Delta x$")
+
+fig.colorbar(im, ax=ax2)
+plt.legend()
+plt.tight_layout()
+plt.show()
