@@ -779,30 +779,30 @@ def absolute_distance(x_1, y_1, x_2, y_2):
     """
     return(np.sqrt( (x_2 - x_1)**2 + (y_2 - y_1)**2))
 
-# def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
-#     # Lager en like stor delta_x matrise som rommet vårt
-#     # og setter alle Delta_X lik 4 mikrometer
-#     del_x = np.full((len(x[0]), len(y)), 4, dtype=float)
-#     # Utregning radius
-#     radius = np.round(np.sqrt(area/np.pi))
+""" def delta_x_eff(x, y, area, N_tumor, Tumor_Center, Tumor_Coeff):
+    # Lager en like stor delta_x matrise som rommet vårt
+    # og setter alle Delta_X lik 4 mikrometer
+    del_x = np.full((len(x[0]), len(y)), 4, dtype=float)
+    # Utregning radius
+    radius = np.round(np.sqrt(area/np.pi))
 
-#     for i in range(N_tumor):
-#         # Itererer over alle tumorer
-#         xcenter_tumor = Tumor_Center[i][1]
-#         ycenter_tumor = Tumor_Center[i][0]
-#         for v in range(len(x[0])):
-#             for w in range(len(y)):
-#                 # Itererer over rommet
-#                 if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
-#                         # Setter ny Delta_X om punktet er innenfor radius
-#                         del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
+    for i in range(N_tumor):
+        # Itererer over alle tumorer
+        xcenter_tumor = Tumor_Center[i][1]
+        ycenter_tumor = Tumor_Center[i][0]
+        for v in range(len(x[0])):
+            for w in range(len(y)):
+                # Itererer over rommet
+                if(absolute_distance(x[0][v], y[w], xcenter_tumor, ycenter_tumor) <= radius):
+                        # Setter ny Delta_X om punktet er innenfor radius
+                        del_x[v][w] *= np.sqrt(Tumor_Coeff[i])
 
-#     return del_x
-
+    return del_x
+ """
 def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):    
     dx = yy[1]-yy[0]
     del_x = np.full((len(x[0]),len(y)),t_f,dtype=float)
-    radius = (areal/np.pi)**(1/2)
+    radius = int((areal/np.pi)**(1/2))
     radiusN = int(np.round(radius/dx))
     tumor = np.zeros((2*radiusN+1,2*radiusN+1))
     tumorliste = []
@@ -816,8 +816,8 @@ def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,t_f=4):
         temp = np.where(temp!=0,temp,1)
         tumorliste.append(temp)
     for i in range(antallTumor):
-        xSenter = tumorSenter[i][0]
-        ySenter = tumorSenter[i][1]
+        xSenter = tumorSenter[i][1]*10
+        ySenter = tumorSenter[i][0]*10
         tempXMin,tempYMin,tempXMax,tempYMax = (radiusN,radiusN,radiusN,radiusN)
         tumorXMin,tumorYMin,tumorXMax,tumorYMax = (0,0,len(tumor),len(tumor))
         if xSenter-radiusN<0:
@@ -856,6 +856,7 @@ tumor_koeffisients = [0.1]*Antall_Tumors
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
     Sentral_Punkt.append([int(np.random.uniform(0,20)), int(np.random.uniform(0,20))])
+Sentral_Punkt = np.array(Sentral_Punkt)
 area = 4*np.pi
 dt = 0.01
 
@@ -961,9 +962,9 @@ def plott(positions, time, x, y, delta_x, n_virre):
     im = ax0.pcolormesh(x,y,delta_x, cmap ='Greens',shading='auto')
     ax0.set_ylabel(r"Y [$\mu m$]")
     ax0.set_xlabel(r"X [$\mu m$]")
-    ax0.set_title(r"Posisjon til tumorer, gjennom $\Delta x$")
+    ax0.set_title(r"Posisjon til tumorer, gjennom $\Delta x$, og virrevandrer")
 
-    fig.colorbar(im, ax=ax0)
+    fig.colorbar(im, ax=ax0,label=r"$\Delta x$ [$\mu m$]")
 
     for i in range(n_virre):
         y_points = np.zeros(len(positions[0]))
@@ -1012,6 +1013,7 @@ tumor_koeffisients = [0.1]*Antall_Tumors
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
     Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
+Sentral_Punkt = np.array(Sentral_Punkt)
 area = 4*np.pi
 dt = 0.01
 startPosisjon = 10
@@ -1161,6 +1163,7 @@ tumor_koeffisients = [0.1]*Antall_Tumors
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
     Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
+Sentral_Punkt = np.array(Sentral_Punkt)
 area = 4*np.pi
 dt = 0.01
 startPosisjon = 10
@@ -1338,6 +1341,7 @@ tumor_koeffisients = np.random.uniform(0.3,0.45,(Antall_Tumors))
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
     Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
+Sentral_Punkt = np.array(Sentral_Punkt)
 area = 4*np.pi
 dt = 0.01
 startPosisjon = 10
@@ -1395,6 +1399,7 @@ tumor_koeffisients = np.random.uniform(0.3,0.45,(Antall_Tumors))
 Sentral_Punkt = []
 for i in range(Antall_Tumors):
     Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
+Sentral_Punkt = np.array(Sentral_Punkt)
 area = 4*np.pi
 dt = 0.01
 startPosisjon = 10
@@ -1409,7 +1414,7 @@ position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums,
 
 X_, Y_, S_ = Sobel_filter(IPosisjon)
 
-fig, (ax0, ax1,ax2) = plt.subplots(nrows=3)
+fig, ((ax0, ax2), (ax1, ax3)) = plt.subplots(2,2)
 
 ax0.set_title(r"I(i,j), uten  Sobel-filter")
 ax1.set_title(r"I(i,j), med  Sobel-filter")
@@ -1436,9 +1441,11 @@ for i in range(N):
 im3 = ax2.pcolormesh(x,y,delx, cmap ='Greens',shading='auto')
 ax2.set_ylabel(r"Y [$\mu m$]")
 ax2.set_xlabel(r"X [$\mu m$]")
-ax2.set_title(r"Posisjon til tumorer, gjennom $\Delta x$")
+ax2.set_title(r"Posisjon til tumorer, gjennom $\Delta x$, og virrevandrer")
 
-fig.colorbar(im, ax=ax2)
+fig.colorbar(im3,ax=ax2, label=r"$\Delta x$ [$\mu m$]")
+fig.colorbar(im2,ax=ax1, label=r"Tetthet")
+fig.colorbar(im, ax=ax0, label=r"Tetthet")
 plt.legend()
 plt.tight_layout()
 plt.show()
