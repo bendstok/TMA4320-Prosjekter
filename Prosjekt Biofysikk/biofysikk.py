@@ -1390,8 +1390,8 @@ def Sobel_filter(nxm_matrix):
 
     return X_norm, Y_norm, S_norm
 
-N = 2
-M = 1000
+N = 3
+M = 800
 antallTumor = np.random.randint(10, 25)
 t_k = np.random.uniform(0.3,0.45,antallTumor)
 tumorSenter = np.random.randint(0,xLinjeOppløsning,(antallTumor,2))
