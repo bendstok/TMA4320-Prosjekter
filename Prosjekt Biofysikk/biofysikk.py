@@ -771,8 +771,7 @@ Sample text
 # Om tumor K og I overlapper: del_x reduseres med sqrt(t_k * t_i)
 
 def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,f_k=4):
-    
-     """
+    """
     Lager en matrise med friskt vev og srikulære tumorer. Returnerer en 2d matrise med effektive delta_x for systemet.
     
     ...
@@ -789,7 +788,6 @@ def delta_x_eff(x,y,areal,antallTumor,tumorSenter,t_k,f_k=4):
     Output: \n
     del_x  --> En 2d matrise med effektive delta_x for meshgrid satt inn. Indexer representerer koordinater.
     """
-     
     #Finner avstand mellom hvert punkt, lager en frist vev matrise, og finner radius som passer med "indexkoordinatene"
     dx = yy[1]-yy[0]
     del_x = np.full((len(x[0]),len(y)),f_k,dtype=float)
