@@ -1391,20 +1391,17 @@ def Sobel_filter(nxm_matrix):
     return X_norm, Y_norm, S_norm
 
 N = 2
-M = 100
-Antall_Tumors = np.random.randint(10, 25)
-tumor_koeffisients = np.random.uniform(0.3,0.45,(Antall_Tumors))
-Sentral_Punkt = []
-for i in range(Antall_Tumors):
-    Sentral_Punkt.append([int(np.random.uniform(0,LX)), int(np.random.uniform(0,LY))])
-Sentral_Punkt = np.array(Sentral_Punkt)
-area = 4*np.pi
+M = 1000
+antallTumor = np.random.randint(10, 25)
+t_k = np.random.uniform(0.3,0.45,antallTumor)
+tumorSenter = np.random.randint(0,xLinjeOppløsning,(antallTumor,2))
+areal = 4*np.pi
 dt = 0.01
 startPosisjon = 10
 pR = 0.5
 
 # Finner Delta_X
-delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt*10, tumor_koeffisients)
+delx = delta_x_eff(xx,yy, areal, antallTumor, tumorSenter, t_k)
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
