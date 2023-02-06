@@ -1432,7 +1432,7 @@ for i in range(N):
             x_points[j] = (position[i][j][0])
             y_points[j] = (position[i][j][1])
             # "Un-comment" denne under om du vil se de ulike steppene markert med  en x
-            ax2.plot(position[i][j][0],position[i][j][1], marker="x")
+            #ax2.plot(position[i][j][0],position[i][j][1], marker="x")
             #print(x_points[j], y_points[j], j)
         #print("NEXT")
         ax2.plot(x_points, y_points, label= f"Virrevandrer {i + 1}")
