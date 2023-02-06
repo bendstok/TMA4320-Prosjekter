@@ -1292,3 +1292,45 @@ position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums,
 # Plotting av data
 
 plott(position, timeintervall, xx, yy, delx, N)
+
+
+
+
+
+
+"""Oppgave 2g"""
+
+
+def Sobel_filter(nxm_matrix):
+    n = len(nxm_matrix)
+    m = len(nxm_matrix[0])
+
+    g_x = np.array([[1,0,-1],
+                    [2,0,-2],
+                    [1,0-1]])
+
+    g_y = np.array([[1,2,1],
+                    [0,0,0]
+                    [-1,-2,-1]])
+
+    X = np.zeroes((n-2,m-2))
+    Y = np.zeroes((n-2,m-2))
+    S = np.zeroes((n-2,m-2))
+    local_pixels = [[0,0,0],
+                    [0,0,0],
+                    [0,0,0]]
+
+    for i in range(2,n-1):
+        for j in range(2,m-1):
+            for x in range(3):
+                for y in range(3):
+                    local_pixels[x][y] = nxm_matrix[i][j]
+            X[i-1][j-1] = sum(g_x*local_pixels)
+            Y[i-1][j-1] = sum(g_y*local_pixels)
+            S[i-1][j-1] = np.sqrt((X[i-1][j-1])**2 + (Y[i-1][j-1])**2)
+
+    X_norm = X / np.linalg.norm(X)
+    Y_norm = Y / np.linalg.norm(Y)
+    S_norm = S / np.linalg.norm(S)
+
+    return X_norm, Y_norm, S_norm
