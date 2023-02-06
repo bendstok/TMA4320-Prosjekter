@@ -970,8 +970,10 @@ def plott(positions, time, x, y, delta_x, n_virre):
             # "Un-comment" denne under om du vil se de ulike steppene markert med  en x
             #plt.plot(position[i][j][0],position[i][j][1], marker="x")
             #print(x_points[j], y_points[j], j)
-
-        ax0.plot(x_points, y_points, label = f"Virrevandrer {i + 1}")
+        if(i <= 5):
+            ax0.plot(x_points, y_points, label = f"Virrevandrer {i + 1}")
+        else:
+            ax0.plot(x_points, y_points)
 
     plt.legend()
     plt.tight_layout()
@@ -1350,6 +1352,7 @@ randomNums = np.random.uniform(0,1,(N,M-1))
 position, timeintervall, IPosisjon = v_2d_gb_ITeller(xx,yy,N, M, pR, randomNums, I, delx, dt)
 # Plotting av data
 
+print("2f")
 plott(position, timeintervall, xx, yy, delx, N)
 
 
