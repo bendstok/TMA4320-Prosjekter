@@ -1256,7 +1256,7 @@ def v_2d_gb_ITeller(x,y,N, M, pR, tilfeldigeTall, I, dx, dt):
             if posY == (nY):
                 posY = 0
             IPosisjon[posY][posX] += 1
-    
+    IPosisjon = np.flip(IPosisjon, axis=1)
     IPosisjon = IPosisjon / (N * M)
     return posisjon, tidsIntervaller, IPosisjon
 
@@ -1273,7 +1273,6 @@ randomNums = np.random.uniform(0,1,(N,M-1))
 
 """oppgave 2f"""
 
-print("true start")
 
 nX = 40
 nY = 40
@@ -1355,7 +1354,7 @@ def Sobel_filter(nxm_matrix):
 
     return X_norm, Y_norm, S_norm
 
-N = 3
+N = 2
 M = 100
 Antall_Tumors = np.random.randint(10, 25)
 tumor_koeffisients = np.random.uniform(0.3,0.45,(Antall_Tumors))
