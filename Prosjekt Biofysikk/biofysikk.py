@@ -1404,7 +1404,7 @@ startPosisjon = 10
 pR = 0.5
 
 # Finner Delta_X
-delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt, tumor_koeffisients)
+delx = delta_x_eff(xx,yy, area, Antall_Tumors, Sentral_Punkt*10, tumor_koeffisients)
 
 randomNums = np.random.uniform(0,1,(N,M-1))
 
