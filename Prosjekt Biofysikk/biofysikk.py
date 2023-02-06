@@ -866,7 +866,7 @@ def absolute_distance(x_1, y_1, x_2, y_2):
 
 
 # Lager en dx kart
-def delta_x_eff_r(x, y, areal, antallTumor, tumorSenter, t_k, t_f=4):
+def delta_x_eff(x, y, areal, antallTumor, tumorSenter, t_k, t_f=4):
     
     """
     Lager en steglengdekart som simulerer tumorenes effekt på virrevandrerne.
