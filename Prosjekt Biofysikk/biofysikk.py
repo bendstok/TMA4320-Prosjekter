@@ -815,7 +815,7 @@ def delta_x_eff(x, y, areal, antallTumor, tumorSenter, t_k, t_f=4):
     
     # Får verdier til videre kalkulasjoner
     dx = yy[1]-yy[0]
-    del_x = np.full((len(x[0]),len(y)),f_k,dtype=float)
+    del_x = np.full((len(x[0]),len(y)),t_f,dtype=float)
     radius = (areal/np.pi)**(1/2)
     radiusN = int(np.round(radius/dx))
     
