@@ -110,3 +110,26 @@ def truncSVD(A, d):
     return W, H
     
 print(truncSVD(A2, 3))
+
+
+def orthproj(A, d, B):
+    
+    """
+    Projekterer en matrise på en dictionary (ordbok)
+    """
+    
+    W, H = truncSVD(A, d)
+    Wt = np.transpose(W)
+    return(W @ Wt @ B)
+
+print(f"A1 W to B: {orthproj(A1, 2, B)}")
+print(f"A2 W to B : {orthproj(A2, 2, B)}")
+
+print(f"A1 W to b1 distance: {np.linalg.norm((b1 - orthproj(A1, 2, b1)), 2)}")
+print(f"A1 W to b1 distance: {np.linalg.norm((b2 - orthproj(A1, 2, b2)), 2)}")
+print(f"A1 W to b1 distance: {np.linalg.norm((b3 - orthproj(A1, 2, b3)), 2)}")
+print(f"A2 W to b1 distance: {np.linalg.norm((b1 - orthproj(A2, 2, b1)), 2)}")
+print(f"A2 W to b1 distance: {np.linalg.norm((b2 - orthproj(A2, 2, b2)), 2)}")
+print(f"A2 W to b1 distance: {np.linalg.norm((b3 - orthproj(A2, 2, b3)), 2)}")
+
+print("intewesting")
