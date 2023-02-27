@@ -15,17 +15,19 @@ Til sist kan vi måle vannets dispersjon ved å se på hvordan vannets mangetisk
 Dette betyr at vi kan bruke magnetiske målinger til å finne tumorer.
 
 Først går vi nermere inn på dispersjonslikningen:
-![bilde.png](attachment:bilde.png)
-![bilde-9.png](attachment:bilde-9.png)
-
+𝜕𝜑(x, t) / 𝜕t = D * 𝜕^2 𝜑(x, t) / 𝜕x^2},     
+D = (Δx)^2 / 2Δt}
 konstanten D er dispersjonskonstanten.
 Jo lavere den er, jo tregere sprer molekyler seg.
 Matematikere har vist at dispersjon følger en gaussisk sannsynlighetsfordeling, og at forventningsverdien til posisjonen av et vannmolekyls posisjon, når det går ut i det uendelige, er startpunktet selv.
 Først skal vi vise at hvis σ^2 = at, så løser dette dispersjonslikningen ved riktig valg av a:
 
-print("LEGG TIL MATTEBILIDE HER!")
-(LEGG TIL MATTEBILIDE HER!)
-print("LEGG TIL MATTEBILIDE HER!")
+𝜑 = [e^-((x - 𝜇)/σ)^2 / 2})] / [σ * sqrt(2𝜋),     𝜇 = 0,     σ\power{2} = at 
+𝜑 = [e^-(x^2 / 2at)] / [sqrt(2𝜋at)]
+(𝜕^2 / 𝜕x^2) [[e^-(x^2 / 2at)] / [sqrt(2𝜋at)]]     =     [e^-(x^2 / 2at)] * [x^2 - at] / [sqrt(2𝜋) * (at)^(5/2)]
+(𝜕 / 𝜕t) [[e^-(x^2 / 2at)] / [sqrt(2𝜋at)]]     =     a * [e^-(x^2 / 2at)] * [x^2 - at] / [2 * sqrt(2𝜋) * (at)^(5/2)]
+a * [e^-(x^2 / 2at)] * [x^2 - at] / [2 * sqrt(2𝜋) * (at)^(5/2)]     =     D * [e^-(x^2 / 2at)] * [x^2 - at] / [sqrt(2𝜋) * (at)^(5/2)]
+a/2 = D
 
 Med a = 2D, løser likningen seg.
 '''
