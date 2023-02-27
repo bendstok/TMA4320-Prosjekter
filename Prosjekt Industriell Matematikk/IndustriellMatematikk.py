@@ -1,6 +1,7 @@
 #importerer biblioteker
 import numpy as np
 import matplotlib.pyplot as plt
+import os 
 
 #Skriver inn test-datasetter A1 og A2, hver med kolonner som datapunkter
 A1 = np.array([[1000, 1], [0, 1], [0, 0]])
@@ -252,7 +253,7 @@ def nnproj(W, A, maxiter, safeDiv, B):
     
     # Projekterer b på a med W@H, og returnerer
     P = W@H
-    return H
+    return P
 
 
 def nndist(W, A, maxiter, safeDiv, B):
@@ -316,3 +317,61 @@ ok, skriv på gamle kode. et er bedre på gjøre det.
 ekker bare replace alle A med b? idk???
 mulig det, W er avhengig av a. lets see later. men først tekst.
 """
+
+
+"""OPPGAVE 2"""
+
+#a)
+
+
+# Load the data and rescale
+
+# Finner 'veien' til der python filen er på din maskin, for å finne
+# train og test filene
+# Altså, må train og test filene være i samme mappe som denne fila
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+train = np.load(dir_path + '/train.npy')/255.0
+test = np.load(dir_path + '/test.npy')/255.0
+
+def plotimgs(imgs, nplot = 4):
+    """
+    Plots the nplot*nplot first images in imgs on an nplot x nplot grid. 
+    Assumes heigth = width, and that the images are stored columnwise
+    input:
+        imgs: (height*width,N) array containing images, where N > nplot**2
+        nplot: integer, nplot**2 images will be plotted
+    """
+
+    n = imgs.shape[1]
+    m = int(np.sqrt(imgs.shape[0]))
+
+    assert(n > nplot**2), "Need amount of data in matrix N > nplot**2"
+
+    # Initialize subplots
+    fig, axes = plt.subplots(nplot,nplot)
+
+    # Set background color
+    plt.gcf().set_facecolor("lightgray")
+
+    # Iterate over images
+    for idx in range(nplot**2):
+
+        # Break if we go out of bounds of the array
+        if idx >= n:
+            break
+
+        # Indices
+        i = idx//nplot; j = idx%nplot
+
+        # Remove axis
+        axes[i,j].axis('off')
+
+        axes[i,j].imshow(imgs[:,idx].reshape((m,m)), cmap = "gray")
+    
+    # Plot
+
+    fig.tight_layout()
+    plt.show()
+
+plotimgs(train[:,1,:], nplot=4)
