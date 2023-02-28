@@ -298,32 +298,40 @@ print(nndist(W, A1, maxiter, safeDiv, B))
 W, useless = truncSVD(A2, 3)
 print(nndist(W, A2, maxiter, safeDiv, B))
 
-# def orthproj(A,W):
-#     Wt = np.transpose(W)
-#     WtA = Wt@A
-#     P_wA=W@WtA
-#     return P_wA
+def orthproj(A,W):
+    Wt = np.transpose(W)
+    WtA = Wt@A
+    P_wA=W@WtA
+    return P_wA
 
-# W1,H=truncSVD(A1, d)
-# W2,H=truncSVD(A2, d)
-# #print(orthproj(B,W))
+W1,H=truncSVD(A1, d)
+W2,H=truncSVD(A2, d)
+#print(orthproj(B,W))
 
-# def dist(B,W):
-#     D = np.zeros(len(B))
-#     P_BW=orthproj(B,W)
-#     for i in range(len(D)):
-#         D[i] = np.linalg.norm(B[:,i]-P_BW[:,i])
-#     return D
-# #print(dist(B,W))
-# def nnproj(A,W,maxiter=50,delta=10e-10):
-#     H = np.random.uniform(0,1,[len(W[0,:]),len(A[0])])
-#     Wt = np.transpose(W)
-#     WtA = Wt@A
-#     WtW = Wt@W
-#     for k in range(maxiter):
-#         H = H*WtA/(WtW@H+delta)
-#     P_WA = W@H
-#     return P_WA
+#Oppgave 1c-d:
+
+def nndist(B,W):
+    D = np.zeros(len(B[0]))
+    P_WB=nnproj(B,W)
+#     print(D)
+#     print(P_WB)
+#     print(B)
+    for i in range(len(D)):
+#         print(B[:,i])
+#         print(P_WB[:,i])
+#         print()
+        D[i] = np.linalg.norm(B[:,i]-P_WB[:,i])
+    return D
+#print(dist(B,W))
+def nnproj(A,W,maxiter=50,delta=10e-10):
+    H = np.random.uniform(0,1,[len(W[0,:]),len(A[0])])
+    Wt = np.transpose(W)
+    WtA = Wt@A
+    WtW = Wt@W
+    for k in range(maxiter):
+        H = H*WtA/(WtW@H+delta)
+    P_WA = W@H
+    return P_WA
 
 """
 "hm, skal få en vektor???"
