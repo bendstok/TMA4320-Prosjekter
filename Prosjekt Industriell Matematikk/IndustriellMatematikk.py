@@ -28,44 +28,47 @@ def A1SVD(A1):
     """
     
     # Henter svd
-    u, s, vt = np.linalg.svd(A1, full_matrices = False)
+    U, S, Vt = np.linalg.svd(A1, full_matrices = False)
     
     # Printer ut svd-matrisene
-    print(f"u = {u}")
-    print(f"s = {s}")
-    print(f"vt = {vt}")
+    print(f"U = {U}")
+    print("Formen på U: ", U.shape)
+    print(f"S = {S}")
+    print("Formen på S: ", S.shape)
+    print(f"Vt = {Vt}")
+    print("Formen på Vt: ", Vt.shape)
     
     # Gjør diagonalvektoren til en matrise
-    fs = np.diag(s)
+    FS = np.diag(S)
 
     # Rekonstruerer, og printer
-    A = u @ fs @ vt
+    A = U @ FS @ Vt
     print(f"A1, kolonne 3 vekk = {A}")
     print("Den første kolonnen i u er vekk, og likevel får vi rekonstruert A nøyaktig lik den fullt rekonstruerte A")
     
     
     
     # Henter svd
-    u, s, vt = np.linalg.svd(A1, full_matrices = False)
+    U, S, Vt = np.linalg.svd(A1, full_matrices = False)
     
     # Fjerner kolonne 2
-    u[:,1] = 0
+    U[:,1] = 0
     
     # Rekonstruerer, og printer
-    A = u @ fs @ vt
+    A = U @ FS @ Vt
     print(f"A1 kolonne 3 + kolonne 1 vekk = {A}")
     print("Andre vekk gir et større feil, hvertfall for indeks [2][2], som er nå 10^-6")
     
     
     
-    # Henter svd
-    u, s, vt = np.linalg.svd(A1, full_matrices = False)
+     # Henter svd
+    U, S, Vt = np.linalg.svd(A1, full_matrices = False)
     
-    # Fjerner kolonne 1
-    u[:,0] = 0
+    # Fjerner kolonne 2
+    U[:,0] = 0
     
     # Rekonstruerer, og printer
-    A = u @ fs @ vt
+    A = U @ FS @ Vt
     print(f"A1 kolonne 3 + kolonne 1 vekk = {A}")
     print("Første vekk gir en matrise som ikke på noen måte har de samme verdiene der verdiene ikke er 0.")
     print("Det betyr at denne første kolonnen er viktigst for å rekonstruere matrisen")
@@ -91,25 +94,28 @@ def A2SVD(A2):
     """
     
     # Henter svd
-    u, s, vt = np.linalg.svd(A2, full_matrices = False)
+    U, S, Vt = np.linalg.svd(A2, full_matrices = False)
     
     # Printer ut svd-matrisene
-    print(f"u = {u}")
-    print(f"s = {s}")
-    print(f"vt = {vt}")
+    print(f"U = {U}")
+    print("Formen på U: ", U.shape)
+    print(f"S = {S}")
+    print("Formen på S: ", S.shape)
+    print(f"Vt = {Vt}")
+    print("Formen på Vt: ", Vt.shape)
     
     # Gjør diagonalvektoren til en matrise
-    fs = np.diag(s)
+    FS = np.diag(S)
 
     # Rekonstruerer, og printer
-    A = u @ fs @ vt
+    A = U @ FS @ Vt
     print(f"A2 = {A}")
     
     # Fjerner kolonne 3
-    u[:,2] = 0
-    
+    U[:,2] = 0
+
     # Rekonstruerer, og printer
-    A = u @ fs @ vt
+    A = U @ FS @ Vt
     print(f"A2, u3 vekk = {A}")
     print("Med å ta vekk u3, ser vi at vi får den nøyaktige samme rekonstruerte A som før") 
     print("siden u# = [0, 1, 0], viser det at A2 ikke har noen tall ved andre kolonne.")
@@ -138,16 +144,16 @@ def truncSVD(A, d):
     """
     
     # Henter svd
-    u, s, vt = np.linalg.svd(A, full_matrices = False)
+    U, S, Vt = np.linalg.svd(A, full_matrices = False)
 
     # Velger de første d relevante vektorer og verdier
-    u = u[:, :d]
-    fs = np.diag(s[:d])
-    vt = vt[:d]
+    U = U[:, :d]
+    FS = np.diag(S[:d])
+    Vt = Vt[:d]
     
     # setter inn dictionary og vekt, og returnerer
-    W = u
-    H = fs @ vt
+    W = U
+    H = FS @ Vt
     return W, H
 
 
