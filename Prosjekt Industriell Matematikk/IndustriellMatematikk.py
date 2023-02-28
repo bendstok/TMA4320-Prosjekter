@@ -317,28 +317,74 @@ W2,H=truncSVD(A2, d)[0:2]
 
 #Oppgave 1c-d:
 
-def nndist(B,W):
-    D = np.zeros(len(B[0]))
-    P_WB=nnproj(B,W)
-#     print(D)
-#     print(P_WB)
-#     print(B)
-    for i in range(len(D)):
-#         print(B[:,i])
-#         print(P_WB[:,i])
-#         print()
-        D[i] = np.linalg.norm(B[:,i]-P_WB[:,i])
-    return D
-#print(dist(B,W))
-def nnproj(A,W,maxiter=50,delta=10e-10):
+def orthproj(W,A):
+    
+    """
+    Tar inn et dictionary med ortogonale kolonner W og et datasett A og prosjekterer A på W.
+    
+    input:
+    W: Dictionary med ortogonale kolonner
+    A: datasett-martise
+    
+    Output:
+    orthproj: En projektert versjon av A på W
+    """
+    Wt = np.transpose(W)
+    orthproj = W@Wt@A
+    return orthproj
+def ortdist(W,A):
+    """
+    Regner ut kolonnevis avstand fra matrise A til dictionary W.
+    
+    input:
+    W: Dictionary med ortogonale kolonner
+    A: Datasett-martise
+    
+    Output:
+    dist: Distanse fra A til W.
+    """
+    dist = np.zeros(len(A[0]))
+    proj=orthproj(W,A)
+    for i in range(len(dist)):
+        dist[i] = np.linalg.norm(A[:,i]-proj[:,i])
+    return dist
+def nnproj(W,A,maxiter=50,safeDiv=10e-10):
+    """
+    Tar inn et ikke-negativ dictionary W og matrise A og returnerer den ikke negative projeksjonen av A på W.
+    
+    input:
+    W: Ikke-negativ dictionary
+    A: Datasett-martise
+    maxiter: Antall iterasjoner brukt for å regne ut den ikke-negative vekt matrisen H
+    safeDiv: Konstant ledd i divisor for å unngå null-divisjon
+    
+    Output:
+    proj: Den ikke-negative projeksjonen av A på W.
+    """
     H = np.random.uniform(0,1,[len(W[0,:]),len(A[0])])
     Wt = np.transpose(W)
     WtA = Wt@A
     WtW = Wt@W
     for k in range(maxiter):
-        H = H*WtA/(WtW@H+delta)
-    P_WA = W@H
-    return P_WA
+        H = H*WtA/(WtW@H+safeDiv)
+    proj = W@H
+    return proj
+def nndist(W,A):
+    """
+    Regner ut kolonnevis avstand fra ikke-negative matrise A til ikke-negativ dictionary W.
+    
+    input:
+    W: Ikke-negativ dictionary
+    A: Ikke-negativ datasett-martise
+    
+    Output:
+    dist: Distanse fra A til W.
+    """
+    dist = np.zeros(len(A[0]))
+    proj = nnproj(W,A)
+    for i in range(len(dist)):
+        dist[i] = np.linalg.norm(A[:,i]-proj[:,i])
+    return dist
 
 """
 
