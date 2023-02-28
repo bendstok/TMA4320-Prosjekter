@@ -340,23 +340,6 @@ def nnproj(A,W,maxiter=50,delta=10e-10):
     return P_WA
 
 """
-"hm, skal få en vektor???"
-d = 0, 1, 1/sq2.
-what :(
-
-"så bruke maff, og sammenligh A og b.
-"etter det, skriv tekst på koden. og bam"
-
-Ehm, avhengig av hva b er?
-printe B som distanse, men projiserer ikke på den...????
-
-what does it mean at den bruker A, og så b?
-
-ok, skriv på gamle kode. et er bedre på gjøre det.
-
-ekker bare replace alle A med b? idk???
-mulig det, W er avhengig av a. lets see later. men først tekst.
-"""
 
 
 """OPPGAVE 2"""
@@ -386,7 +369,7 @@ def plotimgs(imgs, nplot = 4):
     n = imgs.shape[1]
     m = int(np.sqrt(imgs.shape[0]))
 
-    assert(n > nplot**2), "Need amount of data in matrix N > nplot**2"
+    assert(n >= nplot**2), "Need amount of data in matrix N >= nplot**2"
 
     # Initialize subplots
     fig, axes = plt.subplots(nplot,nplot)
@@ -415,3 +398,27 @@ def plotimgs(imgs, nplot = 4):
     plt.show()
 
 plotimgs(train[:,1,:], nplot=4)
+
+
+"2b"
+
+
+n = 1000 # Antall datapunkter
+c = 0 # Klasse
+d = 500 # 16 viktigste kolonner
+
+A = train[:,c,:n]
+W, H, S, FS, Vt = truncSVD(A, d)
+
+plotimgs(W, nplot = 4)
+
+plt.semilogy(S)
+
+
+"interesting"
+"Her, kommenter om resultatet vi fill nedenfor"
+"ikke matchende som over? mulig fordi de første ikke er de beste?" "probably"
+
+"Den går raskt ned, og går veldig sakte nedover. med en høyere d, ser vi at den begynner å raskt gå ned igjen"
+"Dette viser oss en funksjon som har mange gjennomsnittelige, noen få gode, og noen får dårlige matriser"
+"Funnksjon? nei ikke helt"
