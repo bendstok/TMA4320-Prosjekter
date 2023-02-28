@@ -148,13 +148,14 @@ def truncSVD(A, d):
 
     # Velger de første d relevante vektorer og verdier
     U = U[:, :d]
-    FS = np.diag(S[:d])
+    S = S[:d]
+    FS = np.diag(S)
     Vt = Vt[:d]
     
     # setter inn dictionary og vekt, og returnerer
     W = U
     H = FS @ Vt
-    return W, H
+    return W, H, S, FS, Vt
 
 
 
@@ -180,7 +181,7 @@ def orthproj(A, d, B):
     """
     
     #Henter dictionary og vekt
-    W, H = truncSVD(A, d)
+    W = truncSVD(A, d)[0]
     
     #Transponerer W
     Wt = np.transpose(W)
@@ -295,13 +296,13 @@ safeDiv = 10**-10
 
 
 # Printer P_A1 og P_A2 for å sjekke om de funker:
-W, useless = truncSVD(A1, 3)
+W = truncSVD(A1, 3)[0]
 print(W)
 print(b1)
 print(b2)
 print(b3)
 print(nndist(W, A1, maxiter, safeDiv, B))
-W, useless = truncSVD(A2, 3)
+W = truncSVD(A2, 3)[0]
 print(nndist(W, A2, maxiter, safeDiv, B))
 
 def orthproj(A,W):
@@ -310,8 +311,8 @@ def orthproj(A,W):
     P_wA=W@WtA
     return P_wA
 
-W1,H=truncSVD(A1, d)
-W2,H=truncSVD(A2, d)
+W1,H=truncSVD(A1, d)[0:2]
+W2,H=truncSVD(A2, d)[0:2]
 #print(orthproj(B,W))
 
 #Oppgave 1c-d:
