@@ -386,6 +386,10 @@ def nndist(W,A):
         dist[i] = np.linalg.norm(A[:,i]-proj[:,i])
     return dist
 
+"Tester de forskjellige distanse funksjonene"
+print(ortdist(W1,B))
+print(nndist(A1,B))
+
 """
 
 
