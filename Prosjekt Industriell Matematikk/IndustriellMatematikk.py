@@ -242,20 +242,24 @@ def ortdist(W, B):
     
     Input:
     W: Dictionary med ortogonale kolonner
-    B: kolonnevis matrise, representerer treningsbilder eller testebilder
+    B: Datasett-matrise, representerer treningsbilder eller testbilder
     
     Output:
     dist: Distanse fra A til W.
     """
+    
+    # Lager en distansevektor, og setter dem 0. Henter så projeksjonen fra B til W
     dist = np.zeros(len(B[0]))
     proj = orthproj(W, B)
+    
+    #Regner ut distansene til hvert kolonne, og returnerer deres avstand
     for i in range(len(dist)):
         dist[i] = np.linalg.norm(B[:,i] - proj[:,i])
     return dist
 
 # Printer projeksjonen for B på W1 og W2
-print(f"Distansen fra B på W1 =\n{ortdist(W1, B)}\n")
-print(f"Distansen fra B på W2 =\n{ortdist(W2, B)}")
+print(f"Distansen fra B til W1 =\n{ortdist(W1, B)}\n")
+print(f"Distansen fra B til W2 =\n{ortdist(W2, B)}")
 
 """
 T E K S T MARKDOWN!!!!
@@ -266,52 +270,88 @@ For W2, ser vi at alle kolonnene i B er inni W2
 T E K S T MARKDOWN!!!!
 """
 
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 1d
+Det kan ta lang tid å trene opp en maskin ned at en SVD kan ta lang tid å renge ut
+Derfor gjår vi også et ikke-negativ frengang til projeksjon og distansemåling
+Vi lager Funksonene, og tester dem på B med A1 og A2
+T E K S T MARKDOWN!!!!
+"""
 
-#Oppgave 1d
-
-def nnproj(W,A,maxiter=50,safeDiv=10e-10):
+def nnproj(W, B, maxiter=50, safeDiv=10e-10):
     """
     Tar inn et ikke-negativ dictionary W og matrise A og returnerer den ikke negative projeksjonen av A på W.
     
-    input:
+    Input:
     W: Ikke-negativ dictionary
-    A: Datasett-martise
-    maxiter: Antall iterasjoner brukt for å regne ut den ikke-negative vekt matrisen H
+    A: Ikke-negativ datasett-matrise, representerer treningsbilder eller testbilder
+    maxiter: Antall iterasjoner brukt for å regne ut den ikke-negative vekt-matrisen H
     safeDiv: Konstant ledd i divisor for å unngå null-divisjon
     
     Output:
-    proj: Den ikke-negative projeksjonen av A på W.
+    proj: Den ikke-negative projeksjonen av B på W.
     """
-    H = np.random.uniform(0,1,[len(W[0,:]),len(A[0])])
+    
+    #Velger tilfeldlig H med verdier fra 0 til 1. Krukes til konvergens til å få den ekte H-matrisen = Wt @ B
+    H = np.random.uniform(0, 1, [len(W[0,:]), len(B[0])])
+    
+    #Transponerer W, og henter inn hjelpeverdiene WtB og WtW
     Wt = np.transpose(W)
-    WtA = Wt@A
+    WtB = Wt@B
     WtW = Wt@W
+    
+    # Itererer maxiter ganger for å konvergere H til den ekte H-matrisen = Wt @ B.
     for k in range(maxiter):
-        H = H*WtA/(WtW@H+safeDiv)
+        H = H*WtB/(WtW@H+safeDiv)
+    
+    #projekterer B på W, og returnerer projeksonen
     proj = W@H
     return proj
 
 
-def nndist(W,A):
+def nndist(W, B):
+    
     """
     Regner ut kolonnevis avstand fra ikke-negative matrise A til ikke-negativ dictionary W.
     
-    input:
+    Input:
     W: Ikke-negativ dictionary
-    A: Ikke-negativ datasett-martise
+    A: Ikke-negativ datasett-matrise, representerer treningsbilder eller testbilder
     
     Output:
     dist: Distanse fra A til W.
     """
-    dist = np.zeros(len(A[0]))
-    proj = nnproj(W,A)
+    # Lager en distansevektor, og setter dem 0. Henter så projeksjonen fra B til W
+    dist = np.zeros(len(B[0]))
+    proj = nnproj(W, B)
+    
+    #Regner ut distansene til hvert kolonne, og returnerer deres avstand
     for i in range(len(dist)):
-        dist[i] = np.linalg.norm(A[:,i]-proj[:,i])
+        dist[i] = np.linalg.norm(B[:,i] - proj[:,i])
     return dist
 
 "Tester de forskjellige distanse funksjonene"
-print(ortdist(W1,B))
-print(nndist(A1,B))
+print(f"Distansen fra B til A1, ikke-negativt, =\n{nndist(A1, B)}\n")
+print(f"Distansen fra B til A2, ikke-negativt, =\n{nndist(A2, B)}")
+
+"""
+T E K S T MARKDOWN!!!!
+Merk at vi her har distansen til A, og ikke til W
+Her ser vi at distansen fra B til A1, kolonnevis, er [0, 1, 1/Sq(2)].
+Dette viser oss at b1 er inni A1, mens b2 og b3 er utenfor A1.
+Dette er riktig svar ifølge oppgaveskjemaet vi følger
+For W2, ser vi neglisjerbart de samme verdiene
+T E K S T MARKDOWN!!!!
+"""
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 2a
+Nå som vi har matematikken nede og testet, begynner vi med MNIST dataet.
+Vi laster den led, og printer ut de 16 første 0-ene.
+T E K S T MARKDOWN!!!!
+"""
 
 
 """OPPGAVE 2"""
