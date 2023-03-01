@@ -1,9 +1,33 @@
-#Oppgave 1a
+"""punktum ta det lol."""
+
+"""
+T E K S T MARKDOWN!!!!
+Dictionary learning
+
+I denne rapporten ser vi på det som kalles for "Dictionary learning", og hvordan en maskin kan gjenkjenne fra hveradnre to ulike tall, 0, og 1
+Vi ser først gjennom noen matematiske prosesser for å forstå hvordan vi kan utføre dictionary learning
+Så bruker vi data fra MNIST til å utføre dictionary learning, og ser hvordan den projekterer nye bilder til dictilarien den har lært
+Til slutt ser vi på hvordan maskinen klassifiserer mange ulike tallbilder i dybde.
+
+
+Først undersøker vi matematikken. Matrisene A representerer sett med "bilder", der hver kolonne skal representere en bilde.
+Disse bildene kan brukes til å trene opp datamaskinen, og til å få dem i maskinens dictionary
+Kolonnevektorene b representerer nye bilder.
+Disse brukes til å teste hvordan maskinen ser på nye bilder i forhold til dictionarien sin, altså hvordan den klassifiserer de nye bildene.
+T E K S T MARKDOWN!!!!
+"""
 
 #importerer biblioteker
 import numpy as np
 import matplotlib.pyplot as plt
 import os 
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 1a
+Først skriver vi ned vektorene, som vi skal bruke i denne delen av oppgaven
+T E K S T MARKDOWN!!!!
+"""
 
 #Skriver inn test-datasetter A1 og A2, hver med kolonner som datapunkter
 A1 = np.array([[1000, 1], [0, 1], [0, 0]])
@@ -15,153 +39,154 @@ b2 = np.array([[0], [0], [1]])
 b3 = np.array([[0], [1], [0]])
 B = np.concatenate((b1, b2, b3), axis=1)
 
-def A1SVD(A1):
-    
-    """
-    Regner ut SVD til A1, sjekker om de rekonstrueres til A, og sjekker hviken kolonne som er viktigst
-    
-    ...
-    
-    input:
-    A1; datasett A1
-    
-    Output:
-    Printer ut A1 med henholdsvis full rekonstruering (uten kolonne 3), og med kolonne, 2, og 1 vekk
-    """
-    
-    # Henter svd
-    U, S, Vt = np.linalg.svd(A1, full_matrices = False)
-    
-    # Printer ut svd-matrisene
-    print(f"U = {U}")
-    print("Formen på U: ", U.shape)
-    print(f"S = {S}")
-    print("Formen på S: ", S.shape)
-    print(f"Vt = {Vt}")
-    print("Formen på Vt: ", Vt.shape)
-    
-    # Gjør diagonalvektoren til en matrise
-    FS = np.diag(S)
+"""
+T E K S T MARKDOWN!!!!
+Det første vi gjør, er å åpne opp A1 ved å regne ut dens SVD: A = U @ S @ Vt. U er dens dictionary W, mens S @ Vt er dens vektmatrise H.
+Vi undersøker dens egenskaper
+T E K S T MARKDOWN!!!!
+"""
 
-    # Rekonstruerer, og printer
-    A = U @ FS @ Vt
-    print(f"A1, kolonne 3 vekk = {A}")
-    print("Den første kolonnen i u er vekk, og likevel får vi rekonstruert A nøyaktig lik den fullt rekonstruerte A")
-    
-    
-    
-    # Henter svd
-    U, S, Vt = np.linalg.svd(A1, full_matrices = False)
-    
-    # Fjerner kolonne 2
-    U[:,1] = 0
-    
-    # Rekonstruerer, og printer
-    A = U @ FS @ Vt
-    print(f"A1 kolonne 3 + kolonne 1 vekk = {A}")
-    print("Andre vekk gir et større feil, hvertfall for indeks [2][2], som er nå 10^-6")
-    
-    
-    
-     # Henter svd
-    U, S, Vt = np.linalg.svd(A1, full_matrices = False)
-    
-    # Fjerner kolonne 2
-    U[:,0] = 0
-    
-    # Rekonstruerer, og printer
-    A = U @ FS @ Vt
-    print(f"A1 kolonne 3 + kolonne 1 vekk = {A}")
-    print("Første vekk gir en matrise som ikke på noen måte har de samme verdiene der verdiene ikke er 0.")
-    print("Det betyr at denne første kolonnen er viktigst for å rekonstruere matrisen")
+# Regner ut SVD
+U, S, Vt = np.linalg.svd(A1, full_matrices = False)
 
+# Printer ut svd-matrisene
+print(f"U =\n{U} \n")
+print("Formen på U: ", U.shape, "\n")
+print(f"S (egenvektorene) =\n{S} \n")
+print("Formen på S: ", S.shape, "\n")
+print(f"Vt =\n{Vt} \n")
+print("Formen på Vt: ", Vt.shape, "\n")
 
-    
-print(A1SVD(A1))
+# Gjør S sine egenvektorer til en matrise. (FS = Full S)
+FS = np.diag(S)
 
+# Rekonstruerer, og printer
+A = U @ FS @ Vt
+print(f"A1 rekonstruert =\n{A}")
 
-#Oppgave 1b
+"""
+T E K S T MARKDOWN!!!!
+Her ser vi at U er på formen (3, 2).
+Vanligvis skal den være (3, 3). det viser oss at den siste kolonnen var bare fyllt med 0, og er dermed ubrukelig for oss
+Dette ser vi er tilfelle, fordi ved å rekonstruere A1, ser vi at vi får samme resultat
+Vi finner vi ut hvor viktig de to andre kolonnene er til å rekonstruere A
+T E K S T MARKDOWN!!!!
+"""
 
-def A2SVD(A2):
-    
-    """
-    Regner ut SVD til A2, printer ut SVD-matrisene, sjekker om de rekonstrueres til A, og sjekker hviken kolonne som er viktigst
-    
-    ...
-    
-    input:
-    A2: datasett A2
-    
-    Output:
-    Printer ut SVD-matriser, og A1 med henholdsvis full rekonstruering (uten kolonne 3), og med kolonne, 2, og 1 vekk
-    """
-    
-    # Henter svd
-    U, S, Vt = np.linalg.svd(A2, full_matrices = False)
-    
-    # Printer ut svd-matrisene
-    print(f"U = {U}")
-    print("Formen på U: ", U.shape)
-    print(f"S = {S}")
-    print("Formen på S: ", S.shape)
-    print(f"Vt = {Vt}")
-    print("Formen på Vt: ", Vt.shape)
-    
-    # Gjør diagonalvektoren til en matrise
-    FS = np.diag(S)
+# Regner ut SVD
+U, S, Vt = np.linalg.svd(A1, full_matrices = False)
 
-    # Rekonstruerer, og printer
-    A = U @ FS @ Vt
-    print(f"A2 = {A}")
-    
-    # Fjerner kolonne 3
-    U[:,2] = 0
+# Fjerner kolonne 2
+U[:,1] = 0
 
-    # Rekonstruerer, og printer
-    A = U @ FS @ Vt
-    print(f"A2, u3 vekk = {A}")
-    print("Med å ta vekk u3, ser vi at vi får den nøyaktige samme rekonstruerte A som før") 
-    print("siden u# = [0, 1, 0], viser det at A2 ikke har noen tall ved andre kolonne.")
-    print("Dermed kan vi fjerne denne delen ved å ta vekk u[:,3], og de korresponderende delene ved s, og vt,")
-    print("og trygt få det samme resultatet: A2 = u_d s_d vt_d")
+# Rekonstruerer, og printer
+A = U @ FS @ Vt
+print(f"A1 rekonstruert, uten U[:,1] =\n{A}\n")
 
 
 
-print(A2SVD(A2))
+# Henter svd
+U, S, Vt = np.linalg.svd(A1, full_matrices = False)
+
+# Fjerner kolonne 2
+U[:,0] = 0
+
+# Rekonstruerer, og printer
+A = U @ FS @ Vt
+print(f"A1 rekonstruert, uten U[:,0] =\n{A}")
+print("Første vekk gir en matrise som ikke på noen måte har de samme verdiene der verdiene ikke er 0.")
+print("Det betyr at denne første kolonnen er viktigst for å rekonstruere matrisen")
+
+"""
+T E K S T MARKDOWN!!!!
+Vi ser at ved å fjerne kolonne 2, får vi omtrent samme svar, bortsett fra indeks A[1][1], som er nå 10^-6, og ikke 1.
+Med første kolonne vekk istedenfor, får vi en matrise som ikke på noen måte har de samme verdiene der verdiene ikke er 0.
+Det viser oss at den første kolonnen er viktigst for å rekonstruere matrisen
+Det er fordi np.linalg.svd sorterer kolonnene fra mest viktig til minst viktig
+T E K S T MARKDOWN!!!!
+"""
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 1b
+nå sjekker vi A2, om hva redusering av dens U-kolonner vil gjøre med rekonstrueringen
+T E K S T MARKDOWN!!!!
+"""
+
+# Henter svd
+U, S, Vt = np.linalg.svd(A2, full_matrices = False)
+
+# Printer ut svd-matrisene
+print(f"U =\n{U} \n")
+print("Formen på U: ", U.shape, "\n")
+print(f"S (egenvektorene) =\n{S} \n")
+print("Formen på S: ", S.shape, "\n")
+print(f"Vt =\n{Vt} \n")
+print("Formen på Vt: ", Vt.shape, "\n")
+print(S)
+
+"""
+T E K S T MARKDOWN!!!!
+Her ser vi at S har bare 0 ved dens tredje kolonne.
+Det vi gi FS @ Vt som har sin tredge rad fylt med bare 0.
+Det vil gjøre den tredje U-kolonnen ubrukelig
+Dermed kan vi fjerne denne U-kolonnen, og de korresponderende delene ved S, og Vt, og likevel få den samme matrisen
+T E K S T MARKDOWN!!!!
+"""
+
+# Fjerner kolonne 3
+U[:,2] = 0
+
+# Gjør diagonalvektoren til en matrise
+FS = np.diag(S)
+
+# Rekonstruerer, og printer
+A = U @ FS @ Vt
+print(f"A2 rekonstruert, uten U[:,2] =\n{A}")
+
+"""
+T E K S T MARKDOWN!!!!
+Denne er nøyaktig den samme som den originale A2, som bekrefter våre tanker
+
+
+Vi ser at slik redusering kan spare oss plass og tid; om vi ønsker full rekonstryering, eller rask og nesten perfect rekonstruering.
+Vi skriver en funksjon til å gjøre dette
+T E K S T MARKDOWN!!!!
+"""
+
 
 def truncSVD(A, d):
     
     """
-    Gjør et svd med de d viktigste leddene i matrisen, altså et trunktert versjon av vanlig SVD-regning,
+    Gjør et SVD med de d viktigste leddene i matrisen, altså et trunktert versjon av vanlig SVD-regning,
     
     ...
     
     input:
-    A: datasett-martise
-    d: antal vektorer/kolonner/singulærvektorer som skal brukes
+    A: Datasett-martise
+    d: Antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
     
     Output:
     
     W: Dictionaries
-    H: Vekt på dictionarien
+    H: Vekt på dictionariesene
     """
     
-    # Henter svd
+    # Regner ut full SVD
     U, S, Vt = np.linalg.svd(A, full_matrices = False)
 
     # Velger de første d relevante vektorer og verdier
     U = U[:, :d]
     S = S[:d]
-    FS = np.diag(S)
     Vt = Vt[:d]
     
-    # setter inn dictionary og vekt, og returnerer
+    # Gjør diagonalvektoren til en matrise
+    FS = np.diag(S)
+    
+    # Setter inn dictionary og vekt, og returnerer
     W = U
     H = FS @ Vt
     return W, H, S, FS, Vt
-
-
-#Oppgave 1c
 
 def orthproj(W,A):
     
