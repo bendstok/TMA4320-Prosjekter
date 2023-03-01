@@ -1,3 +1,5 @@
+#Oppgave 1a
+
 #importerer biblioteker
 import numpy as np
 import matplotlib.pyplot as plt
@@ -78,6 +80,7 @@ def A1SVD(A1):
 print(A1SVD(A1))
 
 
+#Oppgave 1b
 
 def A2SVD(A2):
     
@@ -158,164 +161,7 @@ def truncSVD(A, d):
     return W, H, S, FS, Vt
 
 
-
-print(f"trunctSVD på a2 med d = 2 gir: {truncSVD(A2, 2)}")
-
-
-
-def orthproj(A, d, B):
-    
-    """
-    Projekterer en datastt-matrise på en dictionary
-    
-    ...
-    
-    input:
-    A: datasett-martise
-    d: antal vektorer/kolonner/singulærvektorer som skal brukes
-    B: test-vektor(er) som projekteres
-    
-    Output:
-    orthproj: En projektert versjon av b til datasettet A
-    
-    """
-    
-    #Henter dictionary og vekt
-    W = truncSVD(A, d)[0]
-    
-    #Transponerer W
-    Wt = np.transpose(W)
-    
-    # Projiserer B på A, og returnerer
-    orthproj = W @ Wt @ B
-    return orthproj
-
-
-
-#Printer en projeksjon av b til A1 og A2
-print(f"A1 W to B: {orthproj(A1, 2, B)}")
-print(f"A2 W to B : {orthproj(A2, 2, B)}")
-
-
-
-def distSVD(A, d, B):
-    
-    """
-    Regner ut distanse fra test-vektor(er) B til den projiserte versjonen av B
-    
-    input:
-    A: datasett-martise
-    d: antal vektorer/kolonner/singulærvektorer som skal brukes
-    B: test-vektor(er) som projekteres
-    
-    Output:
-    dist: Distansen fra test-vektor(er) B til den projuserte versjonen av B
-    
-    """
-    
-    #Henter projeksjon av B på A
-    proj = orthproj(A, d, B)
-    
-    # regner ut distansene til B og de projiserte versjonene, og returnerer
-    dist = np.zeros(B.shape[1])
-    for i in range(B.shape[1]):
-        dist[i] = np.linalg.norm((B[:,i] - proj), 2)
-    return dist
-
-
-# Printer alle distansene fra b-vektorene til A1 og A2
-d = 2
-print(f"A1 W to b2 distance: {distSVD(A1, d, B)}")
-print(f"A1 W to b2 distance: {distSVD(A2, d, B)}")
-
-
-
-def nnproj(W, A, maxiter, safeDiv, B):
-    
-    
-    """
-    W: Dictionaries
-    A: Datasett-matrise
-    maxiter: Antall ganger en iterasjonsløkke skal skje
-    safeDiv: for å unngå nulldivisjon
-    B: test-vektor(er) som projekteres
-    
-    Output:
-    En ikke-negativ projektert versjon av b til datasettet A...?
-    """
-    
-    # Tansponerer W
-    Wt = np.transpose(W)
-    
-    # Regner ut Wt@A og Wt@W
-    WtB = Wt@B
-    WtW = Wt@W
-    
-    # hager ne tilfeldig H-matrise med riktig forn, med tilfeldig innhold fra 0 til 1
-    H = np.random.uniform(0,1,(len(W[0]),len(B[0])))
-    
-    # Itererer gjennom en konvergensrekke for å få den reelle H, og returnerer
-    for i in range(maxiter):
-        H = H * WtB / ((WtW @ H) + safeDiv)
-    
-    # Projekterer b på a med W@H, og returnerer
-    P = W@H
-    return P
-
-
-def nndist(W, A, maxiter, safeDiv, B):
-    
-    """
-    Regner ut distanse  fra test-vektor(er) B til den projiserte versjonen av B, 
-    
-    input:
-    W: Dictionaries
-    A: Datasett-matrise
-    maxiter: Antall ganger en iterasjonsløkke skal skje
-    safeDiv: for å unngå nulldivisjon
-    B: test-vektor(er) som projekteres
-    
-    Output:
-    dist: Distansen (ikke-negativt) fra test-vektor(er) B til den projuserte versjonen av B
-    
-    """
-    
-    #Henter projeksjon av B på A
-    P = nnproj(W, A, maxiter, safeDiv, B)
-    
-    # regner ut distansene til B og de projiserte versjonene, og returnerer
-    dist = np.zeros(B.shape[1])
-    for i in range(B.shape[1]):
-        dist[i] = np.linalg.norm((B[:,i] - P), 2)
-    return dist
-
-#Henter Dictionary, of andre tallverdier
-maxiter = 50
-safeDiv = 10**-10
-
-
-
-# Printer P_A1 og P_A2 for å sjekke om de funker:
-W = truncSVD(A1, 3)[0]
-print(W)
-print(b1)
-print(b2)
-print(b3)
-print(nndist(W, A1, maxiter, safeDiv, B))
-W = truncSVD(A2, 3)[0]
-print(nndist(W, A2, maxiter, safeDiv, B))
-
-def orthproj(A,W):
-    Wt = np.transpose(W)
-    WtA = Wt@A
-    P_wA=W@WtA
-    return P_wA
-
-W1,H=truncSVD(A1, d)[0:2]
-W2,H=truncSVD(A2, d)[0:2]
-#print(orthproj(B,W))
-
-#Oppgave 1c-d:
+#Oppgave 1c
 
 def orthproj(W,A):
     
@@ -332,6 +178,8 @@ def orthproj(W,A):
     Wt = np.transpose(W)
     orthproj = W@Wt@A
     return orthproj
+
+
 def ortdist(W,A):
     """
     Regner ut kolonnevis avstand fra matrise A til dictionary W.
@@ -348,6 +196,10 @@ def ortdist(W,A):
     for i in range(len(dist)):
         dist[i] = np.linalg.norm(A[:,i]-proj[:,i])
     return dist
+
+
+#Oppgave 1d
+
 def nnproj(W,A,maxiter=50,safeDiv=10e-10):
     """
     Tar inn et ikke-negativ dictionary W og matrise A og returnerer den ikke negative projeksjonen av A på W.
@@ -369,6 +221,8 @@ def nnproj(W,A,maxiter=50,safeDiv=10e-10):
         H = H*WtA/(WtW@H+safeDiv)
     proj = W@H
     return proj
+
+
 def nndist(W,A):
     """
     Regner ut kolonnevis avstand fra ikke-negative matrise A til ikke-negativ dictionary W.
@@ -389,8 +243,6 @@ def nndist(W,A):
 "Tester de forskjellige distanse funksjonene"
 print(ortdist(W1,B))
 print(nndist(A1,B))
-
-"""
 
 
 """OPPGAVE 2"""
