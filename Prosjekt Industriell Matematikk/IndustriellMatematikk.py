@@ -51,11 +51,11 @@ U, S, Vt = np.linalg.svd(A1, full_matrices = False)
 
 # Printer ut svd-matrisene
 print(f"U =\n{U} \n")
-print("Formen på U: ", U.shape, "\n")
+print(f"Formen på U: {U.shape}\n")
 print(f"S (egenvektorene) =\n{S} \n")
-print("Formen på S: ", S.shape, "\n")
+print(f"Formen på S: {S.shape}\n")
 print(f"Vt =\n{Vt} \n")
-print("Formen på Vt: ", Vt.shape, "\n")
+print(f"Formen på Vt: {Vt.shape}\n")
 
 # Gjør S sine egenvektorer til en matrise. (FS = Full S)
 FS = np.diag(S)
@@ -118,12 +118,11 @@ U, S, Vt = np.linalg.svd(A2, full_matrices = False)
 
 # Printer ut svd-matrisene
 print(f"U =\n{U} \n")
-print("Formen på U: ", U.shape, "\n")
+print(f"Formen på U: {U.shape}\n")
 print(f"S (egenvektorene) =\n{S} \n")
-print("Formen på S: ", S.shape, "\n")
+print(f"Formen på S: {S.shape}\n")
 print(f"Vt =\n{Vt} \n")
-print("Formen på Vt: ", Vt.shape, "\n")
-print(S)
+print(f"Formen på Vt: {Vt.shape}\n")
 
 """
 T E K S T MARKDOWN!!!!
@@ -160,14 +159,11 @@ def truncSVD(A, d):
     """
     Gjør et SVD med de d viktigste leddene i matrisen, altså et trunktert versjon av vanlig SVD-regning,
     
-    ...
-    
-    input:
+    Input:
     A: Datasett-martise
     d: Antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
     
     Output:
-    
     W: Dictionaries
     H: Vekt på dictionariesene
     """
@@ -188,39 +184,87 @@ def truncSVD(A, d):
     H = FS @ Vt
     return W, H, S, FS, Vt
 
-def orthproj(W,A):
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 1c
+Nå ønsker vi å projektere test-datasettene til de ortogonale dictionaries.
+Slik kan maskinen dra inn nye datasett til sine dictionaries.
+Vi tester så dens projeksjon med test-matrisen B på den.
+T E K S T MARKDOWN!!!!
+"""
+
+
+def orthproj(W, B):
     
     """
-    Tar inn et dictionary med ortogonale kolonner W og et datasett A og prosjekterer A på W.
+    Tar inn et dictionary med ortogonale kolonner W og et sett med kolonner B og prosjekterer B på W.
     
-    input:
+    Input:
     W: Dictionary med ortogonale kolonner
-    A: datasett-martise
+    B: Datasett-matrise, representerer treningsbilder eller testbilder
     
     Output:
-    orthproj: En projektert versjon av A på W
+    orthproj: En projektert versjon av B på W
     """
+    
+    #Transponerer W
     Wt = np.transpose(W)
-    orthproj = W@Wt@A
+    
+    #Projekterer B på W, og returnerer
+    orthproj = W @ Wt @ B
     return orthproj
 
 
-def ortdist(W,A):
-    """
-    Regner ut kolonnevis avstand fra matrise A til dictionary W.
+
+# Henter W1, og printer projeksjonen for B på W1
+W1 = truncSVD(A1, 3)[0]
+print(f"Projeksjon fra B på W1 =\n{orthproj(W1, B)}\n")
+
+# Henter W2, og printer projeksjonen for B på W1
+W2 = truncSVD(A2, 3)[0]
+print(f"Projeksjon fra B på W2 =\n{orthproj(W2, B)}")
+      
+"""
+T E K S T MARKDOWN!!!!
+Disse verdiene viser oss projeksjonen fra B på W1 og W2
+
+Nå finner vi deres distance, distancen fra datasett-matrisene til våre dictionaries.
+Distansen brukes til å se hvor nerme matrisene matcher dictionariesene.
+Vi tester så dens distance med test-matrisen B.
+T E K S T MARKDOWN!!!!
+"""
+      
+def ortdist(W, B):
     
-    input:
+    """
+    Regner ut kolonnevis avstand fra matrise B til dictionary W.
+    
+    Input:
     W: Dictionary med ortogonale kolonner
-    A: Datasett-martise
+    B: kolonnevis matrise, representerer treningsbilder eller testebilder
     
     Output:
     dist: Distanse fra A til W.
     """
-    dist = np.zeros(len(A[0]))
-    proj=orthproj(W,A)
+    dist = np.zeros(len(B[0]))
+    proj = orthproj(W, B)
     for i in range(len(dist)):
-        dist[i] = np.linalg.norm(A[:,i]-proj[:,i])
+        dist[i] = np.linalg.norm(B[:,i] - proj[:,i])
     return dist
+
+# Printer projeksjonen for B på W1 og W2
+print(f"Distansen fra B på W1 =\n{ortdist(W1, B)}\n")
+print(f"Distansen fra B på W2 =\n{ortdist(W2, B)}")
+
+"""
+T E K S T MARKDOWN!!!!
+Her ser vi at distansen fra B til W1, kolonnevis, er [0, 1, 0].
+Dette viser oss at b1  og b2 er inni W1, mens b2 er utenfor W1.
+Dette er riktig svar ifølge oppgaveskjemaet vi følger
+For W2, ser vi at alle kolonnene i B er inni W2
+T E K S T MARKDOWN!!!!
+"""
 
 
 #Oppgave 1d
