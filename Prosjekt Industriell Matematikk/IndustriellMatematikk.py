@@ -274,8 +274,8 @@ T E K S T MARKDOWN!!!!
 T E K S T MARKDOWN!!!!
 Oppgave 1d
 Det kan ta lang tid å trene opp en maskin ned at en SVD kan ta lang tid å renge ut
-Derfor gjår vi også et ikke-negativ frengang til projeksjon og distansemåling
-Vi lager Funksonene, og tester dem på B med A1 og A2
+Derfor gjør vi også et ikke-negativ frengang til projeksjon og distansemåling
+Vi lager projeksjonsfunksjonen først
 T E K S T MARKDOWN!!!!
 """
 
@@ -293,7 +293,7 @@ def nnproj(W, B, maxiter=50, safeDiv=10e-10):
     proj: Den ikke-negative projeksjonen av B på W.
     """
     
-    #Velger tilfeldlig H med verdier fra 0 til 1. Krukes til konvergens til å få den ekte H-matrisen = Wt @ B
+    #Velger tilfeldlige verdier på H (vekt-matrisen) med verdier fra 0 til 1. Brukes til konvergens til å få den ekte H-matrisen = Wt @ B
     H = np.random.uniform(0, 1, [len(W[0,:]), len(B[0])])
     
     #Transponerer W, og henter inn hjelpeverdiene WtB og WtW
@@ -301,14 +301,26 @@ def nnproj(W, B, maxiter=50, safeDiv=10e-10):
     WtB = Wt@B
     WtW = Wt@W
     
-    # Itererer maxiter ganger for å konvergere H til den ekte H-matrisen = Wt @ B.
+    # Itererer maxiter ganger for å konvergere H til den ekte H-matrisen.
     for k in range(maxiter):
         H = H*WtB/(WtW@H+safeDiv)
     
     #projekterer B på W, og returnerer projeksonen
     proj = W@H
-    return proj
+    return proj, H
 
+# Printer projeksjonene fra B på A1 og A2, og A-enes vekter:
+print(f"Projeksjonen fra B til A1, ikke-negativt, =\n{nnproj(A1, B)[0]}\n")
+print(f"Vektene til A1, ikke-negativt, =\n{nnproj(A1, B)[1]}\n")
+print(f"Projeksjonen fra B til A2, ikke-negativt, =\n{nnproj(A2, B)[0]}\n")
+print(f"Vektene til A2, ikke-negativt, =\n{nnproj(A2, B)[1]}")
+
+"""
+T E K S T MARKDOWN!!!!
+Her ser vi projeksjonene, og vektene. senere vil vi se at disse gir de riktige verdiene, og viser dermed at denne algoritmen funker.
+Nå ser vi på distansen fra B til A
+T E K S T MARKDOWN!!!!
+"""
 
 def nndist(W, B):
     
@@ -324,7 +336,7 @@ def nndist(W, B):
     """
     # Lager en distansevektor, og setter dem 0. Henter så projeksjonen fra B til W
     dist = np.zeros(len(B[0]))
-    proj = nnproj(W, B)
+    proj = nnproj(W, B)[0]
     
     #Regner ut distansene til hvert kolonne, og returnerer deres avstand
     for i in range(len(dist)):
@@ -340,8 +352,9 @@ T E K S T MARKDOWN!!!!
 Merk at vi her har distansen til A, og ikke til W
 Her ser vi at distansen fra B til A1, kolonnevis, er [0, 1, 1/Sq(2)].
 Dette viser oss at b1 er inni A1, mens b2 og b3 er utenfor A1.
+Vi ser her at b3 er innenfor spennet av SVD A1, men ikke i kjeglen av den ikke-negative A1.
 Dette er riktig svar ifølge oppgaveskjemaet vi følger
-For W2, ser vi neglisjerbart de samme verdiene
+For A2, ser vi neglisjerbart de samme verdiene, som også er forskjellig fra den vanlige SVD A2
 T E K S T MARKDOWN!!!!
 """
 
@@ -349,26 +362,20 @@ T E K S T MARKDOWN!!!!
 T E K S T MARKDOWN!!!!
 Oppgave 2a
 Nå som vi har matematikken nede og testet, begynner vi med MNIST dataet.
-Vi laster den led, og printer ut de 16 første 0-ene.
+Vi laster den ned, og printer ut de 16 første 0-ene.
 T E K S T MARKDOWN!!!!
 """
-
-
-"""OPPGAVE 2"""
-
-#a)
-
-
-# Load the data and rescale
 
 # Finner 'veien' til der python filen er på din maskin, for å finne
 # train og test filene
 # Altså, må train og test filene være i samme mappe som denne fila
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
+# Henter treningsbildene og testbildene
 train = np.load(dir_path + '/train.npy')/255.0
 test = np.load(dir_path + '/test.npy')/255.0
 
+# Kvadratisk bildeplottingsfunksjon
 def plotimgs(imgs, nplot = 4):
     """
     Plots the nplot*nplot first images in imgs on an nplot x nplot grid. 
@@ -377,60 +384,86 @@ def plotimgs(imgs, nplot = 4):
         imgs: (height*width,N) array containing images, where N > nplot**2
         nplot: integer, nplot**2 images will be plotted
     """
-
+    
+    # Henter antall bilder, og lengden på bildene 
     n = imgs.shape[1]
     m = int(np.sqrt(imgs.shape[0]))
 
+    #sjekker om det er nok bilder til at de kan plottes
     assert(n >= nplot**2), "Need amount of data in matrix N >= nplot**2"
 
-    # Initialize subplots
+    # Initialiserer subplots
     fig, axes = plt.subplots(nplot,nplot)
 
-    # Set background color
+    # Setter bakgrunnsfargen
     plt.gcf().set_facecolor("lightgray")
 
-    # Iterate over images
+    # Itererer over bildene
     for idx in range(nplot**2):
 
-        # Break if we go out of bounds of the array
+        # Bryter av hvis vi går utenfor arrayet
         if idx >= n:
             break
 
-        # Indices
+        # Indekser
         i = idx//nplot; j = idx%nplot
 
-        # Remove axis
+        # Fjerner akse
         axes[i,j].axis('off')
-
         axes[i,j].imshow(imgs[:,idx].reshape((m,m)), cmap = "gray")
     
-    # Plot
-
+    # Plotter
     fig.tight_layout()
     plt.show()
 
 plotimgs(train[:,1,:], nplot=4)
 
 
-"2b"
+"""
+T E K S T MARKDOWN!!!!
+Her ser vi de første 16 0-ene. nå bruker vi 0-ene
 
+Oppgave 2b
+Nå ser vi litt på deres SVd, egenskaper.
+Vi regner ut deres SVD, og plotter deres 16 første dictionaries
+T E K S T MARKDOWN!!!!
+"""
 
 n = 1000 # Antall datapunkter
 c = 0 # Klasse
-d = 500 # 16 viktigste kolonner
+d = 16 # 16 viktigste kolonner
 
 A = train[:,c,:n]
 W, H, S, FS, Vt = truncSVD(A, d)
 
 plotimgs(W, nplot = 4)
 
+"""
+T E K S T MARKDOWN!!!!
+Her ser vi de 16 første U-kolonnene.
+Merk at disse ikke er de sammen som de første 0-bildene.
+Vi ser at disse bildene inneholder viktige egenskaper som tallet 0 har, og at dens egenskaper blir nimdre og mindre representerende for tallet 0
+
+
+Vi ser på dens singulørvekotrer plottet logaritmisk vis for å mer innsikt i dem
+T E K S T MARKDOWN!!!!
+"""
+
 plt.semilogy(S)
 
 
-"interesting"
-"Her, kommenter om resultatet vi fill nedenfor"
-"ikke matchende som over? mulig fordi de første ikke er de beste?" "probably"
+"""
+T E K S T MARKDOWN!!!!
+Plotten vise oss at de aller første bildene har store singulæregenvektorer
+Den viser at de synker kraftig ned forst, men etterpå går den ganske sakte nedover, med mange singulærvektorer som er ontrent det samme
+Hvis vi hadde større d, ville vi ha sett at den begynner p gå kraftig ned igjen, helt til at den krasjer til neglisjerfart 0
 
-"Den går raskt ned, og går veldig sakte nedover. med en høyere d, ser vi at den begynner å raskt gå ned igjen"
-"Dette viser oss en funksjon som har mange gjennomsnittelige, noen få gode, og noen får dårlige matriser"
-"Funnksjon? nei ikke helt"
+Dette forteller oss at singulærvektorene inneholder noen få viktige bilder, mange mindre viktige, men brukbare bilder, og en del bilder som er neglisjerbart. 
+T E K S T MARKDOWN!!!!
+"""
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgace 2c
+T E K S T MARKDOWN!!!!
+"""
