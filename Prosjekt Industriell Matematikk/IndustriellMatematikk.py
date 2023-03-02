@@ -546,26 +546,48 @@ def FMS(A):
 A = train[:,c,:n]
 b = train[:,0,:1]
 d = np.arange(1, 784, 20)
+W, S = manytruncSVD(A, d)
 
-W = manytruncSVD(A, d)
-
-I = manyorthproj(W, A[:, :len(d)], len(d))
-
-print(I[0].shape)
-print(len(d))
+I = manyorthproj(W, b, len(d))
+"""bildene, som er projisert"""
 
 matrisedist = np.zeros(len(d))
-print(A[:, :len(d)].shape)
-print(A[:, :len(d)][:,0].shape)
+
+
 
 for i in range(len(d)):
-    matrisedist[i] = FMS(A[:, :len(d)][:,i] - I[i])
+    matrisedist[i] = FMS(b[:,0] - I[i])
+
+plt.semilogy(matrisedist)
+      
+annettall = train[:,1,:1]
+
+for i in range(len(d)):
+    matrisedist[i] = FMS(annettall[:,0] - I[i])
 
 plt.semilogy(matrisedist)
 
-annettall = train[:,1,:n]
+"""
+Singulær lik?
+Mulig fordi singulær forteller viktigheten til et spesifikt dictionary, altså hvor mye "kraft den skal ha"
+som betyr hvor mye den skal påvirke, og dermed hvor forskjellig den nå er til den reelle greia
+altrså avstanden fra b til projektert b. idk
 
-for i in range(len(d)):
-    matrisedist[i] = FMS(annettall[:, :len(d)][:,i] - I[i])
+den oransje, holder seg den samme, for den er feil uansett. blir ikke noe nermere svaret, fordi den bruker feil dictionary.
+"""
 
-plt.semilogy(matrisedist)
+
+
+d = 32
+A = train[:,c,:n]
+
+nxn = 4
+
+Wpluss = A[:,np.random.choice(A.shape[1],d,replace=False)]
+Ann = A[:,np.random.choice(A.shape[1],nxn**2,replace=False)]
+
+proj = nnproj(Wpluss, Ann)[0]
+
+plotimgs(proj, nxn)
+
+"that was fast"
