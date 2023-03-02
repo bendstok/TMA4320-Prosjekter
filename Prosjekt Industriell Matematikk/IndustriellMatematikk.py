@@ -500,7 +500,7 @@ def manytruncSVD(A, d):
 
 def manyorthproj(W, B, antall):
     
-    I = ["text"] * 4
+    I = ["text"] * antall
     
     images = np.zeros((antall, A.shape[0]))
     
@@ -511,12 +511,10 @@ def manyorthproj(W, B, antall):
 
 def fiveplotter(W, B, antall):
     """I = image"""
-    
-    b = train[:,0,:1]
-    
-    I = manyorthproj(W, B, 4)
+        
+    I = manyorthproj(W, B, len(d))
     zeros = np.zeros((1, A.shape[0]))
-    b = np.transpose(b)
+    b = np.transpose(B)
     
     totimage = np.transpose(np.concatenate((I[0], I[1], zeros, I[2], I[3], zeros, zeros, zeros, b), axis = 0))
     
@@ -525,17 +523,49 @@ def fiveplotter(W, B, antall):
 """henter verdier"""
 A = train[:,c,:n]
 d = np.array([16, 32, 64, 128])
-
 W = manytruncSVD(A, d)
 antall = 4
 
 """første bilde"""
 
 b = train[:,0,:1]
-
 fiveplotter(W, b, antall)
 """annen tall"""
 
 b = train[:,1,:1]
-
 fiveplotter(W, b, antall)
+
+
+
+
+"""FMS = Frobenium Norm Squared"""
+
+def FMS(A):
+    return sum(sum(A * A))
+
+A = train[:,c,:n]
+b = train[:,0,:1]
+d = np.arange(1, 784, 20)
+
+W = manytruncSVD(A, d)
+
+I = manyorthproj(W, A[:, :len(d)], len(d))
+
+print(I[0].shape)
+print(len(d))
+
+matrisedist = np.zeros(len(d))
+print(A[:, :len(d)].shape)
+print(A[:, :len(d)][:,0].shape)
+
+for i in range(len(d)):
+    matrisedist[i] = FMS(A[:, :len(d)][:,i] - I[i])
+
+plt.semilogy(matrisedist)
+
+annettall = train[:,1,:n]
+
+for i in range(len(d)):
+    matrisedist[i] = FMS(annettall[:, :len(d)][:,i] - I[i])
+
+plt.semilogy(matrisedist)
