@@ -467,3 +467,82 @@ T E K S T MARKDOWN!!!!
 Oppgace 2c
 T E K S T MARKDOWN!!!!
 """
+
+
+
+def manytruncSVD(A, d):
+    
+    """
+    Gjør et svd med en LISTE av de d viktigste leddene i matrisen, altså flere trunkterte versjoner av vanlig SVD-regning.
+    
+    Input:
+    A: Datasett-martise
+    d: En liste med antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
+    
+    Output:
+    W: En liste med dictionaries
+    """
+        
+    W = np.array([np.zeros((A.shape[0], A.shape[0]))] * len(d))
+    
+    maxW = truncSVD(A, max(d))[0]
+    
+    W[np.argmax(d)][:, :d[np.argmax(d)]] = maxW 
+    d[np.argmax(d)] = 0
+    
+    while max(d) != 0:
+        W[np.argmax(d)][:, :d[np.argmax(d)]] = maxW[:, :max(d)]
+        d[np.argmax(d)] = 0
+    
+    return W
+
+
+"""det første bildet, henter flere W her"""
+A = train[:,c,:n]
+d = np.array([16, 32, 64, 128])
+
+W = manytruncSVD(A, d)
+
+
+
+"Første bilde"
+b = train[:,0,:1]
+print(b.shape)
+zeros = np.zeros((1, A.shape[0]))
+image = np.zeros((4, A.shape[0]))
+
+for i in range(4):
+    image[i] = np.transpose(orthproj(W[i], b))
+
+b = np.transpose(b)
+
+i1 = image[0][np.newaxis, :]
+i2 = image[1][np.newaxis, :]
+i3 = image[2][np.newaxis, :]
+i4 = image[3][np.newaxis, :]
+
+totimage = np.transpose(np.concatenate((i1, i2, zeros, i3, i4, zeros, zeros, zeros, b), axis = 0))
+
+plotimgs(totimage, 3)
+
+
+"""annen tall"""
+
+b = train[:,1,:1]
+print(b.shape)
+zeros = np.zeros((1, A.shape[0]))
+image = np.zeros((4, A.shape[0]))
+
+for i in range(4):
+    image[i] = np.transpose(orthproj(W[i], b))
+
+b = np.transpose(b)
+
+i1 = image[0][np.newaxis, :]
+i2 = image[1][np.newaxis, :]
+i3 = image[2][np.newaxis, :]
+i4 = image[3][np.newaxis, :]
+
+totimage = np.transpose(np.concatenate((i1, i2, zeros, i3, i4, zeros, zeros, zeros, b), axis = 0))
+
+plotimgs(totimage, 3)
