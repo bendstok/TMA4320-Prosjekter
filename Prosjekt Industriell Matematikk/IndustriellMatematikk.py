@@ -2,18 +2,17 @@
 
 """
 T E K S T MARKDOWN!!!!
-Dictionary learning
+# Dictionary learning
 
-I denne rapporten ser vi på det som kalles for "Dictionary learning", og hvordan en maskin kan gjenkjenne fra hveradnre to ulike tall, 0, og 1
-Vi ser først gjennom noen matematiske prosesser for å forstå hvordan vi kan utføre dictionary learning
-Så bruker vi data fra MNIST til å utføre dictionary learning, og ser hvordan den projekterer nye bilder til dictilarien den har lært
-Til slutt ser vi på hvordan maskinen klassifiserer mange ulike tallbilder i dybde.
+I denne rapporten ser vi på det som kalles for "Dictionary learning", og hvordan en maskin kan gjenkjenne fra hverandre to bilder av ulike tall, 0, og 1. <br>
+Vi ser først gjennom noen matematiske prosesser for å forstå hvordan vi kan utføre dictionary learning. <br>
+Så bruker vi data fra MNIST til å utføre dictionary learning, og ser hvordan den projekterer nye bilder til dictionary-en (ordboka) den har lært. <br>
+Til slutt ser vi på hvordan maskinen klassifiserer mange ulike tallbilder i dybde. <br> <br>
 
-
-Først undersøker vi matematikken. Matrisene A representerer sett med "bilder", der hver kolonne skal representere en bilde.
-Disse bildene kan brukes til å trene opp datamaskinen, og til å få dem i maskinens dictionary
-Kolonnevektorene b representerer nye bilder.
-Disse brukes til å teste hvordan maskinen ser på nye bilder i forhold til dictionarien sin, altså hvordan den klassifiserer de nye bildene.
+Først undersøker vi matematikken. Matrisene A representerer sett med "bilder", der hver kolonne skal representere et bilde. <br>
+Disse bildene kan brukes til å trene opp datamaskinen, og til å få dem i maskinens dictionary. <br>
+Kolonnevektorene b representerer nye bilder. <br>
+Disse brukes til å teste hvordan maskinen ser på nye bilder i forhold til dictionary-en sin, altså hvordan den klassifiserer de nye bildene.
 T E K S T MARKDOWN!!!!
 """
 
@@ -24,7 +23,7 @@ import os
 
 """
 T E K S T MARKDOWN!!!!
-Oppgave 1a
+### Oppgave 1a
 Først skriver vi ned vektorene, som vi skal bruke i denne delen av oppgaven
 T E K S T MARKDOWN!!!!
 """
@@ -67,9 +66,9 @@ print(f"A1 rekonstruert =\n{A}")
 """
 T E K S T MARKDOWN!!!!
 Her ser vi at U er på formen (3, 2).
-Vanligvis skal den være (3, 3). det viser oss at den siste kolonnen var bare fyllt med 0, og er dermed ubrukelig for oss
-Dette ser vi er tilfelle, fordi ved å rekonstruere A1, ser vi at vi får samme resultat
-Vi finner vi ut hvor viktig de to andre kolonnene er til å rekonstruere A
+Vanligvis skal den være (3, 3). det viser oss at den siste kolonnen var bare fyllt med 0, og er dermed ubrukelig for oss. <br>
+Dette ser vi er tilfelle, fordi ved å rekonstruere A1, ser vi at vi får samme resultat. <br>
+Vi finner vi ut hvor viktig de to andre kolonnene er til å rekonstruere A.
 T E K S T MARKDOWN!!!!
 """
 
@@ -99,17 +98,17 @@ print("Det betyr at denne første kolonnen er viktigst for å rekonstruere matri
 
 """
 T E K S T MARKDOWN!!!!
-Vi ser at ved å fjerne kolonne 2, får vi omtrent samme svar, bortsett fra indeks A[1][1], som er nå 10^-6, og ikke 1.
-Med første kolonne vekk istedenfor, får vi en matrise som ikke på noen måte har de samme verdiene der verdiene ikke er 0.
-Det viser oss at den første kolonnen er viktigst for å rekonstruere matrisen
-Det er fordi np.linalg.svd sorterer kolonnene fra mest viktig til minst viktig
+Vi ser at ved å fjerne kolonne 2, får vi omtrent samme svar, bortsett fra indeks A[1][1], som er nå 10^-6, og ikke 1. <br>
+Med første kolonne vekk istedenfor, får vi en matrise som ikke på noen måte har de samme verdiene der verdiene ikke er 0. <br>
+Det viser oss at den første kolonnen er viktigst for å rekonstruere matrisen. <br>
+Det er fordi np.linalg.svd sorterer kolonnene fra mest viktig til minst viktig.
 T E K S T MARKDOWN!!!!
 """
 
 """
 T E K S T MARKDOWN!!!!
-Oppgave 1b
-nå sjekker vi A2, om hva redusering av dens U-kolonner vil gjøre med rekonstrueringen
+### Oppgave 1b
+Nå sjekker vi A2, om hva redusering av dens U-kolonner vil gjøre med rekonstrueringen
 T E K S T MARKDOWN!!!!
 """
 
@@ -126,10 +125,10 @@ print(f"Formen på Vt: {Vt.shape}\n")
 
 """
 T E K S T MARKDOWN!!!!
-Her ser vi at S har bare 0 ved dens tredje kolonne.
-Det vi gi FS @ Vt som har sin tredge rad fylt med bare 0.
-Det vil gjøre den tredje U-kolonnen ubrukelig
-Dermed kan vi fjerne denne U-kolonnen, og de korresponderende delene ved S, og Vt, og likevel få den samme matrisen
+Her ser vi at S har bare 0 ved dens tredje kolonne.<br>
+Det vi gi FS @ Vt som har sin tredge rad fylt med bare 0. <br>
+Det vil gjøre den tredje U-kolonnen ubrukelig. <br>
+Dermed kan vi fjerne denne U-kolonnen, og de korresponderende delene ved S, og Vt, og likevel få den samme matrisen.
 T E K S T MARKDOWN!!!!
 """
 
@@ -145,11 +144,10 @@ print(f"A2 rekonstruert, uten U[:,2] =\n{A}")
 
 """
 T E K S T MARKDOWN!!!!
-Denne er nøyaktig den samme som den originale A2, som bekrefter våre tanker
+Denne er nøyaktig den samme som den originale A2, som bekrefter våre tanker. <br>
 
-
-Vi ser at slik redusering kan spare oss plass og tid; om vi ønsker full rekonstryering, eller rask og nesten perfect rekonstruering.
-Vi skriver en funksjon til å gjøre dette
+Vi ser at slik redusering kan spare oss plass og tid om vi ønsker full rekonstruering, eller rask og nesten perfect rekonstruering.(Små singulærverdier spiller mindre rolle i rekonstrueringen av den original matrisen) <br>
+Vi skriver en funksjon til å gjøre dette.
 T E K S T MARKDOWN!!!!
 """
 
@@ -187,9 +185,9 @@ def truncSVD(A, d):
 
 """
 T E K S T MARKDOWN!!!!
-Oppgave 1c
-Nå ønsker vi å projektere test-datasettene til de ortogonale dictionaries.
-Slik kan maskinen dra inn nye datasett til sine dictionaries.
+### Oppgave 1c
+Nå ønsker vi å projektere test-datasettene til de ortogonale dictionaries. <br>
+Slik kan maskinen dra inn nye datasett til sine dictionaries. <br>
 Vi tester så dens projeksjon med test-matrisen B på den.
 T E K S T MARKDOWN!!!!
 """
@@ -219,18 +217,18 @@ def orthproj(W, B):
 
 # Henter W1, og printer projeksjonen for B på W1
 W1 = truncSVD(A1, 3)[0]
-print(f"Projeksjon fra B på W1 =\n{orthproj(W1, B)}\n")
+print(f"Projeksjon av B på W1 =\n{orthproj(W1, B)}\n")
 
 # Henter W2, og printer projeksjonen for B på W1
 W2 = truncSVD(A2, 3)[0]
-print(f"Projeksjon fra B på W2 =\n{orthproj(W2, B)}")
+print(f"Projeksjon av B på W2 =\n{orthproj(W2, B)}")
       
 """
 T E K S T MARKDOWN!!!!
-Disse verdiene viser oss projeksjonen fra B på W1 og W2
+Disse verdiene viser oss projeksjonen av B på W1 og W2. <br>
 
-Nå finner vi deres distance, distancen fra datasett-matrisene til våre dictionaries.
-Distansen brukes til å se hvor nerme matrisene matcher dictionariesene.
+Nå finner vi deres distanse; distansen fra datasett-matrisene til våre dictionaries. <br>
+Distansen brukes til å se hvor nerme matrisene matcher dictionariesene. <br>
 Vi tester så dens distance med test-matrisen B.
 T E K S T MARKDOWN!!!!
 """
@@ -263,29 +261,29 @@ print(f"Distansen fra B til W2 =\n{ortdist(W2, B)}")
 
 """
 T E K S T MARKDOWN!!!!
-Her ser vi at distansen fra B til W1, kolonnevis, er [0, 1, 0].
-Dette viser oss at b1  og b2 er inni W1, mens b2 er utenfor W1.
-Dette er riktig svar ifølge oppgaveskjemaet vi følger
-For W2, ser vi at alle kolonnene i B er inni W2
+Her ser vi at distansen fra B til W1, kolonnevis, er [0, 1, 0]. <br>
+Dette viser oss at b1  og b2 er inni W1, mens b2 er utenfor W1. <br>
+Dette er riktig svar ifølge oppgaveskjemaet vi følger. <br>
+For W2, ser vi at alle kolonnene i B er inni W2.
 T E K S T MARKDOWN!!!!
 """
 
 """
 T E K S T MARKDOWN!!!!
-Oppgave 1d
-Det kan ta lang tid å trene opp en maskin ned at en SVD kan ta lang tid å renge ut
-Derfor gjør vi også et ikke-negativ frengang til projeksjon og distansemåling
-Vi lager projeksjonsfunksjonen først
+### Oppgave 1d
+Det kan ta lang tid å trene opp en maskin pga. at en SVD kan ta lang tid å renge ut. <br>
+Derfor gjør vi også en ikke-negativ fremgang til projeksjon og distansemåling. <br>
+Vi lager projeksjonsfunksjonen først.
 T E K S T MARKDOWN!!!!
 """
 
 def nnproj(W, B, maxiter=50, safeDiv=10e-10):
     """
-    Tar inn et ikke-negativ dictionary W og matrise A og returnerer den ikke negative projeksjonen av A på W.
+    Tar inn et ikke-negativ dictionary W og matrise A og returnerer den ikke negative projeksjonen av B på W.
     
     Input:
     W: Ikke-negativ dictionary
-    A: Ikke-negativ datasett-matrise, representerer treningsbilder eller testbilder
+    B: Ikke-negativ datasett-matrise, representerer treningsbilder eller testbilder
     maxiter: Antall iterasjoner brukt for å regne ut den ikke-negative vekt-matrisen H
     safeDiv: Konstant ledd i divisor for å unngå null-divisjon
     
@@ -310,29 +308,29 @@ def nnproj(W, B, maxiter=50, safeDiv=10e-10):
     return proj, H
 
 # Printer projeksjonene fra B på A1 og A2, og A-enes vekter:
-print(f"Projeksjonen fra B til A1, ikke-negativt, =\n{nnproj(A1, B)[0]}\n")
+print(f"Projeksjonen av B på A1, ikke-negativt, =\n{nnproj(A1, B)[0]}\n")
 print(f"Vektene til A1, ikke-negativt, =\n{nnproj(A1, B)[1]}\n")
-print(f"Projeksjonen fra B til A2, ikke-negativt, =\n{nnproj(A2, B)[0]}\n")
+print(f"Projeksjonen av B på A2, ikke-negativt, =\n{nnproj(A2, B)[0]}\n")
 print(f"Vektene til A2, ikke-negativt, =\n{nnproj(A2, B)[1]}")
 
 """
 T E K S T MARKDOWN!!!!
-Her ser vi projeksjonene, og vektene. senere vil vi se at disse gir de riktige verdiene, og viser dermed at denne algoritmen funker.
-Nå ser vi på distansen fra B til A
+Her ser vi projeksjonene, og vektene. Senere vil vi se at disse gir de riktige verdiene, og viser dermed at denne algoritmen funker. <br>
+Nå ser vi på distansen fra B til A.
 T E K S T MARKDOWN!!!!
 """
 
 def nndist(W, B):
     
     """
-    Regner ut kolonnevis avstand fra ikke-negative matrise A til ikke-negativ dictionary W.
+    Regner ut kolonnevis avstand fra ikke-negative matrise B til ikke-negativ dictionary W.
     
     Input:
     W: Ikke-negativ dictionary
-    A: Ikke-negativ datasett-matrise, representerer treningsbilder eller testbilder
+    B: Ikke-negativ datasett-matrise, representerer treningsbilder eller testbilder
     
     Output:
-    dist: Distanse fra A til W.
+    dist: Distanse fra B til W.
     """
     # Lager en distansevektor, og setter dem 0. Henter så projeksjonen fra B til W
     dist = np.zeros(len(B[0]))
@@ -349,20 +347,20 @@ print(f"Distansen fra B til A2, ikke-negativt, =\n{nndist(A2, B)}")
 
 """
 T E K S T MARKDOWN!!!!
-Merk at vi her har distansen til A, og ikke til W
-Her ser vi at distansen fra B til A1, kolonnevis, er [0, 1, 1/Sq(2)].
-Dette viser oss at b1 er inni A1, mens b2 og b3 er utenfor A1.
-Vi ser her at b3 er innenfor spennet av SVD A1, men ikke i kjeglen av den ikke-negative A1.
-Dette er riktig svar ifølge oppgaveskjemaet vi følger
-For A2, ser vi neglisjerbart de samme verdiene, som også er forskjellig fra den vanlige SVD A2
+Merk at vi her har distansen A til B, og ikke W til B. <br>
+Her ser vi at distansen fra B til A1, kolonnevis, er [0, 1, 1/Sq(2)]. <br>
+Dette viser oss at b1 er inni A1, mens b2 og b3 er utenfor A1. <br>
+Vi ser her at b3 er innenfor spennet av SVD A1, men ikke i kjeglen av den ikke-negative A1. <br>
+Dette er riktig svar ifølge oppgaveskjemaet vi følger. <br>
+For A2, ser vi neglisjerbart de samme verdiene, som også er forskjellig fra den vanlige SVD A2.
 T E K S T MARKDOWN!!!!
 """
 
 """
 T E K S T MARKDOWN!!!!
-Oppgave 2a
-Nå som vi har matematikken nede og testet, begynner vi med MNIST dataet.
-Vi laster den ned, og printer ut de 16 første 0-ene.
+### Oppgave 2a
+Nå som vi har matematikken nede og testet, begynner vi med MNIST dataset. <br>
+Vi laster det ned, og printer ut de 16 første 0-ene.
 T E K S T MARKDOWN!!!!
 """
 
@@ -378,11 +376,12 @@ test = np.load(dir_path + '/test.npy')/255.0
 # Kvadratisk bildeplottingsfunksjon
 def plotimgs(imgs, nplot = 4):
     """
-    Plots the nplot*nplot first images in imgs on an nplot x nplot grid. 
-    Assumes heigth = width, and that the images are stored columnwise
-    input:
-        imgs: (height*width,N) array containing images, where N > nplot**2
-        nplot: integer, nplot**2 images will be plotted
+    Plotter de første nplot*nplot bildene i imgs på et nplot*nplot grid.
+    Antar høyde=bredde, og at bildene er lagret kolonnevis.
+    
+    Input:
+    imgs: (høyde=bredde,N) array som inneholder bildene. N > nplot**2
+    nplot: Heltall. nplot**2 bilder vil bli plottete
     """
     
     # Henter antall bilder, og lengden på bildene 
@@ -416,15 +415,17 @@ def plotimgs(imgs, nplot = 4):
     fig.tight_layout()
     plt.show()
 
-plotimgs(train[:,1,:], nplot=4)
+plotimgs(train[:,0,:], nplot=4)
 
 
 """
 T E K S T MARKDOWN!!!!
 Her ser vi de første 16 0-ene. nå bruker vi 0-ene
+T E K S T MARKDOWN!!!!
 
-Oppgave 2b
-Nå ser vi litt på deres SVd, egenskaper.
+T E K S T MARKDOWN!!!!
+### Oppgave 2b
+Nå ser vi litt på deres SVD, egenskaper. <br>
 Vi regner ut deres SVD, og plotter deres 16 første dictionaries
 T E K S T MARKDOWN!!!!
 """
@@ -440,12 +441,11 @@ plotimgs(W, nplot = 4)
 
 """
 T E K S T MARKDOWN!!!!
-Her ser vi de 16 første U-kolonnene.
-Merk at disse ikke er de sammen som de første 0-bildene.
-Vi ser at disse bildene inneholder viktige egenskaper som tallet 0 har, og at dens egenskaper blir nimdre og mindre representerende for tallet 0
+Her ser vi de 16 første U-kolonnene. <br>
+Merk at disse ikke er de sammen som de første 0-bildene. <br>
+Vi ser at disse bildene inneholder viktige egenskaper som tallet 0 har, og at dens egenskaper blir mimdre og mindre. <br> representerende for tallet 0. <br>
 
-
-Vi ser på dens singulørvekotrer plottet logaritmisk vis for å mer innsikt i dem
+Vi ser på dens singulærvekotrer plottet logaritmisk vis for å mer innsikt i dem.
 T E K S T MARKDOWN!!!!
 """
 
@@ -454,11 +454,11 @@ plt.semilogy(S)
 
 """
 T E K S T MARKDOWN!!!!
-Plotten vise oss at de aller første bildene har store singulæregenvektorer
-Den viser at de synker kraftig ned forst, men etterpå går den ganske sakte nedover, med mange singulærvektorer som er ontrent det samme
-Hvis vi hadde større d, ville vi ha sett at den begynner p gå kraftig ned igjen, helt til at den krasjer til neglisjerfart 0
-
-Dette forteller oss at singulærvektorene inneholder noen få viktige bilder, mange mindre viktige, men brukbare bilder, og en del bilder som er neglisjerbart. 
+Plotten vise oss at de aller første bildene har store singulæregenvektorer. <br>
+Den viser at de synker kraftig ned først, men etterpå går den ganske sakte nedover, med mange singulærvektorer som er ontrent det samme. <br>
+Hvis vi hadde større d, ville vi ha sett at den begynner å gå kraftig ned igjen, helt til at den krasjer til neglisjerbart 0. <br>
+    
+Dette forteller oss at singulærvektorene inneholder noen få viktige bilder, mange mindre viktige, men brukbare bilder, og en del bilder som er neglisjerbare. 
 T E K S T MARKDOWN!!!!
 """
 
