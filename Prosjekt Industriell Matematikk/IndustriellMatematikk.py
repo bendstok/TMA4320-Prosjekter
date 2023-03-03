@@ -481,6 +481,8 @@ def manytruncSVD(A, d):
     
     Output:
     W: En liste med dictionaries
+    (Bytt til manyW?)
+    S: Singulærvektorene til W. Brukes i 2d
     """
         
     W = np.array([np.zeros((A.shape[0], A.shape[0]))] * len(d))
@@ -494,7 +496,7 @@ def manytruncSVD(A, d):
         W[np.argmax(d)][:, :d[np.argmax(d)]] = maxW[:, :max(d)]
         d[np.argmax(d)] = 0
     
-    return W
+    return W, S
 
 
 
@@ -523,7 +525,7 @@ def fiveplotter(W, B, antall):
 """henter verdier"""
 A = train[:,c,:n]
 d = np.array([16, 32, 64, 128])
-W = manytruncSVD(A, d)
+W = manytruncSVD(A, d)[0]
 antall = 4
 
 """første bilde"""
@@ -582,12 +584,68 @@ d = 32
 A = train[:,c,:n]
 
 nxn = 4
-
-Wpluss = A[:,np.random.choice(A.shape[1],d,replace=False)]
 Ann = A[:,np.random.choice(A.shape[1],nxn**2,replace=False)]
 
+Wpluss = A[:,np.random.choice(A.shape[1],d,replace=False)]
+    
 proj = nnproj(Wpluss, Ann)[0]
 
 plotimgs(proj, nxn)
 
 "that was fast"
+"""
+Alle er blurry
+"""
+
+
+
+def manynnproj(Wpluss, B, d):
+
+    proj = np.array([np.zeros((A.shape[0], 1))] * len(d))
+    
+    proj[np.argmax(d)]= nnproj(Wpluss, b)[0]
+    d[np.argmax(d)] = 0
+    
+    
+    while max(d) != 0:
+        Wpluss = Wpluss[:,np.random.choice(Wpluss.shape[1],max(d),replace=False)]
+        proj[np.argmax(d)] = nnproj(Wpluss, b)[0]
+        d[np.argmax(d)] = 0
+    
+    return proj
+
+d = np.logspace(1,3,10, dtype = np.int64)
+
+A = train[:,c,:n]
+Wpluss = A[:,np.random.choice(A.shape[1],max(d),replace=False)]
+
+b = train[:,0,:1]
+
+
+manyproj = manynnproj(Wpluss, b, d)
+
+print(manyproj.shape)
+"""fiks det messet ^^. gosh >.<"""
+
+
+"""bildene, som er projisert"""
+
+matrisedist = np.zeros(len(d))
+
+
+for i in range(len(d)):
+    matrisedist[i] = FMS(b - manyproj[i])
+
+"""bruk print(a.shape) for å finne ut om det er i en matrise. da funker FMS"""
+    
+
+plt.semilogy(matrisedist)
+      
+annettall = train[:,1,:1]
+
+for i in range(len(d)):
+    matrisedist[i] = FMS(annettall - manyproj[i])
+
+plt.semilogy(matrisedist)
+
+"""tilfelidgheter kommer her ja. masse ved slutten"""
