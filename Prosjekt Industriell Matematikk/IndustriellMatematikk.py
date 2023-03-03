@@ -278,6 +278,7 @@ T E K S T MARKDOWN!!!!
 """
 
 def nnproj(W, B, maxiter=50, safeDiv=10e-10):
+    
     """
     Tar inn et ikke-negativ dictionary W og matrise A og returnerer den ikke negative projeksjonen av B på W.
     
@@ -375,6 +376,7 @@ test = np.load(dir_path + '/test.npy')/255.0
 
 # Kvadratisk bildeplottingsfunksjon
 def plotimgs(imgs, nplot = 4):
+    
     """
     Plotter de første nplot*nplot bildene i imgs på et nplot*nplot grid.
     Antar høyde=bredde, og at bildene er lagret kolonnevis.
@@ -382,6 +384,9 @@ def plotimgs(imgs, nplot = 4):
     Input:
     imgs: (høyde=bredde,N) array som inneholder bildene. N > nplot**2
     nplot: Heltall. nplot**2 bilder vil bli plottete
+    
+    Output:
+    Plot av de første nplot*nplot bildene i imgs på et nplot*nplot grid.
     """
     
     # Henter antall bilder, og lengden på bildene 
@@ -465,11 +470,18 @@ T E K S T MARKDOWN!!!!
 """
 T E K S T MARKDOWN!!!!
 Oppgace 2c
+Med vår SVD, tester vi dens trunktering på MNIST-datasettet
+Vi ser på fire ulike trunkterte svd, hver med økende grad av d valgte elementer.
+med disse dictionaris(ene) med ulike d, ser vi hva vi får når det projekteres på en vektore den er trent på, og en vektor den ikke er trent på
 T E K S T MARKDOWN!!!!
 """
 
 
+"""
+TEKST TIL DERE TO: SJEKKE OM DET SKAL VÆRE W ELLER WMANY; IMPLEMENTER DET SOM ER LEST FORSTÅELIG. SAMME MED MANYPROJ
+"""
 
+# Gjør flere trunktert SVD
 def manytruncSVD(A, d):
     
     """
@@ -480,172 +492,265 @@ def manytruncSVD(A, d):
     d: En liste med antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
     
     Output:
-    W: En liste med dictionaries
-    (Bytt til manyW?)
+    manyW: En liste med dictionaries
     S: Singulærvektorene til W. Brukes i 2d
     """
-        
-    W = np.array([np.zeros((A.shape[0], A.shape[0]))] * len(d))
     
+    # Setter opp en liste av dictionaries(ene)
+    manyW = np.array([np.zeros((A.shape[0], A.shape[0]))] * len(d))
+    
+    # Henter den største W
     maxW = truncSVD(A, max(d))[0]
     
-    W[np.argmax(d)][:, :d[np.argmax(d)]] = maxW 
+    # Itererer gjennom den første W
+    manyW[np.argmax(d)][:, :d[np.argmax(d)]] = maxW 
     d[np.argmax(d)] = 0
     
+    # Itererer gjennom de resterende W, og returnerer W og dens singulærvektorer
     while max(d) != 0:
-        W[np.argmax(d)][:, :d[np.argmax(d)]] = maxW[:, :max(d)]
+        manyW[np.argmax(d)][:, :d[np.argmax(d)]] = maxW[:, :max(d)]
         d[np.argmax(d)] = 0
-    
-    return W, S
+    return manyW, S
 
 
 
+# Gjør flere ortogonale projiseringer
 def manyorthproj(W, B, antall):
     
-    I = ["text"] * antall
+    """
+    Tar inn et LISTE med dictionaries med ortogonale kolonner W , og et sett med kolonner B og prosjekterer B på alle W.
     
+    Input:
+    W: Dictionaries med ortogonale kolonner
+    B: Datasett-matrise, representerer treningsbilder eller testbilder
+    antall: hvor mange projeksjoner som skal skje
+    
+    Output:
+    manyproj: En projektert versjon av B på W
+    """
+    
+    # Setter opp en flerdimensjonal python liste av de projekterte datasettene, og en endimensjonal numpy liste av dem
+    manyproj = ["text"] * antall
     images = np.zeros((antall, A.shape[0]))
     
+    # Itererer gjennom alle projeksjonene, og returnerer dem
     for i in range(antall):
         images[i] = (np.transpose(orthproj(W[i], b)))
         I[i] = images[i][np.newaxis, :]
-    return I
+    return manyproj
 
+
+
+# Printer bildene med orignalbildet
 def fiveplotter(W, B, antall):
-    """I = image"""
-        
+    
+    """
+    Plotter flere bilder sammenlignet med den originale, for inspeksjon
+    
+    Input:
+    W: Dictionaries med ortogonale kolonner
+    B: Datasett-matrise, representerer treningsbilder eller testbilder
+    antall: hvor mange projeksjoner som skal skje
+    
+    Output:
+    En plott av flere bilder sammenlignet med den originale, for inspeksjon
+    """
+    
+    # Henter de projekterte bildene, nullmatriser, og originalbildet. I = image
     I = manyorthproj(W, B, len(d))
     zeros = np.zeros((1, A.shape[0]))
     b = np.transpose(B)
     
+    # Setter opp bildene, og plotter dem
     totimage = np.transpose(np.concatenate((I[0], I[1], zeros, I[2], I[3], zeros, zeros, zeros, b), axis = 0))
-    
     plotimgs(totimage, 3)
 
-"""henter verdier"""
-A = train[:,c,:n]
+
+
+# Henter verdier
 d = np.array([16, 32, 64, 128])
 W = manytruncSVD(A, d)[0]
-antall = 4
+antall = len(d)
 
-"""første bilde"""
-
+# Printer med den første 0-bildet, der 0 er hva dictionatien er tent opp til
 b = train[:,0,:1]
 fiveplotter(W, b, antall)
-"""annen tall"""
 
+# Printer med den første 1-bildet, der 1 er IKKE hva dictionatien er tent opp til
 b = train[:,1,:1]
 fiveplotter(W, b, antall)
 
+"""
+T E K S T MARKDOWN!!!!
+Med en vektor dictionarien er trent opp med, ser vi at med høyere d, klarer den å projektere den originale 0 inntil sin dictionary bedre og bedre.
+Det samme skjer visuellt med bildet den ikke er trent på, men her er den alltid mye mer blurry enn den andre vektoren.
+Det er fordi dette 1-bildet projiserer den som om bildet var en 0, men det er den ikke.
+Da får vi blur mellom 0 og 1, der 1 viser sterkere jo høyere d vi får, men får masse artifater rundt eneren
+T E K S T MARKDOWN!!!!
+"""
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 2d
+For å sjekke bildenes sanne forskell med dictionaries(ene) finner vi deres distance til dem
+Vi bruker frobenius-norm for å finne distansene til disse bildematrisen og dictionaries(ene)
+T E K S T MARKDOWN!!!!
+"""
 
 
-
-"""FMS = Frobenium Norm Squared"""
-
+# Frobenium Norm Squared = FMS
 def FMS(A):
+    
+    """
+    Regner ut Frobeniumn-normen til en matrise, kvadrert
+    
+    Input:
+    A: en matrise
+    
+    Output:
+    frobenium normen kvadrert
+    """
+    
     return sum(sum(A * A))
 
-A = train[:,c,:n]
+# Henter verdier
 b = train[:,0,:1]
 d = np.arange(1, 784, 20)
 W, S = manytruncSVD(A, d)
-
 I = manyorthproj(W, b, len(d))
-"""bildene, som er projisert"""
 
+# Setter opp en liste av distansene fra bildene og dictionarie(sene).
 matrisedist = np.zeros(len(d))
 
-
-
+# Itererer gjennom FMS, og printer logaritmisk dictionaries(enes) distanser fra første 0-bilde, med hver 20-ende d
 for i in range(len(d)):
     matrisedist[i] = FMS(b[:,0] - I[i])
-
 plt.semilogy(matrisedist)
-      
-annettall = train[:,1,:1]
 
+# Itererer gjennom FMS, og printer logaritmisj dictionaries(enes) distanser fra første 1-bilde, med hver 20-ende d
+annettall = train[:,1,:1]
 for i in range(len(d)):
     matrisedist[i] = FMS(annettall[:,0] - I[i])
-
 plt.semilogy(matrisedist)
 
 """
-Singulær lik?
-Mulig fordi singulær forteller viktigheten til et spesifikt dictionary, altså hvor mye "kraft den skal ha"
-som betyr hvor mye den skal påvirke, og dermed hvor forskjellig den nå er til den reelle greia
-altrså avstanden fra b til projektert b. idk
+T E K S T MARKDOWN!!!!
+Her ser vi at distansen fra 0-bildet synker mer og mer jo høyere d vi har.
+Dette gjør mening, siden maskinen har da flere vektorer den kan bruke til å bedre projektere bildet
+Vi ser også at den ligner veldig mye på bildets singulærverdier.
+Dette er fordi grafen av singulærverdiene er også basert på hvor høye d-verdiene er.
+Man kan si at verdiene til singulærvektorene forteller viktigheten til et spesifikt dictionary, altså hvor mye "kraft den skal ha",
+som betyr hvor mye den skal påvirke projiseringen, og dermed hvor forskjellig den nå er til det reelle bilde, altså avstanden fra b til projektert b.
 
-den oransje, holder seg den samme, for den er feil uansett. blir ikke noe nermere svaret, fordi den bruker feil dictionary.
+Det andre bildet, gir samme distanse uansett d, fordi dette bildet er ikke blitt trent opp i dictionarien,
+så unasett hva maskienn gjør, har den ingen dictionaries osm matcher det nye bildet.
+T E K S T MARKDOWN!!!!
 """
 
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 1e
+Nå gjør vi det samme som vi hittil har gjort, men med den ikke-negative måten.
+Vi plotter deres projeksjoner først, og ser hva vi får av dem
+T E K S T MARKDOWN!!!!
+"""
 
-
+# Henter verdier
 d = 32
 A = train[:,c,:n]
-
 nxn = 4
+
+#Henter test-bilder, og dictionaries
 Ann = A[:,np.random.choice(A.shape[1],nxn**2,replace=False)]
-
 Wpluss = A[:,np.random.choice(A.shape[1],d,replace=False)]
-    
-proj = nnproj(Wpluss, Ann)[0]
 
+# Projekterer bildene, og plotter dem
+proj = nnproj(Wpluss, Ann)[0]
 plotimgs(proj, nxn)
 
-"that was fast"
+
 """
-Alle er blurry
+T E K S T MARKDOWN!!!!
+Her ser vi tilfeldig valgte opptrente bilder, og tilfeldig valgte test-bilder.
+Vi ser at alle sammen er litt blurry i forhold til bildet med d = 32 på oppgave 2c,
+siden dictionarisene er ikke sortert fra best til verst, men er heller plukket frem tilfeldig.
+T E K S T MARKDOWN!!!!
+"""
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 2f
+Nå sjekker vi distansene vi får med høyere d, og ulike bilder, med den ikke-negative metoden.
+T E K S T MARKDOWN!!!!
 """
 
 
-
+# Gjør flere ikke-negative projiseringer 
 def manynnproj(Wpluss, B, d):
-
+    
+    """
+    Tar inn et LISTE med dictionaries med ikke-negative kolonner W , og et sett med kolonner B og prosjekterer B på alle W.
+    
+    Input:
+    W: Dictionaries med ikke-negative kolonner
+    B: Datasett-matrise, representerer treningsbilder eller testbilder
+    antall: hvor mange projeksjoner som skal skje
+    
+    Output:
+    manyproj: En projektert versjon av B på W
+    """
+    
+    # Setter opp en liste av de projekterte datasettene.
     proj = np.array([np.zeros((A.shape[0], 1))] * len(d))
     
+    # Itererer gjennom den første projeksjonen
     proj[np.argmax(d)]= nnproj(Wpluss, b)[0]
     d[np.argmax(d)] = 0
     
-    
+    # Itererer gjennom de resterende krympende W, og projeksjonene, og returnerer dem
     while max(d) != 0:
         Wpluss = Wpluss[:,np.random.choice(Wpluss.shape[1],max(d),replace=False)]
         proj[np.argmax(d)] = nnproj(Wpluss, b)[0]
         d[np.argmax(d)] = 0
-    
     return proj
 
+
+
+#Henter verdier
 d = np.logspace(1,3,10, dtype = np.int64)
-
-A = train[:,c,:n]
 Wpluss = A[:,np.random.choice(A.shape[1],max(d),replace=False)]
-
-b = train[:,0,:1]
-
-
 manyproj = manynnproj(Wpluss, b, d)
 
-print(manyproj.shape)
-"""fiks det messet ^^. gosh >.<"""
-
-
-"""bildene, som er projisert"""
-
+# Setter opp en liste av distansene fra bildene og dictionarie(sene).
 matrisedist = np.zeros(len(d))
 
-
+# Itererer gjennom FMS, og printer logaritmisk dictionaries(enes) distanser fra første 0-bilde, med hver 20-ende d
 for i in range(len(d)):
     matrisedist[i] = FMS(b - manyproj[i])
-
-"""bruk print(a.shape) for å finne ut om det er i en matrise. da funker FMS"""
-    
-
 plt.semilogy(matrisedist)
-      
-annettall = train[:,1,:1]
+  
+# Itererer gjennom FMS, og printer logaritmisk dictionaries(enes) distanser fra første 1-bilde, med hver 20-ende d
 
+annettall = train[:,1,:1]
 for i in range(len(d)):
     matrisedist[i] = FMS(annettall - manyproj[i])
-
 plt.semilogy(matrisedist)
 
 """tilfelidgheter kommer her ja. masse ved slutten"""
+
+"""
+T E K S T MARKDOWN!!!!
+I forhold til plotten fra 2d, ser vi at distansen fra 0-bildet synker først mer og mer jo høyere d vi har.
+Men så ser vi at den blir ganske tilfelidg ved de største d, og at det ikke er alltid at distansen er lav.
+Det er fordi H-matrisen som konvergerer ved nnproj er nå så stor at maxiter = 50 er for lite til at den kan skikkelig konvergere.
+Dette skaper tilfeldighetene, ettersom H vil nå være preget av tilfeldigheter fra randint.
+
+Det andre bildet, gir samme distanse uansett d, fordi dette bildet er ikke blitt trent opp i dictionarien; selv med den ikke-negative metoden.
+T E K S T MARKDOWN!!!!
+"""
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 3a lets go
+T E K S T MARKDOWN!!!!
+"""
