@@ -757,3 +757,136 @@ T E K S T MARKDOWN!!!!
 Oppgave 3a lets go
 T E K S T MARKDOWN!!!!
 """
+
+
+
+def generate_test(test, digits = [0,1,2], N = 800):
+    
+    """
+    Tilfeldig genererer test sets.
+    
+    Input:
+        test: numpy array. Test data lastet ned fra filen
+        digits: python lists. Inneholder ønskede heltall
+        N: Heltall mengde test data for hver klasse
+    
+    Output:
+        test_sub: (784,len(digits)*N) numpy array. Inneholder len(digits)*N bilder
+        test_labels: (len(digits)*N) numpy array. Inneholder etiketter korresponderende til bildene av test_sub
+    """
+
+    assert N <= test.shape[2] , "N må være mindre enn eller lik det totale mengden av tilgjengelig test data for hver klasse"
+
+    assert len(digits)<= 10, "Liste av tall kan bare holde opp til 10 tall"
+
+    # Arrays til å lagre test sets og etiketter
+    test_sub = np.zeros((test.shape[0], len(digits)*N))
+    test_labels = np.zeros(len(digits)*N)
+
+    # Itererer over alle tall-klasser, og lagrer test data og etiketter
+    for i, digit in enumerate(digits):
+        test_sub[:, i*N:(i+1)*N] = test[:,digit,:]
+        test_labels[i*N:(i+1)*N] = digit
+
+    # Indekser til å bli shufflet 
+    ids = np.arange(0,len(digits)*N)
+
+    # Shufflet indekser
+    np.random.shuffle(ids)
+
+    # Returnerer shufflet data 
+    return test_sub[:,ids], test_labels[ids]
+
+digits = [0,1,2]
+
+A_test, A_labels = generate_test(test, digits = digits, N = 800)
+print("Test data shape: ", A_test.shape) # Bør være (784,2400)
+print("Test labels shape: ", A_labels.shape) # Bør være (2400)
+print("First 16 labels: ", A_labels[:16])
+plotimgs(A_test, nplot = 4)
+
+# ALSO SJEKK OM ALL TEKST ER NORSK ELLER IKKE
+
+
+def datacollection(A, B, D, c):
+    
+    """
+    Henter Dictionary, projeksjon, og distanse av en klasse bilder
+    
+    Input:
+    A: Trenings-bilder
+    B: Test-bilder
+    d: Antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
+    c: klassen til bildene
+    
+    Output:
+    Wodict: Ortogonale dictionaries
+    Wnndict: Ikke-negative dictionaries
+    Woproj: Ortogonale projeksjoner
+    Wnnproj: Ikke-negative projeksjoner
+    Wodist: Ortogonale distanser
+    Wnndist: Ikke-negative distanser
+    """
+    
+    print("lol")
+    
+    # Henter dictionaries
+    Wodict = truncSVD(A, d)[0]
+    Wnndict = A[:,np.random.choice(A.shape[1],d,replace=False)]
+   
+    # Regner ut projeksjoner
+    Woproj = orthproj(W, B)
+    Wnnproj = nnproj(W, B)[0]
+    
+    # Regner ut distanser
+    Wodist = ortdist(W, B)
+    Wnndist = nndist(W, B)
+
+    return Wodict, Wnndict, Woproj, Wnnproj, Wodist, Wnndist
+
+c = 0    
+A = train[:,c,:n]
+B = train[:,c,:1]
+d = 32
+
+
+def klassifisering(A, B, D, c):
+    
+    """
+    Klassifiserer bilder
+    
+    Input:
+    A: Trenings-bilder
+    B: Test-bilder
+    d: Antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
+    c: klassen til bildene
+    
+    Output:
+    Wodict: Ortogonale dictionaries
+    Wnndict: Ikke-negative dictionaries
+    Woproj: Ortogonale projeksjoner
+    Wnnproj: Ikke-negative projeksjoner
+    Wodist: Ortogonale distanser
+    Wnndist: Ikke-negative distanser
+    """
+    
+    # Setter opp en liste for distansene
+    wodlist = np.zeros(len(c))
+    Wndlist = np.zeros(len(c))
+    
+    #Henter distansene
+    for i in range(len(c)):
+        wodlist[i], wndlist[i] = datacollection(A, B, D, c)[4:6]
+    
+    classifyOlabels = np.zeros(lenB[:,0])
+    classifyNlabels = np.zeros(lenB[:,0])
+    
+    for i in range(lenB[:,0]):
+        classifyOlabels[i] = np.argmin(wodlist[:,i])
+        classifyNlabels[i] = np.argmin(wodlist[:,i])
+    
+    return classifyOlabels, classifyNlabels
+
+"""
+accuracy, and recall, and easy implementations idk
+"""
