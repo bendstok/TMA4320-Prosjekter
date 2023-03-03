@@ -368,11 +368,15 @@ T E K S T MARKDOWN!!!!
 # Finner 'veien' til der python filen er på din maskin, for å finne
 # train og test filene
 # Altså, må train og test filene være i samme mappe som denne fila
-dir_path = os.path.dirname(os.path.realpath(__file__))
-
-# Henter treningsbildene og testbildene
-train = np.load(dir_path + '/train.npy')/255.0
-test = np.load(dir_path + '/test.npy')/255.0
+try:
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+except:
+    print("Could not find dir_path. If using jupyter notebook, ignore")
+    train = np.load('train.npy')/255.0
+    test = np.load('test.npy')/255.0
+else:
+    train = np.load(dir_path + '/train.npy')/255.0
+    test = np.load(dir_path + '/test.npy')/255.0
 
 # Kvadratisk bildeplottingsfunksjon
 def plotimgs(imgs, nplot = 4):
@@ -477,106 +481,69 @@ T E K S T MARKDOWN!!!!
 """
 
 
-"""
-TEKST TIL DERE TO: SJEKKE OM DET SKAL VÆRE W ELLER WMANY; IMPLEMENTER DET SOM ER LEST FORSTÅELIG. SAMME MED MANYPROJ
-"""
-
-# Gjør flere trunktert SVD
 def manytruncSVD(A, d):
-    
     """
     Gjør et svd med en LISTE av de d viktigste leddene i matrisen, altså flere trunkterte versjoner av vanlig SVD-regning.
-    
+
     Input:
     A: Datasett-martise
     d: En liste med antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
-    
+
     Output:
-    manyW: En liste med dictionaries
+    W: En liste med dictionaries
+    (Bytt til manyW?)
     S: Singulærvektorene til W. Brukes i 2d
     """
-    
-    # Setter opp en liste av dictionaries(ene)
-    manyW = np.array([np.zeros((A.shape[0], A.shape[0]))] * len(d))
-    
-    # Henter den største W
+
+    W = np.array([np.zeros((A.shape[0], A.shape[0]))] * len(d))
+
     maxW = truncSVD(A, max(d))[0]
-    
-    # Itererer gjennom den første W
-    manyW[np.argmax(d)][:, :d[np.argmax(d)]] = maxW 
+
+    W[np.argmax(d)][:, :d[np.argmax(d)]] = maxW 
     d[np.argmax(d)] = 0
-    
-    # Itererer gjennom de resterende W, og returnerer W og dens singulærvektorer
+
     while max(d) != 0:
-        manyW[np.argmax(d)][:, :d[np.argmax(d)]] = maxW[:, :max(d)]
+        W[np.argmax(d)][:, :d[np.argmax(d)]] = maxW[:, :max(d)]
         d[np.argmax(d)] = 0
-    return manyW, S
+
+    return W, S
 
 
 
-# Gjør flere ortogonale projiseringer
 def manyorthproj(W, B, antall):
-    
-    """
-    Tar inn et LISTE med dictionaries med ortogonale kolonner W , og et sett med kolonner B og prosjekterer B på alle W.
-    
-    Input:
-    W: Dictionaries med ortogonale kolonner
-    B: Datasett-matrise, representerer treningsbilder eller testbilder
-    antall: hvor mange projeksjoner som skal skje
-    
-    Output:
-    manyproj: En projektert versjon av B på W
-    """
-    
-    # Setter opp en flerdimensjonal python liste av de projekterte datasettene, og en endimensjonal numpy liste av dem
-    manyproj = ["text"] * antall
+
+    I = ["text"] * antall
+
     images = np.zeros((antall, A.shape[0]))
-    
-    # Itererer gjennom alle projeksjonene, og returnerer dem
+
     for i in range(antall):
         images[i] = (np.transpose(orthproj(W[i], b)))
         I[i] = images[i][np.newaxis, :]
-    return manyproj
+    return I
 
-
-
-# Printer bildene med orignalbildet
 def fiveplotter(W, B, antall):
-    
-    """
-    Plotter flere bilder sammenlignet med den originale, for inspeksjon
-    
-    Input:
-    W: Dictionaries med ortogonale kolonner
-    B: Datasett-matrise, representerer treningsbilder eller testbilder
-    antall: hvor mange projeksjoner som skal skje
-    
-    Output:
-    En plott av flere bilder sammenlignet med den originale, for inspeksjon
-    """
-    
-    # Henter de projekterte bildene, nullmatriser, og originalbildet. I = image
+    """I = image"""
+
     I = manyorthproj(W, B, len(d))
     zeros = np.zeros((1, A.shape[0]))
     b = np.transpose(B)
-    
-    # Setter opp bildene, og plotter dem
+
     totimage = np.transpose(np.concatenate((I[0], I[1], zeros, I[2], I[3], zeros, zeros, zeros, b), axis = 0))
+
     plotimgs(totimage, 3)
 
-
-
-# Henter verdier
+"""henter verdier"""
+A = train[:,c,:n]
 d = np.array([16, 32, 64, 128])
 W = manytruncSVD(A, d)[0]
-antall = len(d)
+antall = 4
 
-# Printer med den første 0-bildet, der 0 er hva dictionatien er tent opp til
+"""første bilde"""
+
 b = train[:,0,:1]
 fiveplotter(W, b, antall)
+"""annen tall"""
 
-# Printer med den første 1-bildet, der 1 er IKKE hva dictionatien er tent opp til
 b = train[:,1,:1]
 fiveplotter(W, b, antall)
 
@@ -597,7 +564,7 @@ Vi bruker frobenius-norm for å finne distansene til disse bildematrisen og dict
 T E K S T MARKDOWN!!!!
 """
 
-
+print(2)
 # Frobenium Norm Squared = FMS
 def FMS(A):
     
@@ -632,6 +599,7 @@ annettall = train[:,1,:1]
 for i in range(len(d)):
     matrisedist[i] = FMS(annettall[:,0] - I[i])
 plt.semilogy(matrisedist)
+plt.show()
 
 """
 T E K S T MARKDOWN!!!!
@@ -649,7 +617,7 @@ T E K S T MARKDOWN!!!!
 
 """
 T E K S T MARKDOWN!!!!
-Oppgave 1e
+Oppgave 2e
 Nå gjør vi det samme som vi hittil har gjort, men med den ikke-negative måten.
 Vi plotter deres projeksjoner først, og ser hva vi får av dem
 T E K S T MARKDOWN!!!!
@@ -687,54 +655,56 @@ T E K S T MARKDOWN!!!!
 
 # Gjør flere ikke-negative projiseringer 
 def manynnproj(Wpluss, B, d):
-    
-    """
-    Tar inn et LISTE med dictionaries med ikke-negative kolonner W , og et sett med kolonner B og prosjekterer B på alle W.
-    
-    Input:
-    W: Dictionaries med ikke-negative kolonner
-    B: Datasett-matrise, representerer treningsbilder eller testbilder
-    antall: hvor mange projeksjoner som skal skje
-    
-    Output:
-    manyproj: En projektert versjon av B på W
-    """
-    
-    # Setter opp en liste av de projekterte datasettene.
+
     proj = np.array([np.zeros((A.shape[0], 1))] * len(d))
-    
-    # Itererer gjennom den første projeksjonen
+
     proj[np.argmax(d)]= nnproj(Wpluss, b)[0]
     d[np.argmax(d)] = 0
-    
-    # Itererer gjennom de resterende krympende W, og projeksjonene, og returnerer dem
+
+
     while max(d) != 0:
         Wpluss = Wpluss[:,np.random.choice(Wpluss.shape[1],max(d),replace=False)]
         proj[np.argmax(d)] = nnproj(Wpluss, b)[0]
         d[np.argmax(d)] = 0
+
     return proj
 
-
-
-#Henter verdier
 d = np.logspace(1,3,10, dtype = np.int64)
+
+A = train[:,c,:n]
 Wpluss = A[:,np.random.choice(A.shape[1],max(d),replace=False)]
+
+b = train[:,0,:1]
+
+
 manyproj = manynnproj(Wpluss, b, d)
 
-# Setter opp en liste av distansene fra bildene og dictionarie(sene).
+print(manyproj.shape)
+"""fiks det messet ^^. gosh >.<"""
+
+
+"""bildene, som er projisert"""
+
 matrisedist = np.zeros(len(d))
 
-# Itererer gjennom FMS, og printer logaritmisk dictionaries(enes) distanser fra første 0-bilde, med hver 20-ende d
+
 for i in range(len(d)):
     matrisedist[i] = FMS(b - manyproj[i])
+
+"""bruk print(a.shape) for å finne ut om det er i en matrise. da funker FMS"""
+
+
 plt.semilogy(matrisedist)
-  
-# Itererer gjennom FMS, og printer logaritmisk dictionaries(enes) distanser fra første 1-bilde, med hver 20-ende d
+
 
 annettall = train[:,1,:1]
+
 for i in range(len(d)):
     matrisedist[i] = FMS(annettall - manyproj[i])
+
 plt.semilogy(matrisedist)
+plt.show()
+"""tilfelidgheter kommer her ja. masse ved slutten"""
 
 """tilfelidgheter kommer her ja. masse ved slutten"""
 
