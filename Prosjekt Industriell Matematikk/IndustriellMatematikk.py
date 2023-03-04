@@ -797,7 +797,11 @@ def generate_test(test, digits = [0,1,2], N = 800):
     # Returnerer shufflet data 
     return test_sub[:,ids], test_labels[ids]
 
-digits = [0,1,2]
+
+
+digits = np.array([0, 1, 2])
+
+N = 800
 
 A_test, A_labels = generate_test(test, digits = digits, N = 800)
 print("Test data shape: ", A_test.shape) # Bør være (784,2400)
@@ -808,7 +812,9 @@ plotimgs(A_test, nplot = 4)
 # ALSO SJEKK OM ALL TEKST ER NORSK ELLER IKKE
 
 
-def datacollection(A, B, D, c):
+
+
+def datacollection(A, B, d):
     
     """
     Henter Dictionary, projeksjon, og distanse av en klasse bilder
@@ -817,7 +823,6 @@ def datacollection(A, B, D, c):
     A: Trenings-bilder
     B: Test-bilder
     d: Antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
-    c: klassen til bildene
     
     Output:
     Wodict: Ortogonale dictionaries
@@ -827,30 +832,23 @@ def datacollection(A, B, D, c):
     Wodist: Ortogonale distanser
     Wnndist: Ikke-negative distanser
     """
-    
-    print("lol")
-    
+        
     # Henter dictionaries
     Wodict = truncSVD(A, d)[0]
     Wnndict = A[:,np.random.choice(A.shape[1],d,replace=False)]
-   
+    
     # Regner ut projeksjoner
-    Woproj = orthproj(W, B)
-    Wnnproj = nnproj(W, B)[0]
+    Woproj = orthproj(Wodict, B)
+    Wnnproj = nnproj(Wnndict, B)[0]
     
     # Regner ut distanser
-    Wodist = ortdist(W, B)
-    Wnndist = nndist(W, B)
+    Wodist = ortdist(Wodict, B)
+    Wnndist = nndist(Wnndict, B)
 
     return Wodict, Wnndict, Woproj, Wnnproj, Wodist, Wnndist
 
-c = 0    
-A = train[:,c,:n]
-B = train[:,c,:1]
-d = 32
 
-
-def klassifisering(A, B, D, c):
+def klassifisering(A, B, c, d):
     
     """
     Klassifiserer bilder
@@ -858,8 +856,8 @@ def klassifisering(A, B, D, c):
     Input:
     A: Trenings-bilder
     B: Test-bilder
-    d: Antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
     c: klassen til bildene
+    d: Antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
     
     Output:
     Wodict: Ortogonale dictionaries
@@ -870,23 +868,124 @@ def klassifisering(A, B, D, c):
     Wnndist: Ikke-negative distanser
     """
     
-    # Setter opp en liste for distansene
-    wodlist = np.zeros(len(c))
-    Wndlist = np.zeros(len(c))
+    # liste thingy
+    Odictlist = np.zeros((len(c), len(B[:,0]), d))
+    Ndictlist = np.zeros((len(c), len(B[:,0]), d))
     
-    #Henter distansene
+    Oprojlist = np.zeros((len(c), len(B[:,0]), N*len(c)))
+    Nprojlist = np.zeros((len(c), len(B[:,0]), N*len(c)))
+    
+    Odistlist = np.zeros((len(c), len(B[0])))
+    Ndistlist = np.zeros((len(c), len(B[0])))
+    
+    # Henter distansene
     for i in range(len(c)):
-        wodlist[i], wndlist[i] = datacollection(A, B, D, c)[4:6]
+        Ac = A[:, n*i : n*(i+1)]
+        Odictlist[i], Ndictlist[i], Oprojlist[i], Nprojlist[i], Odistlist[i], Ndistlist[i] = datacollection(Ac, B, d)
     
-    classifyOlabels = np.zeros(lenB[:,0])
-    classifyNlabels = np.zeros(lenB[:,0])
     
-    for i in range(lenB[:,0]):
-        classifyOlabels[i] = np.argmin(wodlist[:,i])
-        classifyNlabels[i] = np.argmin(wodlist[:,i])
+    classifyOlabels = np.zeros(len(B[0]))
+    classifyNlabels = np.zeros(len(B[0]))
     
-    return classifyOlabels, classifyNlabels
+    
+    for i in range(len(B[0])):
+        classifyOlabels[i] = c[np.argmin(Odistlist[:,i])]
+        classifyNlabels[i] = c[np.argmin(Ndistlist[:,i])]
+    
+    return classifyOlabels, classifyNlabels, Odictlist, Ndictlist, Oprojlist, Nprojlist, Odistlist, Ndistlist
 
-"""
-accuracy, and recall, and easy implementations idk
-"""
+
+
+
+# Henter verdier
+c = digits
+
+A = np.zeros((len(train[:,0,0]), n*len(c)))
+              
+for i in range(len(c)):
+    A[:, n*i : n*(i+1)] = train[:,c[i],:n]
+
+B = A_test
+d = 32
+
+
+
+truelabel = A_labels
+predictions = klassifisering(A, B, c, d)
+
+def recallandacc(c, truelabel, predictions):
+    
+    # recall
+    Orecall = np.zeros(len(c))
+    Nrecall = np.zeros(len(c))
+    
+    for i in range(len(c)):
+        OErI = truelabel == c[i]
+        OmenerErI = predictions[0][OErI]
+        OsammenlignErI[i] = OmenerErI == c[i]
+        Oantallriktige = OmenerErI[OsammenlignErI[i]]
+        Orecall[i] = len(Oantallriktige) / len(OmenerErI)
+        
+        NErI = truelabel == c[i]
+        NmenerErI = predictions[1][NErI]
+        NsammenlignErI[i] = NmenerErI == c[i]
+        Nantallriktige = NmenerErI[NsammenlignErI[i]]
+        Nrecall[i] = len(Nantallriktige) / len(NmenerErI)
+        
+    Oacc = sum(Orecall) / len(c)
+    Nacc = sum(Nrecall) / len(c)
+    
+    return Orecall, Nrecall, Oacc, Nacc
+
+print(recallandacc(c, truelabel, predictions))
+
+
+
+
+# class 0
+
+Class = 0
+
+ODist = np.argmin(predictions[6][Class])
+NDist = np.argmin(predictions[7][Class])
+
+if predictions[6][Class][ODist] < predictions[7][Class][NDist]:
+    
+    b = B[:,ODist]
+    proj = predictions[4][Class][:,ODist]
+    Type = 0
+    
+else:
+    b = B[:,NDist]
+    proj = predictions[5][Class][:,NDist]
+    Type = 1
+
+def comparepic(b, proj):
+    b = b[np.newaxis, :]
+    proj = proj[np.newaxis, :]
+    
+    zeros = np.zeros((1, b.shape[1]))
+    totimage = np.transpose(np.concatenate((proj, zeros, zeros, b), axis = 0))
+    plotimgs(totimage, 2)
+
+comparepic(b, proj)
+
+
+
+
+# class 0
+predict = predictions[0 + Type]
+
+indexfind = np.arange(len(B[0]))
+
+foundindex = indexfind[(truelabel == Class) & (predict != truelabel)]
+try:
+    index = foundindex[0]
+except:
+    index = foundindex
+
+b = B[:,index]
+proj = predictions[4 + Type][Class][:,index]
+
+
+comparepic(b, proj)
