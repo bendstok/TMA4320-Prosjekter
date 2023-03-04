@@ -480,7 +480,7 @@ med disse dictionaris(ene) med ulike d, ser vi hva vi får når det projekteres 
 T E K S T MARKDOWN!!!!
 """
 
-# Gjlr flere trunkert SVD
+# Gjør flere trunkert SVD
 def manytruncSVD(A, d):
     """
     Gjør et svd med en LISTE av de d viktigste leddene i matrisen, altså flere trunkterte versjoner av vanlig SVD-regning.
@@ -754,7 +754,7 @@ T E K S T MARKDOWN!!!!
 
 """
 T E K S T MARKDOWN!!!!
-Oppgave 3a lets go
+Oppgave 3a
 T E K S T MARKDOWN!!!!
 """
 
@@ -879,6 +879,7 @@ def klassifisering(A, B, c, d):
     Ndistlist = np.zeros((len(c), len(B[0])))
     
     # Henter distansene
+    
     for i in range(len(c)):
         Ac = A[:, n*i : n*(i+1)]
         Odictlist[i], Ndictlist[i], Oprojlist[i], Nprojlist[i], Odistlist[i], Ndistlist[i] = datacollection(Ac, B, d)
@@ -922,14 +923,14 @@ def recallandacc(c, truelabel, predictions):
     for i in range(len(c)):
         OErI = truelabel == c[i]
         OmenerErI = predictions[0][OErI]
-        OsammenlignErI[i] = OmenerErI == c[i]
-        Oantallriktige = OmenerErI[OsammenlignErI[i]]
+        OsammenlignErI = OmenerErI == c[i]
+        Oantallriktige = OmenerErI[OsammenlignErI]
         Orecall[i] = len(Oantallriktige) / len(OmenerErI)
         
         NErI = truelabel == c[i]
         NmenerErI = predictions[1][NErI]
-        NsammenlignErI[i] = NmenerErI == c[i]
-        Nantallriktige = NmenerErI[NsammenlignErI[i]]
+        NsammenlignErI = NmenerErI == c[i]
+        Nantallriktige = NmenerErI[NsammenlignErI]
         Nrecall[i] = len(Nantallriktige) / len(NmenerErI)
         
     Oacc = sum(Orecall) / len(c)
@@ -989,3 +990,56 @@ proj = predictions[4 + Type][Class][:,index]
 
 
 comparepic(b, proj)
+
+
+
+
+# Henter verdier
+c = np.array([0, 1, 2, 3])
+
+A = np.zeros((len(train[:,0,0]), n*len(c)))
+              
+for i in range(len(c)):
+    A[:, n*i : n*(i+1)] = train[:,c[i],:n]
+
+    
+A_test, A_labels = generate_test(test, digits = c, N = 800)
+
+B = A_test
+d = 32
+
+truelabel = A_labels
+predictions = klassifisering(A, B, c, d)
+
+
+print(recallandacc(c, truelabel, predictions))
+
+
+
+
+# do safediv = 10^-2? idk
+
+# Henter verdier
+c = np.array([0, 1, 2, 3])
+
+A = np.zeros((len(train[:,0,0]), n*len(c)))
+              
+for i in range(len(c)):
+    A[:, n*i : n*(i+1)] = train[:,c[i],:n]
+
+    
+A_test, A_labels = generate_test(test, digits = c, N = 800)
+
+B = A_test
+truelabel = A_labels
+
+exp = np.arange(10)
+d = 2**exp
+
+for i in d:
+    predictions = klassifisering(A, B, c, i)
+    print(recallandacc(c, truelabel, predictions))
+
+"""
+Gosh this was alot >.<
+"""
