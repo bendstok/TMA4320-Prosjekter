@@ -1159,6 +1159,20 @@ T E K S T MARKDOWN!!!!
 # do safediv = 10^-2? idk. (implementer det. legg til safediv for alle de andre funksjonene slik at den kan endres iterativt der idk)
 
 # Henter verdier (sjekk om A, B, og c er de samme som over)
+
+c = np.array([0, 1, 2, 3])
+
+A = np.zeros((len(train[:,0,0]), n*len(c)))
+              
+for i in range(len(c)):
+    A[:, n*i : n*(i+1)] = train[:,c[i],:n]
+
+    
+A_test, A_labels = generate_test(test, digits = c, N = 800)
+
+B = A_test
+truelabel = A_labels
+
 exp = np.arange(10)
 d = 2**exp
 
