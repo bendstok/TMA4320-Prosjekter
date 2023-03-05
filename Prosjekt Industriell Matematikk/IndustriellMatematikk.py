@@ -896,7 +896,7 @@ def klassifisering(A, B, c, d):
     return classifyOlabels, classifyNlabels, Odictlist, Ndictlist, Oprojlist, Nprojlist, Odistlist, Ndistlist
 
 
-
+"""Oppgave b"""
 
 # Henter verdier
 c = digits
@@ -942,7 +942,7 @@ print(recallandacc(c, truelabel, predictions))
 
 
 
-
+"""Oppgave 2c"""
 # class 0
 
 Class = 0
@@ -973,7 +973,7 @@ comparepic(b, proj)
 
 
 
-
+"""Oppgave 2d"""
 # class 0
 predict = predictions[0 + Type]
 
@@ -992,7 +992,7 @@ proj = predictions[4 + Type][Class][:,index]
 comparepic(b, proj)
 
 
-
+"""Oppgave 2e"""
 
 # Henter verdier
 c = np.array([0, 1, 2, 3])
@@ -1036,10 +1036,20 @@ truelabel = A_labels
 exp = np.arange(10)
 d = 2**exp
 
+
+overallacc1 = np.zeros(len(d))
+
+overallacc2 = np.zeros(len(d))
+
+
+dummy = 0
 for i in d:
     predictions = klassifisering(A, B, c, i)
-    print(recallandacc(c, truelabel, predictions))
+    xx, yy, overallacc1[dummy], overallacc2[dummy] = recallandacc(c,truelabel, predictions)
+    print(xx, yy, overallacc1[dummy], overallacc2[dummy])
+    dummy +=1
 
-"""
-Gosh this was alot >.<
-"""
+
+plt.plot(d,overallacc2)
+plt.plot(d,overallacc1)
+plt.show()
