@@ -1,5 +1,3 @@
-"""punktum ta det lol."""
-
 """
 T E K S T MARKDOWN!!!!
 # Dictionary learning
@@ -755,11 +753,14 @@ T E K S T MARKDOWN!!!!
 """
 T E K S T MARKDOWN!!!!
 Oppgave 3a
+Nå har vi på plass det vi trenger for å starte med å klassifisere bildene!
+Først lager vi en funksjon som genererer et sett med test-bilder
 T E K S T MARKDOWN!!!!
 """
 
 
 
+# Genererer et sett med test-bilder
 def generate_test(test, digits = [0,1,2], N = 800):
     
     """
@@ -797,23 +798,34 @@ def generate_test(test, digits = [0,1,2], N = 800):
     # Returnerer shufflet data 
     return test_sub[:,ids], test_labels[ids]
 
+"""
+T E K S T MARKDOWN!!!!
+Vi printer ut settet, og sjekker om den er ok
+T E K S T MARKDOWN!!!!
+"""
 
-
+# talltypene fra bildene som skal brukes
 digits = np.array([0, 1, 2])
 
+#Antall tall per talltype
 N = 800
 
+# setter verdier, printer ot deres form, og printer de første 16 av dem med deres etiketter
 A_test, A_labels = generate_test(test, digits = digits, N = 800)
 print("Test data shape: ", A_test.shape) # Bør være (784,2400)
 print("Test labels shape: ", A_labels.shape) # Bør være (2400)
 print("First 16 labels: ", A_labels[:16])
 plotimgs(A_test, nplot = 4)
 
-# ALSO SJEKK OM ALL TEKST ER NORSK ELLER IKKE
+"""
+T E K S T MARKDOWN!!!!
+Med en test-matrise, bruker vi den til å klassifisere dem via å finne deres distanse fra de ulike dictionary-projeksonene deres.
+Vi henter først deres data fra én talltype
+T E K S T MARKDOWN!!!!
+"""
 
 
-
-
+# Henter dictionaries, projeksjoner, og distanser av treningsmatrise A og testmatrise B
 def datacollection(A, B, d):
     
     """
@@ -844,10 +856,19 @@ def datacollection(A, B, d):
     # Regner ut distanser
     Wodist = ortdist(Wodict, B)
     Wnndist = nndist(Wnndict, B)
-
+    
+    # Returnerer data
     return Wodict, Wnndict, Woproj, Wnnproj, Wodist, Wnndist
 
 
+"""
+T E K S T MARKDOWN!!!!
+Så henter vi ut denne informasjonen fra hver talltype, og klassifiserer bildene
+T E K S T MARKDOWN!!!!
+"""
+
+
+# klassifiserer bildene, og henter informasjon fra hver talltype
 def klassifisering(A, B, c, d):
     
     """
@@ -860,66 +881,100 @@ def klassifisering(A, B, c, d):
     d: Antall U-kolonner/S-singulærvektorer/V-rader som skal brukes
     
     Output:
-    Wodict: Ortogonale dictionaries
-    Wnndict: Ikke-negative dictionaries
-    Woproj: Ortogonale projeksjoner
-    Wnnproj: Ikke-negative projeksjoner
-    Wodist: Ortogonale distanser
-    Wnndist: Ikke-negative distanser
+    classifyOlabels: en loste med predikterte klassifikasjoner av test-bilder, ortogonalt
+    classifyNlabels: en loste med predikterte klassifikasjoner av test-bilder, ikke-negativt
+    Odictlist: En liste med ortogonale dictionaries
+    Ndictlist: En liste med ikke-negative dictionaries
+    Oprojlist: En liste med ortogonale projeksjoner
+    Nprojlist: En liste med ikke-negative projeksjoner
+    Odistlist: En liste med ortogonale distanser
+    Ndistlist: En liste med ikke-negative distanser
     """
     
-    # liste thingy
+    # Lager lister for oppbevaring av ulike dictionaries, projeksoner, og distanser, for O = Ortogonale og N = ikke-Negative sett
     Odictlist = np.zeros((len(c), len(B[:,0]), d))
     Ndictlist = np.zeros((len(c), len(B[:,0]), d))
-    
     Oprojlist = np.zeros((len(c), len(B[:,0]), N*len(c)))
     Nprojlist = np.zeros((len(c), len(B[:,0]), N*len(c)))
-    
     Odistlist = np.zeros((len(c), len(B[0])))
     Ndistlist = np.zeros((len(c), len(B[0])))
     
-    # Henter distansene
-    
+    # Henter data fra hver talltype
     for i in range(len(c)):
         Ac = A[:, n*i : n*(i+1)]
         Odictlist[i], Ndictlist[i], Oprojlist[i], Nprojlist[i], Odistlist[i], Ndistlist[i] = datacollection(Ac, B, d)
     
-    
+    # Lager lister for klassifisering av bildene
     classifyOlabels = np.zeros(len(B[0]))
     classifyNlabels = np.zeros(len(B[0]))
     
-    
+    # Klassifiserer bildene
     for i in range(len(B[0])):
         classifyOlabels[i] = c[np.argmin(Odistlist[:,i])]
         classifyNlabels[i] = c[np.argmin(Ndistlist[:,i])]
     
+    # Returnerer klassifiseringer, dictionaries, projeksoner, og distancer for alle talltyper
     return classifyOlabels, classifyNlabels, Odictlist, Ndictlist, Oprojlist, Nprojlist, Odistlist, Ndistlist
 
+"""
+T E K S T MARKDOWN!!!!
+Nå har vi en kode som plassifiserer ethvert bilde med ethvert dictionary.
+T E K S T MARKDOWN!!!!
+"""
 
-"""Oppgave b"""
+
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 3b
+Vi tester dette med de vanlige projeksjonene, test-bildene, tre talltyper 0 1 og 2, og med d = 32
+T E K S T MARKDOWN!!!!
+"""
 
 # Henter verdier
 c = digits
-
 A = np.zeros((len(train[:,0,0]), n*len(c)))
-              
 for i in range(len(c)):
     A[:, n*i : n*(i+1)] = train[:,c[i],:n]
-
 B = A_test
 d = 32
 
-
-
+# Henter etiketter og datasett-prediksjoner fra maskinen
 truelabel = A_labels
 predictions = klassifisering(A, B, c, d)
 
+
+"""
+T E K S T MARKDOWN!!!!
+Det vil være et rot å se gjennom alle klassifikasjonene.
+Derfor setter vi opp en metode for å finne ut hvor god klassifiseringen er
+Vi bruker her accuracy og recall: Acc = riktig / total-mengde, og Rec = riktig-av-talltype / total-mengde-av-talltype.
+T E K S T MARKDOWN!!!!
+"""
+
+
+# Finner accuracy og recall
 def recallandacc(c, truelabel, predictions):
+    
+    """
+    Regner ut accuracy og recall for hver talltype
+    
+    Input:
+    c: klassen til bildene
+    truelabel: de sanne etikettene til hver bilde
+    predictions: prediksjoner og data fra A, B, c, og d.
+    
+    Output:
+    Orecall: En liste med recall for ortogonale test-bidler
+    Nrecall: En liste med recall for ikke-negative test-bidler
+    Oacc: accuracy for ortogonale test-bidler
+    Nacc: accuracy for ikke-negative test-bidler
+    """
     
     # recall
     Orecall = np.zeros(len(c))
     Nrecall = np.zeros(len(c))
     
+    # Regner ut recall fra begge metodene
     for i in range(len(c)):
         OErI = truelabel == c[i]
         OmenerErI = predictions[0][OErI]
@@ -932,24 +987,70 @@ def recallandacc(c, truelabel, predictions):
         NsammenlignErI = NmenerErI == c[i]
         Nantallriktige = NmenerErI[NsammenlignErI]
         Nrecall[i] = len(Nantallriktige) / len(NmenerErI)
-        
+    
+    # Regner ut accuract
     Oacc = sum(Orecall) / len(c)
     Nacc = sum(Nrecall) / len(c)
     
+    # Returnerer accuracy of recall for både O og N
     return Orecall, Nrecall, Oacc, Nacc
 
+# Printer deres accuracy of recall (Mulig endre dette til et bedre presenterende format idk)
 print(recallandacc(c, truelabel, predictions))
 
+"""
+T E K S T MARKDOWN!!!!
+Her ser vi accuracyen of recallen fra hver metode, fra hver talltype.
+De er på omtrent 99 til 98% området.
+Vi ser at den ortogonale metoden funker litt bedre enn den ikke-negative
+Det kan være fordi den ikke-negative ikke spenner ut hele rommet, men heller bare en del av det.
+Dette kan gjøre at distansemplingen blir anderledes enn den ortogonale metoden, som etr met nøyaktig, men tregere for å gjøre et SVD.
+Vi ser også at tallet 2 we vanskeligere å klassifisere enn o og 1.
+Dette er trolig fordi 0 og 1 har enkle former mens 2 er en litt mer avansert ett.
+T E K S T MARKDOWN!!!!
+"""
 
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 3c
+Vi ser litt på forskjelle på hva klassifiseringen kan gjøre
+Vi priner først en bilde som har lavest projeksjonsdistansem fra tallet 0
+T E K S T MARKDOWN!!!!
+"""
 
-"""Oppgave 2c"""
-# class 0
+# Funksjon som plotter bildet og dens projeksjon sammen
+def comparepic(b, proj):
+    
+    """
+    Plotter en bilde og dens projeksjon sammen
+    
+    Input:
+    b: bildet
+    proj: projeksonen til bildet
+    
+    Output:
+    En plott av bildet og dens projeksjon sammen
+    """
+    
+    # Setter dem opp til plotting
+    b = b[np.newaxis, :]
+    proj = proj[np.newaxis, :]
+    
+    # Henter blanke bilder, setter bildene sammen, og plotter dem
+    zeros = np.zeros((1, b.shape[1]))
+    totimage = np.transpose(np.concatenate((proj, zeros, zeros, b), axis = 0))
+    plotimgs(totimage, 2)
 
+    
+
+# Vi plotter bilder fra tallet 0.
 Class = 0
 
+# Finner minste avstand fra hver metode.
 ODist = np.argmin(predictions[6][Class])
 NDist = np.argmin(predictions[7][Class])
 
+# Henter bildet med den minste distansen, og dens projsering, avhengig av hvilken metode ga minst distanse. Skriver også om det er O eller N
 if predictions[6][Class][ODist] < predictions[7][Class][NDist]:
     
     b = B[:,ODist]
@@ -960,88 +1061,112 @@ else:
     b = B[:,NDist]
     proj = predictions[5][Class][:,NDist]
     Type = 1
-
-def comparepic(b, proj):
-    b = b[np.newaxis, :]
-    proj = proj[np.newaxis, :]
     
-    zeros = np.zeros((1, b.shape[1]))
-    totimage = np.transpose(np.concatenate((proj, zeros, zeros, b), axis = 0))
-    plotimgs(totimage, 2)
-
+# Plotter bildet og dens projeksjon sammen
 comparepic(b, proj)
 
 
+"""
+T E K S T MARKDOWN!!!!
+Bilde viser oss at projeksjonen er nesten identisk med det originale bildet.
+Den har noe fuzz rundt seg, men de sterke punktene er alle omtrent nøyaktig projisert fra der 0-bildet faktisk er.
+Dette gir en medig liten distanse til å klassifsere den som et 0.
+T E K S T MARKDOWN!!!!
+"""
 
-"""Oppgave 2d"""
-# class 0
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 3d
+Nå ser vi på motsatt tilfelle
+Vi analyserer et bilde som ble feilklassifisert
+T E K S T MARKDOWN!!!!
+"""
+
+# Henter klassifiseringer avhengig av om det er O eller N
 predict = predictions[0 + Type]
 
+# Finner indekser til misklassifiserte bilder
 indexfind = np.arange(len(B[0]))
-
 foundindex = indexfind[(truelabel == Class) & (predict != truelabel)]
+
+# Henter det første feilklassifiserte bildet
 try:
     index = foundindex[0]
 except:
     index = foundindex
 
+# Setter opp bildet og dens projisering
 b = B[:,index]
 proj = predictions[4 + Type][Class][:,index]
 
-
+# Plotter dem sammen
 comparepic(b, proj)
 
 
-"""Oppgave 2e"""
+"""
+T E K S T MARKDOWN!!!!
+Her har vi et mye mer fuzzy bilde
+Dette gjør at det er vanskeligere å klassifisere den som et riktig tall
+Ikke nok med det, ser 0-tallet, avhengig av hvilken bilde som ble valgt, litt ut som tallet 1 eller 2 også.
+Dette viser oss at noen bilder er lette å klassifisere, mens andre er mye vanskeligere
+T E K S T MARKDOWN!!!!
+"""
 
-# Henter verdier
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 3e
+Nå gjør vi det sammme som på 3b, men med en ekstra talltype
+Vi ser hva som skjer
+T E K S T MARKDOWN!!!!
+"""
+
+
+# Henter verdier med en ekstra talltype
 c = np.array([0, 1, 2, 3])
-
 A = np.zeros((len(train[:,0,0]), n*len(c)))
-              
 for i in range(len(c)):
     A[:, n*i : n*(i+1)] = train[:,c[i],:n]
-
-    
 A_test, A_labels = generate_test(test, digits = c, N = 800)
-
 B = A_test
 d = 32
 
+# Henter etiketter og datasett-prediksjoner fra maskinen
 truelabel = A_labels
 predictions = klassifisering(A, B, c, d)
 
-
+# Printer de nye accuracy og recall
 print(recallandacc(c, truelabel, predictions))
 
 
+"""
+T E K S T MARKDOWN!!!!
+Her ser vi en del forskjeller fra 3b
+Recall og Accuracy er for de lette tallene litt lavere, mens de er mye lavere ofr de mer avanserte.
+Dette kan være fordi flere typer dictionaries gjør at det er vanskeligere å klassifisere én type tall
+T E K S T MARKDOWN!!!!
+"""
 
 
-# do safediv = 10^-2? idk
+"""
+T E K S T MARKDOWN!!!!
+Oppgave 3f
+Til slutt gjør vi det samme som forrige oppgave, men med ulike d
+Vi sjekker hva d gjør med våre resultater
+T E K S T MARKDOWN!!!!
+"""
 
-# Henter verdier
-c = np.array([0, 1, 2, 3])
 
-A = np.zeros((len(train[:,0,0]), n*len(c)))
-              
-for i in range(len(c)):
-    A[:, n*i : n*(i+1)] = train[:,c[i],:n]
+# do safediv = 10^-2? idk. (implementer det. legg til safediv for alle de andre funksjonene slik at den kan endres iterativt der idk)
 
-    
-A_test, A_labels = generate_test(test, digits = c, N = 800)
-
-B = A_test
-truelabel = A_labels
-
+# Henter verdier (sjekk om A, B, og c er de samme som over)
 exp = np.arange(10)
 d = 2**exp
 
-
+# Lager lister for overall accuracy
 overallacc1 = np.zeros(len(d))
-
 overallacc2 = np.zeros(len(d))
 
-
+# Regner accuracy og recall fra bildene med ulike d
 dummy = 0
 for i in d:
     predictions = klassifisering(A, B, c, i)
@@ -1049,7 +1174,34 @@ for i in d:
     print(xx, yy, overallacc1[dummy], overallacc2[dummy])
     dummy +=1
 
-
+# Plotter dens accuracy og recall
 plt.plot(d,overallacc2)
 plt.plot(d,overallacc1)
 plt.show()
+
+"""
+T E K S T MARKDOWN!!!!
+Plotten viser oss accuracyen for de to ulike metodene
+Vi ser at SVD-metoden gir mer og mer nøyaktgie accuracy, selv om den allerede har meget stor accuracy; altså at den beste d er den høyeste d = 500
+Vi ser også at ENMF-metoden gir gode svar ved relative lave d, men at det stadig går lengre ned ettersom den får høyere d; den høyeste accuracy for den er d = 
+(Antar det ^^)
+Dette er fordi SVD gir et mer og mer nøyaktig dictionary, som vi testet i 2d.
+For EMNF, ser vi at den når et toppunpt får den dipper krafitg ned.
+Dette kan forklares ved 2f, ved at H tar mye lengre tid på å konvergere, som gjør at den skaper mer og mer unøyaktigheter ved et kritisk d
+T E K S T MARKDOWN!!!!
+"""
+
+"""
+T E K S T MARKDOWN!!!!
+Da har vi endelig lager et fullferdig klassifiseringsmaskin, ved denne prosessen av dictionary learning
+Vi gikk gjennom matematiske prosesser for å forstå hvordan vi kan utføre det,. <br>
+vi gikk gjennom data fra MNIST til å utføre dictionary learning,
+vi så på hvordan den projekterer nye bilder til dictionary-en (ordboka) den har lært,
+og vi så på hvordan maskinen klassifiserer mange ulike tallbilder i dybde. <br> <br>
+
+Slike maskiner brukes til mye annet ting enn å bare klassifisere tall,.
+Den kan klassifisere om det står en person foran en selvkjørende bil, hvilken feed en bruker skal få, on en mail er spam, om en pasient har en høy-risiko for keft, og mye mer
+Slike maskiner er i en prosees av å revolusjonere verden, slik vi kjenner den
+Så dette rapporten viser deg et innsikt på hva fremtiden kan by på. (idk)
+T E K S T MARKDOWN!!!!
+"""
