@@ -1158,7 +1158,7 @@ T E K S T MARKDOWN!!!!
 
 # do safediv = 10^-2? idk. (implementer det. legg til safediv for alle de andre funksjonene slik at den kan endres iterativt der idk)
 
-# Henter verdier (sjekk om A, B, og c er de samme som over)
+# Henter verdier
 
 c = np.array([0, 1, 2, 3])
 
