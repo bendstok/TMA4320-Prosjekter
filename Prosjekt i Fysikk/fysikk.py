@@ -66,3 +66,58 @@ Den andre isotermenn bøyer seg langt ned, så opp igjen, for så å gå ned igj
 lavere temperatur vil gjøre at den bøyer seg kraftigere.
 det kritiske punktet er der hvor den slutter å gå oppover, og begynner da bare å gå nedover. idk.
 """
+
+"""
+oppgave c
+"""
+
+"""
+1 = sinh^2(2c/T_c)
+
+c = 1
+"""
+def eksfuncTC(t_c):
+    return np.sinh(2*c/t_c) - 1
+
+def deriverte(f, x, h):
+    deriv = (f(x + h) - f(x)) / h
+    return deriv
+
+def newtmet(f, x, h, tol, k):
+    xliste = np.zeros(k)
+    xliste[0] = x
+    for i in range(k):
+        x -= (f(x) / deriverte(f, x, h))
+        xliste[i+1] = x
+        if f(x) < tol:
+            break
+    return x, xliste
+
+c = 1
+h = 0.01
+tol = 0.0001
+k = 10000
+
+start = 0.5
+t_c = start
+
+
+
+numericalTC = newtmet(eksfuncTC, t_c, h, tol, k)[0]
+print(numericalTC)
+
+analyticTC = 2/np.log(1 + 2**0.5)
+print(analyticTC)
+
+"""
+very close. viser at det er omtrent det ja pog
+startverdi? (ser på det senere lol)
+"""
+
+"""
+oppgave d
+"""
+
+"""
+e_i, calc that. se på notatene lol
+"""
