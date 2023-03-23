@@ -1,45 +1,46 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+# Gjør figurer manuelt større
+plt.rcParams['figure.figsize'] = [12, 8]
 """
 oppgave a
 """
 
 R = 8.31446261815324
 
-"""
+""""
 T_c = 8 * a / (27 * R * b) 
 p_c = a / 27 * b**2
 V_c = 3 * b
 """
 
+
+# Eksperiementelle verdier for vann
 #kelvin
-eT_c = 647.096
+T_c = 647.096
 
-#megapascal
-ep_c = 22.064
+#pascal
+p_c = 22064000
 
-#milliliter
-eV_c = 55.948
+#liter
+eV_c = 0.055948
 
 
-#IKKE SI-ENHETER ^^^^ DE ER MEGAPASCAL OG MILLILITER
 
-"""
-fra t_c og p_c, får vi:
-"""
+#fra t_c og p_c, får vi:
 a = 27 * R**2 * T_c**2 / (64 * p_c)
 b = R * T_c / (8 * p_c)
 
-ea = 27 * R**2 * ekspT_c**2 / (64 * ekspp_c)
-eb = R * ekspT_c / (8 * ekspp_c)
+print("Volum  gitt: " +  str(3 * b))
 
-print(3 * ekspB)
-print(ekspV_c)
-"""
-sjekk om det er samme enhet? men ser at ~91 > ~56
-"""
+# Fra https://www.engineeringtoolbox.com/water-properties-temperature-equilibrium-pressure-d_2099.html#heat_capacity
+# T -> 640K P -> 20 300 000 Bar
+eT_eksp = 640
+ep_eksp = 20300000
+a_eksp = 27 * R**2 * T_c**2 / (64 * p_c)
+b_eksp = R * T_c / (8 * p_c)
 
+print("Volum litteratur: " + str(3 *b_eksp))
 
 """
 oppgave b
@@ -49,15 +50,21 @@ oppgave b
 plottstart = 75
 plottslutt = 300
 plottmengde = (plottslutt - plottstart) + 1
-Vplot = np.linspace(plottstart, plottslutt, plottnengde)
+
+Vplot = np.linspace(plottstart, plottslutt, plottmengde)
+
 def vanderwaalP(R, T, V, a, b):
     vanP = R*T/(V-b) - a/(V**2)
     return vanP
 
 vanP = np.zeros(plottmengde)
 for i in range(plottmengde):
-    vanP[i] = vanderwaalP(R, eT_c, Vplot[i], ea, eb)
+    vanP[i] = vanderwaalP(R, T_c, Vplot[i], 27 * R**2 * T_c**2 / (64 *  22.064), R * T_c / (8 * 22.064))
 plt.plot(Vplot, vanP)
+plt.grid()
+plt.xlabel("Volum [mL]")
+plt.ylabel("Trykk [MPa]")
+plt.title(r"Trykk kurven for vann gitt ved volum ved, $T = 647.096 K$")
 plt.show()
 
 """
@@ -103,7 +110,7 @@ t_c = start
 
 
 
-numericalTC = newtmet(eksfuncTC, t_c, h, tol, k)[0]
+numericalTC, xlisteNewton = newtmet(eksfuncTC, t_c, h, tol, k)
 print(numericalTC)
 
 analyticTC = 2/np.log(1 + 2**0.5)
@@ -118,6 +125,36 @@ startverdi? (ser på det senere lol)
 oppgave d
 """
 
-"""
-e_i, calc that. se på notatene lol
-"""
+#  Utregner e_i
+e_i = abs(xlisteNewton - analyticTC)
+
+# Fjærner unødvendige verdier for plotting, funksjonen blir konstant
+plotting_e_i =  np.zeros(100)
+for val in range(100):
+    plotting_e_i[val] = e_i[val]
+
+# Plotting
+plt.plot(plotting_e_i)
+plt.plot()
+plt.grid()
+plt.xlabel("Verdi for i")
+plt.ylabel(r"Verdi  for $e_i$")
+plt.title(r"Kurven til $e_i$ ved økende i")
+plt.show()
+
+# Utregning av p_i
+p_i = np.zeros(9)
+
+# Forsiktig med rangen her, blir fort uendelig store tall!
+for xx in range(2,9):
+    p_i[xx] = np.log(e_i[xx] / (e_i[xx - 1])) / np.log(e_i[xx - 1]/e_i[xx - 2])
+
+
+# Fjærning av de to nullene foran 
+index = [0,1]
+# Bare for å være ordentlig forsiktig at det ikke blir tull
+p_i = np.copy(np.delete(p_i, index))
+
+print("Utregnet q: " + str(np.mean(p_i)))
+
+# Kan vell si at det er omtrentlig lik 2, som er verdien for Newtons Metode?
