@@ -307,3 +307,52 @@ print("Utregnet q: " + str(np.mean(p_i)))
 """
 Vi ser at verdien for q er omtrent 2, som er det den analytiske løsninger foreslår til oss.
 """
+
+
+"""
+Oppgave 1e
+
+"""
+
+
+T_intervall = np.linspace(274,647,abs(274-647-1))
+
+
+def NewtonTwoVariable(f, g, ddxf, ddyf, ddxg, ddyg, solut_xy, solut, max_k, tol = 10E-4):
+    
+    
+    def f_vec(var):
+        return (np.array([f(var), g(var)]))
+    
+    def Jacobi(var):
+        return (np.array([[ddxf(var), ddyf(var)],
+                          [ddxg(var), ddyg(var)]]))
+
+    solut_answ = solut
+    solut_var = solut_xy
+
+    Jacobimat =  Jacobi[solut_var]
+
+    del_k = - solut_answ / Jacobimat
+
+    solut_var = solut_var + del_k
+    
+    for z in range(1,k):
+        solut_answ = f_vec(solut_var)
+
+        Jacobimat = Jacobimat(solut_var)
+
+        del_k = - solut_answ / Jacobimat
+
+        solut_var = solut_var + del_k
+
+        if(np.linalg.norm(solut_answ) <= tol or np.linalg.norm(del_k) <= tol or k == max_k):
+            return solut_answ, solut_var
+        
+    return solut_answ, solut_var
+
+
+            
+
+            
+
