@@ -19,6 +19,8 @@ Som en oppvarming, starter vi med å se på på noen eksperimentelle verdier for
 # Importerer biblioteker
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+from scipy import integrate
 
 # Gjør figurer manuelt større
 plt.rcParams['figure.figsize'] = [12, 8]
@@ -318,41 +320,136 @@ Oppgave 1e
 T_intervall = np.linspace(274,647,abs(274-647-1))
 
 
-def NewtonTwoVariable(f, g, ddxf, ddyf, ddxg, ddyg, solut_xy, solut, max_k, tol = 10E-4):
+def NewtonTwoVariable(F, J, X, max_i, tol = 10E-4):
+    """
+    Løser et ikke lineært system med newtons to variabel metode.
+
+    Input:
+
+    F -> Funksjonene slik at F = 0\n
+    J -> Jacobi matrisen til F\n
+    X -> Start verdier\n
+    max_k -> max antall iterasjoner\n
+    tol -> Toleranse
+
+    Return:
+
+    X -> verdiene til nullpunkt
+
+    """
     
-    
-    def f_vec(var):
-        return (np.array([f(var), g(var)]))
-    
-    def Jacobi(var):
-        return (np.array([[ddxf(var), ddyf(var)],
-                          [ddxg(var), ddyg(var)]]))
+    F_val = F(X)
+    F_norm = np.linalg.norm(F_val)
+    iter = 0
+    while(abs(F_norm) < tol and iter <= max_i):
+        delta = np.linalg.solve(J(X), - F_val)
+        X = X + delta
+        F_val = F(X)
+        F_norm = np.linalg.norm(F_val)
+        iter += 1
+    return X
 
-    solut_answ = solut
-    solut_var = solut_xy
-
-    Jacobimat =  Jacobi[solut_var]
-
-    del_k = - solut_answ / Jacobimat
-
-    solut_var = solut_var + del_k
-    
-    for z in range(1,k):
-        solut_answ = f_vec(solut_var)
-
-        Jacobimat = Jacobimat(solut_var)
-
-        del_k = - solut_answ / Jacobimat
-
-        solut_var = solut_var + del_k
-
-        if(np.linalg.norm(solut_answ) <= tol or np.linalg.norm(del_k) <= tol or k == max_k):
-            return solut_answ, solut_var
-        
-    return solut_answ, solut_var
+def V_11(T,V):
+    return 0 - (R*T)/(V-b) + a/(V^2)
 
 
+"""1f"""
+
+
+
+
+"""1g"""
+
+def p_8(T,V):
+    return (R*T)/(V-b) - a/(V**2)
+
+T_g = 460
+
+# Tilfeldige verdier
+vv = 10
+p_v = 10
+p_g = 30
+
+volume_space = np.linspace(10,18,380)
+plt.plot(volume_space, p_8(T_g,volume_space), label="P(V)")
+plt.plot(vv, p_v, 'bo', label=r"Punkt $(V_v,p(V_v))$")
+plt.plot(vv, p_g, 'ro', label=r"Punkt $(V_v,p(V_v))$")
+plt.axline((vv,vv),(p_v,p_g), ls="--", c="r",label=r"Linje Gjennom $(V_v,p(V_v)$ og $(V_v,p(V_g)$))")
+plt.xlabel("Volum")
+plt.ylabel("Trykk")
+plt.title("")
+plt.legend()
+plt.show()
             
 
             
 
+# Oppgave 2
+
+
+"""2a"""
+# https://www.engineeringtoolbox.com/water-properties-d_1573.html
+# https://www.engineeringtoolbox.com/water-properties-temperature-equilibrium-pressure-d_2099.html
+
+
+# Vi har 1 mol
+Mm = 18E-3
+#               0.01C  26.9C 86.9C 227C 367C
+T2 =  np.array([273.16, 300, 360, 500, 640])
+Vg2 = np.array([0.00485*Mm, 0.02558*Mm, 0.3786*Mm, 13.20*Mm, 177.1*Mm]) 
+Vv2 = np.array([999.8*Mm, 996.5*Mm, 967.4*Mm, 831.3*Mm, 481.5*Mm])
+#                      25C     90C   220C    360C
+L2  = np.array([45054, 43988, 41120, 33462, 12967]) # Joule / mol 
+
+
+"""2b"""
+def Vv2t_func(X,a,b,c):
+    return  np.exp(-X)+a -b*X**2 + c*X
+
+popt_vv2, covt_vv2 = curve_fit(Vv2t_func,T2,Vv2)
+popt_vg2, covt_vg2 = curve_fit(Vv2t_func,T2,Vg2)
+
+plt.plot(T2,Vg2,"r+", label=r"Data for $V_g(T)$")
+plt.plot(T2, Vv2t_func(T2,*popt_vg2), c="r", label=r"Curvefit for $V_g(T)$")
+
+plt.plot(T2,Vv2, "b+", label=r"Data for $V_v(T)$")
+plt.plot(T2, Vv2t_func(T2,*popt_vv2), c="b", label=r"Curvefit for $V_v(T)$")
+plt.xlabel("Temperatur [K]")
+plt.ylabel("Volum [L]") # Er det liter her?
+plt.legend()
+plt.show()
+
+def l2t_func(X,a,b,c,d):
+    return d*X**3 + a*X**2 + b*X + c
+
+popt_L2, covt_L2 = curve_fit(l2t_func,T2,L2)
+
+plt.plot(T2,L2,"r+", label=r"Data for $L(T)$")
+plt.plot(T2, l2t_func(T2,*popt_L2), c="r", label=r"Curvefit for $L(T)$")
+plt.legend()
+plt.show()
+
+"""2c"""
+n = abs(274-647-1)
+T_intervall = np.linspace(274,647,n)
+
+a = T_intervall[0]
+b = T_intervall[-1]
+
+h = (b-a)/n
+
+# vv2t returnerer matriser? valgte de som så rimelige ut
+def p_int(T):
+    return l2t_func(T, *popt_L2)/(T*(Vv2t_func(Vg2,*popt_vg2)[2] - Vv2t_func(Vv2,*popt_vv2)[2]))
+
+I_simp = p_int(a)
+print(range(1,n))
+for i in range(1,n):
+    if (i % 2 == 0):
+        I_simp += 2*p_int(T_intervall[i])
+    else:
+        I_simp += 4*p_int(T_intervall[i])
+
+I_simp = I_simp*h/3
+
+print(I_simp)
