@@ -1,24 +1,22 @@
 """
 Damptrykkurven
 Skrevet av: Lasse Matias Dragsjø, Bendik Kvamme Stokland, og Thomas Olaussen
-
 Damptrykkurven er en termofysisk begrep som beskriver overgangen fra vann til damp ved ulik trykk, temperatur, og volum.
 Den illustreres vanligvis i en plott med varierende trykk og temperatur, eller varierende trykk og volum.
 Denne krven, og flere slike kurver, er nyttige i termodynamikken, siden de kan anvendes til mange ulike ingeniørformål
 Kurvene kan bli hentet på flere måter:
 Enten kan den løses analytisk, eller man kan bruke van der Waals ligning til å få et foreklet modell av den.
 Verdiene til deres variabler kan deretter bli funnet ved å gjøre eksperimentelle utøvelser.
-
 I dette rapporten går vi gjennom hvordan vi gjør de numeriske metodene:
 Vi går gjennom van der waals tilstandsligning, og hvorfor den ikke er tilstrekkelig til å beskrive kurven
 Så går vi gjennom ?, og finner fram hvordan vi skal finne disse kurvene.
-
 Som en oppvarming, starter vi med å se på på noen eksperimentelle verdier for van der waals tilstandsligning.
 """
 
 # Importerer biblioteker
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy
 from scipy.optimize import curve_fit
 from scipy import integrate
 
@@ -27,20 +25,15 @@ plt.rcParams['figure.figsize'] = [12, 8]
 
 """
 oppgave a
-
 Vi ser på de kritiske verdiene til temperatur, trykk, og volum for van der waals tilstandsligning.
 Den kritiske kunptet er ver punktet på kurvediagrammene der forskjellene mellom væske og gass opphører.
 Van der waals tilstandsligning er gitt ved:
-
 p = RT /(V - b)  - a/V^2,
-
 der a og b er konstanter som man finner eksperimentellt.
 De kritiske verdiene for p, T, og V er:
-
 T_c = 8 * a / (27 * R * b) 
 p_c = a / 27 * b**2
 V_c = 3 * b
-
 Vi undersøker hva a og b blir med eksperimentelle verdier for disse kritiske verdiene,
 og drøfter videre hva dette forteller oss.
 """
@@ -53,8 +46,6 @@ R = 8.31446261815324
 T_c = 647.096 #Kelvin
 p_c = 22064000 #Pascal
 V_c = 0.000055948 #kubikkmeter
-
-# BØR VI BRUKE MPA OG ML ISTEDENFOR? DET GJØR PLOTTEN FRA 1B MYE MER MENING
 
 #fra t_c og p_c, får vi:
 a = 27 * R**2 * T_c**2 / (64 * p_c)
@@ -88,7 +79,6 @@ Dette viser oss at selv om vi har fått a ob b fra T_c og p_c, så er det ingen 
 
 """
 oppgave b
-
 Nå plotter vi van der waals kurve med en satt T_c, fra 75ml til 300ml, og sammenligner det med kurven fra figur 2 på vår guide.
 """
 
@@ -150,13 +140,10 @@ det kritiske punktet er der hvor den slutter å gå oppover, og begynner da bare
 
 """
 oppgave c
-
 Nå som vi har fått litt innsikt i wan der Waals ligning, gåt vi over et verktøy vi skal bruke til å få damptrykkurven: Newtons metode
 Vi ser på et eksempel: faseovergangen i et 2d ising-modell.
-
 Fra ordnet til ordnet tilstand, har kritisk temperatur denne ligningen:
 Sinh^2(2c/T_c) = 1.
-
 Den analytiske løsningen til den er T_c = 2c / ln(1 + 2^0.5).
 Vi bruker c = 1, og finner løsningen numerisk ved newtons metode
 """
@@ -181,7 +168,7 @@ def eksfuncTC(t_c):
     return np.sinh(2*c/t_c) - 1
 
 # Definerer numerisk derivajson
-def deriverte(f, x, h):
+def deriverte(func, x, h = 10e-6):
     
     """
     Numerisk derivasjon
@@ -189,29 +176,28 @@ def deriverte(f, x, h):
     ...
     
     Input:
-    f: funksjon
+    func: funksjon
     x: x-punkt
     h: steglengde
     
     Output:
-    deriv: f'(x), dem deriverte i det punktet.
+    deriv: f'(x), den deriverte i det punktet.
     """
     
-    deriv = (f(x + h) - f(x)) / h
+    deriv = (func(x + h) - func(x)) / h
     return deriv
 
 # Definerer newtons metode for én variabel.
-def newtmet(f, x, h, tol, k):
+def newtmet(func, x, tol, k):
     
     """
-    Numerisk derivasjon
+    Rask versjon av newtons metode for én variabel
     
     ...
     
     Input:
-    f: funksjon
+    func: funksjon
     x: x-punkt
-    h: steglengde
     tol = feiltoleranse
     k = antall maksimum iterasjoner
     
@@ -223,9 +209,9 @@ def newtmet(f, x, h, tol, k):
     xliste = np.zeros(k)
     xliste[0] = x
     for i in range(k):
-        x -= (f(x) / deriverte(f, x, h))
+        x -= (func(x) / deriverte(func, x))
         xliste[i+1] = x
-        if f(x) < tol:
+        if func(x) < tol:
             break
     return x, xliste
 
@@ -233,7 +219,6 @@ def newtmet(f, x, h, tol, k):
 
 # Henter verdier
 c = 1
-h = 0.01
 tol = 0.0001
 k = 10000
 
@@ -242,7 +227,7 @@ t_c = start
 
 
 # Finner numerisk og analytiske svar, og printer dem
-numericalTC, xlisteNewton = newtmet(eksfuncTC, t_c, h, tol, k)
+numericalTC, xlisteNewton = newtmet(eksfuncTC, t_c, tol, k)
 print(numericalTC)
 
 analyticTC = 2/np.log(1 + 2**0.5)
@@ -253,13 +238,12 @@ print(analyticTC)
 numericalTCliste = np.zeros(100)
 for i in range(100):
     start = i
-    numericalTCliste[i] = newtmet(eksfuncTC, t_c, h, tol, k)[0]
+    numericalTCliste[i] = newtmet(eksfuncTC, t_c, tol, k)[0]
 print(numericalTCliste)
 
 """
 Verdiene til den analytisle og den numeriske er veldig nerme hverandre.
 Vi kan dermed si at vi har implementert newtons meotde riktig, og at den analytiske løsningen er riktig
-
 For ulike startverdier, ser vi at alle startverdier fra 0 til 100 konvergerer til det samme tallet.
 Dermed har det ikke noe å si hvor man starter ved dette inntervallet
 """
@@ -268,7 +252,6 @@ Dermed har det ikke noe å si hvor man starter ved dette inntervallet
 
 """
 oppgave d
-
 Newtons metode konvergerer kvadratisk nor den har et fungerende startpunkt.
 Dette er analytisk vist.
 Vi finner ut av dette numerisk, ved å bruke en formel som viser omtrentlig konvergensraten q
@@ -278,7 +261,7 @@ Vi finner ut av dette numerisk, ved å bruke en formel som viser omtrentlig konv
 e_i = abs(xlisteNewton - analyticTC)
 
 # Fjærner unødvendige verdier for plotting, funksjonen blir konstant
-plotting_e_i =  np.zeros(100)
+plotting_e_i = np.zeros(100)
 for val in range(100):
     plotting_e_i[val] = e_i[val]
 
@@ -308,34 +291,29 @@ print("Utregnet q: " + str(np.mean(p_i)))
 
 """
 Vi ser at verdien for q er omtrent 2, som er det den analytiske løsninger foreslår til oss.
+Den viser oss et verdi som er litt lavere enn det, men det er trolig grunnet numeriske feil.
 """
 
 
 """
 Oppgave 1e
-
 """
 
 
-T_intervall = np.linspace(274,647,abs(274-647-1))
-
-
-def NewtonTwoVariable(F, J, X, max_i, tol = 10E-4):
+def NewtonTwoVariable(F, J, X, max_i, tol = 10e-4):
+    
     """
     Løser et ikke lineært system med newtons to variabel metode.
-
+    
     Input:
-
-    F -> Funksjonene slik at F = 0\n
-    J -> Jacobi matrisen til F\n
-    X -> Start verdier\n
-    max_k -> max antall iterasjoner\n
-    tol -> Toleranse
-
-    Return:
-
-    X -> verdiene til nullpunkt
-
+    F: Funksjonene slik at F = 0\n
+    J: Jacobi matrisen til F\n
+    X: Start verdier\n
+    max_k: max antall iterasjoner\n
+    tol: Toleranse
+    
+    Output:
+    X: verdiene til nullpunkt
     """
     
     F_val = F(X)
@@ -350,6 +328,8 @@ def NewtonTwoVariable(F, J, X, max_i, tol = 10E-4):
     return X
 
 def V_11(T,V):
+
+    
     return 0 - (R*T)/(V-b) + a/(V^2)
 
 
@@ -360,38 +340,71 @@ def func(V):
     ep_eksp = 20300000
     a = 27 * R**2 * eT_eksp**2 / (64 * ep_eksp)
     b = R * eT_eksp / (8 * ep_eksp)
-    V_list=np.zeros(2)
-    V_list[0]=(R*T)/(V[1]-b)-a/(V[1]**2)-(R*T)/(V[0]-b)+a/(V[0]**2)
-    V_list[1]=R*T/(V[1]-V[0])*np.log((V[1]-b)/(V[0]-b))-a/(V[1]*V[0])-R*T/(V[1]-b)+a/(V[1]**2)
+    V_list = np.zeros(2)
+    V_list[0] = (R*T)/(V[1]-b) - a/(V[1]**2) - (R*T)/(V[0]-b) + a/(V[0]**2)
+    V_list[1] = R*T/(V[1]-V[0]) * np.log((V[1]-b)/(V[0]-b)) - a/(V[1]*V[0]) - R*T/(V[1]-b) + a/(V[1]**2)
     return V_list
-def derivMultiple(func,x,h=10e-6):
-    h_list=np.ones(len(x))*h
-    return (func(x+h)-func(x))/h
+
+def derivMultiple(func, x ,h = 10e-6):
+     
+    """
+    Numerisk derivasjon, med en h_list
+    
+    ...
+    
+    Input:
+    func: funksjon
+    x: x-punkt
+    h: steglengde
+    
+    Output:
+    deriv: f'(x), den deriverte i det punktet.
+    """
+    
+    # hvorfor er denne vv her?
+    h_list = np.ones(len(x)) * h
+    return (func(x + h) - func(x)) / h
+
 def newtonMultiple(func, x, h=0.0001, tol=0.0001, k=10000):
-    x_list=np.zeros((k+1,len(x)))
-    x_list[0]=x
+    
+    """
+    a
+    """
+    
+    x_list = np.zeros((k+1,len(x)))
+    x_list[0] = x
     for i in range(k):
-        x_list[i+1]=x_list[i]-func(x_list[i])/derivMultiple(func,x_list[i],h)
+        x_list[i+1] = x_list[i] - func(x_list[i]) / derivMultiple(func,x_list[i],h)
         if abs(func(x_list[i+1])).max()<tol:
-            x_list=x_list[0:i+2]
+            x_list = x_list[0:i+2]
             break
     return x_list
 
+
+# Hva er dette?
 V_0 = np.array([100,200])
-T_lower=274
-T_upper=657
-T_list=np.linspace(T_lower,T_upper,T_upper-T_lower+1)
+
+# Lager en liste for helverdige temperaturer
+T_lower = 274
+T_upper = 657
+T_mengde = (T_upper - T_lower) + 1
+T_list = np.linspace(T_lower, T_upper, T_mengde)
+
+# Lager lister med T_list mengde
 V_v=np.zeros(len(T_list))
 V_g=np.zeros(len(T_list))
 V_vSC=np.zeros(len(T_list))
 V_gSC=np.zeros(len(T_list))
+
+# Itererer gjennom nrwtions metode for V_v og V_g
 for i in range(len(T_list)):
     T=T_list[i]
     V_v[i]=newtonMultiple(func,V_0)[-1,0]
     V_g[i]=newtonMultiple(func,V_0)[-1,0]
     V_vSC[i]=scipy.optimize.fsolve(func,V_0,xtol=0.0001)[0]
     V_gSC[i]=scipy.optimize.fsolve(func,V_0,xtol=0.0001)[0]
-    
+
+#Plotter verdiene
 plt.plot(T_list,V_v,label="V_v")
 plt.plot(T_list,V_g,label="V_g")
 plt.legend()
@@ -403,8 +416,22 @@ plt.legend()
 plt.show()
 
 
-"""1f"""
+"""
+Oppgave 1f
+Vi henter eksperimentelle verdier fra nettsiden https://www.engineeringtoolbox.com/water-properties-d_1573.html:
+"""
 
+# 1 bar = 100'000 Pa
+barToPa = 10e5
+
+TrykkP = barToPa * np.array(6.1E-03, 0.0099, 0.0354, 0.105, 0.272, 0.622, 1.29, 2.46, 4.37, 7.34, 11.7, 17.9, 26.4, 44.6, 71.1, 108, 159, 180, 203, 221)
+
+# Verdier som passer for Vv, Vg, og L:
+TrykkVerdier = barToPa * np.array([6.1E-03, 0.0354, 0.622, 26.4, 203, 221])
+
+"""
+Krever 1e for videre koding av 1f
+"""
 
 
 
@@ -444,12 +471,13 @@ plt.show()
 
 # Vi har 1 mol
 Mm = 18E-3
-#               0.01C  26.9C 86.9C 227C 367C
-T2 =  np.array([273.16, 300, 360, 500, 640])
-Vg2 = np.array([0.00485*Mm, 0.02558*Mm, 0.3786*Mm, 13.20*Mm, 177.1*Mm]) 
-Vv2 = np.array([999.8*Mm, 996.5*Mm, 967.4*Mm, 831.3*Mm, 481.5*Mm])
-#                      25C     90C   220C    360C
-L2  = np.array([45054, 43988, 41120, 33462, 12967]) # Joule / mol 
+
+#               0.01C 26.9C 86.9C 227C 367C 373.946C 
+T2 =  np.array([273.16, 300, 360, 500, 640, 647.1])
+Vg2 = np.array([Mm/0.00485, Mm/0.02558, Mm/0.3786, Mm/13.20, Mm/177.1, Mm/322.0]) 
+Vv2 = np.array([Mm/999.8, Mm/996.5, Mm/967.4, Mm/831.3, Mm/481.5, Mm/322.0])
+#                      25C     90C   220C    360C 373.95C
+L2  = np.array([45054, 43988, 41120, 33462, 12967, 0]) # Joule / mol 
 
 
 """2b"""
