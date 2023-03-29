@@ -447,13 +447,14 @@ vv = 10
 p_v = 10
 p_g = 30
 
-volume_space = np.linspace(10,18,380)
+
+volume_space = np.linspace(5,12,380) # Plot
 plt.plot(volume_space, p_8(T_g,volume_space), label="P(V)")
 plt.plot(vv, p_v, 'bo', label=r"Punkt $(V_v,p(V_v))$")
 plt.plot(vv, p_g, 'ro', label=r"Punkt $(V_v,p(V_v))$")
 plt.axline((vv,vv),(p_v,p_g), ls="--", c="r",label=r"Linje Gjennom $(V_v,p(V_v)$ og $(V_v,p(V_g)$))")
-plt.xlabel("Volum")
-plt.ylabel("Trykk")
+plt.xlabel("Volum [L]")
+plt.ylabel("Trykk [P]")
 plt.title("")
 plt.legend()
 plt.show()
@@ -538,10 +539,10 @@ I_simp_val[0] = p_int(a)
 for i in range(1,n):
     if (i % 2 == 0):
         I_simp += 2*p_int(T_intervall[i])
-        I_simp_val[i] = h/3 * I_simp
+        I_simp_val[i] = I_simp
     else:
         I_simp += 4*p_int(T_intervall[i])
-        I_simp_val[i] = h/3 * I_simp
+        I_simp_val[i] = I_simp
     
 
 I_simp = I_simp*h/3
@@ -602,28 +603,31 @@ b = T_intervall[-1]
 
 h = (b-a)/n
 
-I_simp = p_interpol(a)
+I_simp_inter = p_interpol(a)
 
-I_simp_val = np.zeros(n)
-I_simp_val[0] = p_interpol(a)
+I_simp_val_inter = np.zeros(n)
+I_simp_val_inter[0] = p_interpol(a)
 
 for i in range(1,n):
     if (i % 2 == 0):
-        I_simp += 2*p_interpol(T_intervall[i])
-        I_simp_val[i] = h/3*I_simp
+        I_simp_inter += 2*p_interpol(T_intervall[i])
+        I_simp_val_inter[i] = I_simp_inter
+    elif(i == n):
+        I_simp_inter += p_interpol(T_intervall[i])
+        I_simp_val_inter[i] = I_simp_inter
     else:
-        I_simp += 4*p_interpol(T_intervall[i])
-        I_simp_val[i] = h/3*I_simp
+        I_simp_inter += 4*p_interpol(T_intervall[i])
+        I_simp_val_inter[i] = I_simp_inter
     
 
-I_simp = I_simp*h/3
+I_simp_inter = I_simp_inter*h/3
 
-print(I_simp)
+print(I_simp_inter)
 
 plt.title("Simpsons integrering av likning (13), Kubisk spline")
 plt.xlabel("Temperatur [K]")
 plt.ylabel("Trykk [P]")
-plt.plot(T_intervall,I_simp_val)
+plt.plot(T_intervall,I_simp_val_inter)
 plt.show()
 
 """2f"""
@@ -635,5 +639,10 @@ T0_an = T_c
 
 analytic_solution = p0_an*np.exp((L_an/R) * (1/T0_an - 1/T_intervall))
 
-plt.plot(T_intervall, analytic_solution)
+plt.plot(T_intervall, analytic_solution, label="Analytisk løsning, L = {}".format(L_an))
+plt.plot(T_intervall,I_simp_val,label="Kurve interpolering")
+plt.plot(T_intervall,I_simp_val_inter,label="Kubisk spline")
+plt.xlabel("Temperatur [K]")
+plt.ylabel("Trykk [P]")
+plt.legend()
 plt.show()
