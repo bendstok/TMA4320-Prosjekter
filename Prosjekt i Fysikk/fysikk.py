@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from scipy.optimize import curve_fit
-from scipy import integrate
+from scipy import interpolate
 
 # Gjør figurer manuelt større
 plt.rcParams['figure.figsize'] = [12, 8]
@@ -424,7 +424,7 @@ Vi henter eksperimentelle verdier fra nettsiden https://www.engineeringtoolbox.c
 # 1 bar = 100'000 Pa
 barToPa = 10e5
 
-TrykkP = barToPa * np.array(6.1E-03, 0.0099, 0.0354, 0.105, 0.272, 0.622, 1.29, 2.46, 4.37, 7.34, 11.7, 17.9, 26.4, 44.6, 71.1, 108, 159, 180, 203, 221)
+TrykkP = barToPa * np.array([6.1E-03, 0.0099, 0.0354, 0.105, 0.272, 0.622, 1.29, 2.46, 4.37, 7.34, 11.7, 17.9, 26.4, 44.6, 71.1, 108, 159, 180, 203, 221])
 
 # Verdier som passer for Vv, Vg, og L:
 TrykkVerdier = barToPa * np.array([6.1E-03, 0.0354, 0.622, 26.4, 203, 221])
@@ -481,30 +481,41 @@ L2  = np.array([45054, 43988, 41120, 33462, 12967, 0]) # Joule / mol
 
 
 """2b"""
-def Vv2t_func(X,a,b,c):
-    return  np.exp(-X)+a -b*X**2 + c*X
+def Vv2t_func(X,a,b,c,d,e):
+    return  a*np.exp(X)+b -c*X**2 + d*X + e*X**3
+
+def Vg2t_func(X,a,b,c):
+    return  a*(b**X) + c
+
+fig_t, (ax_t_vg, ax_t_vv, ax_t_l) = plt.subplots(1,3)
 
 popt_vv2, covt_vv2 = curve_fit(Vv2t_func,T2,Vv2)
-popt_vg2, covt_vg2 = curve_fit(Vv2t_func,T2,Vg2)
+popt_vg2, covt_vg2 = curve_fit(Vg2t_func,T2,Vg2)
 
-plt.plot(T2,Vg2,"r+", label=r"Data for $V_g(T)$")
-plt.plot(T2, Vv2t_func(T2,*popt_vg2), c="r", label=r"Curvefit for $V_g(T)$")
+ax_t_vg.plot(T2,Vg2,"r+", label=r"Data for $V_g(T)$")
+ax_t_vg.plot(T2, Vg2t_func(T2,*popt_vg2), c="r", label=r"Curvefit for $V_g(T)$")
+ax_t_vg.set_xlabel("Temperatur [K]")
+ax_t_vg.set_ylabel(r"Volum [$m^3$]") 
+ax_t_vg.legend()
 
-plt.plot(T2,Vv2, "b+", label=r"Data for $V_v(T)$")
-plt.plot(T2, Vv2t_func(T2,*popt_vv2), c="b", label=r"Curvefit for $V_v(T)$")
-plt.xlabel("Temperatur [K]")
-plt.ylabel("Volum [L]") # Er det liter her?
-plt.legend()
-plt.show()
+ax_t_vv.plot(T2,Vv2, "b+", label=r"Data for $V_v(T)$")
+ax_t_vv.plot(T2, Vv2t_func(T2,*popt_vv2), c="b", label=r"Curvefit for $V_v(T)$")
+ax_t_vv.set_xlabel("Temperatur [K]")
+ax_t_vv.set_ylabel(r"Volum [$m^3$]") 
+ax_t_vv.legend()
+fig_t.tight_layout()
 
 def l2t_func(X,a,b,c,d):
     return d*X**3 + a*X**2 + b*X + c
 
 popt_L2, covt_L2 = curve_fit(l2t_func,T2,L2)
 
-plt.plot(T2,L2,"r+", label=r"Data for $L(T)$")
-plt.plot(T2, l2t_func(T2,*popt_L2), c="r", label=r"Curvefit for $L(T)$")
-plt.legend()
+ax_t_l.plot(T2,L2,"r+", label=r"Data for $L(T)$")
+ax_t_l.plot(T2, l2t_func(T2,*popt_L2), c="r", label=r"Curvefit for $L(T)$")
+ax_t_l.set_xlabel("Temperatur [K]")
+ax_t_l.set_ylabel(r"Latent Varme [$Joule/Mol$]") 
+ax_t_l.legend()
+fig_t.suptitle("Kurve interpolering av innhentet data")
 plt.show()
 
 """2c"""
@@ -518,16 +529,65 @@ h = (b-a)/n
 
 # vv2t returnerer matriser? valgte de som så rimelige ut
 def p_int(T):
-    return l2t_func(T, *popt_L2)/(T*(Vv2t_func(Vg2,*popt_vg2)[2] - Vv2t_func(Vv2,*popt_vv2)[2]))
+    return l2t_func(T, *popt_L2)/(T*(Vg2t_func(Vg2,*popt_vg2)[2] - Vv2t_func(Vv2,*popt_vv2)[2]))
 
 I_simp = p_int(a)
-print(range(1,n))
+
+I_simp_val = np.zeros(n)
+I_simp_val[0] = p_int(a)
+
 for i in range(1,n):
     if (i % 2 == 0):
-        I_simp += 2*p_int(T_intervall[i])
+        I_simp_val[i] = 2*p_int(T_intervall[i])
+        I_simp += I_simp_val[i]
     else:
-        I_simp += 4*p_int(T_intervall[i])
+        I_simp_val[i] = 4*p_int(T_intervall[i])
+        I_simp += I_simp_val[i]
+    
 
 I_simp = I_simp*h/3
 
 print(I_simp)
+
+plt.title("Simpsons integrering av likning (13)")
+plt.xlabel("Temperatur [K]")
+plt.ylabel("Trykk [P]")
+plt.plot(T_intervall,I_simp_val)
+plt.show()
+
+"""2d"""
+
+interpol_vv = interpolate.CubicSpline(T2,Vv2)
+interpol_vg = interpolate.CubicSpline(T2,Vg2)
+interpol_l  = interpolate.CubicSpline(T2,L2)
+
+fig_2d, (ax_t_vg2d, ax_t_vv2d, ax_t_l2d) = plt.subplots(1,3)
+
+popt_vv2, covt_vv2 = curve_fit(Vv2t_func,T2,Vv2)
+popt_vg2, covt_vg2 = curve_fit(Vg2t_func,T2,Vg2)
+
+ax_t_vg2d.plot(T2,Vg2,"r+", label=r"Data for $V_g(T)$")
+ax_t_vg2d.plot(T2, Vg2t_func(T2,*popt_vg2), c="r", label=r"Curvefit for $V_g(T)$")
+ax_t_vg2d.plot(T2,interpol_vg(T2),c='g', label="Kubisk Spline")
+ax_t_vg2d.set_xlabel("Temperatur [K]")
+ax_t_vg2d.set_ylabel(r"Volum [$m^3$]") 
+ax_t_vg2d.legend()
+
+ax_t_vv2d.plot(T2,Vv2, "b+", label=r"Data for $V_v(T)$")
+ax_t_vv2d.plot(T2, Vv2t_func(T2,*popt_vv2), c="b", label=r"Curvefit for $V_v(T)$")
+ax_t_vv2d.plot(T2,interpol_vv(T2),c='g', label="Kubisk Spline")
+ax_t_vv2d.set_xlabel("Temperatur [K]")
+ax_t_vv2d.set_ylabel(r"Volum [$m^3$]") 
+ax_t_vv2d.legend()
+fig_2d.tight_layout()
+
+ax_t_l2d.plot(T2,L2,"r+", label=r"Data for $L(T)$")
+ax_t_l2d.plot(T2, l2t_func(T2,*popt_L2), c="r", label=r"Curvefit for $L(T)$")
+ax_t_l2d.plot(T2,interpol_l(T2),c='g', label="Kubisk Spline")
+ax_t_l2d.set_xlabel("Temperatur [K]")
+ax_t_l2d.set_ylabel(r"Latent Varme [$Joule/Mol$]") 
+ax_t_l2d.legend()
+fig_2d.suptitle("Figur av Kubisk spline mot Kurve interpolering")
+plt.show()
+
+""""""
