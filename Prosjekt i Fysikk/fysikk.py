@@ -527,9 +527,8 @@ b = T_intervall[-1]
 
 h = (b-a)/n
 
-# vv2t returnerer matriser? valgte de som så rimelige ut
 def p_int(T):
-    return l2t_func(T, *popt_L2)/(T*(Vg2t_func(Vg2,*popt_vg2)[2] - Vv2t_func(Vv2,*popt_vv2)[2]))
+    return l2t_func(T, *popt_L2)/(T*(Vg2t_func(T,*popt_vg2) - Vv2t_func(T,*popt_vv2)))
 
 I_simp = p_int(a)
 
@@ -538,18 +537,18 @@ I_simp_val[0] = p_int(a)
 
 for i in range(1,n):
     if (i % 2 == 0):
-        I_simp_val[i] = 2*p_int(T_intervall[i])
-        I_simp += I_simp_val[i]
+        I_simp += 2*p_int(T_intervall[i])
+        I_simp_val[i] = h/3 * I_simp
     else:
-        I_simp_val[i] = 4*p_int(T_intervall[i])
-        I_simp += I_simp_val[i]
+        I_simp += 4*p_int(T_intervall[i])
+        I_simp_val[i] = h/3 * I_simp
     
 
 I_simp = I_simp*h/3
 
 print(I_simp)
 
-plt.title("Simpsons integrering av likning (13)")
+plt.title("Simpsons integrering av likning (13), Kurve interpolering")
 plt.xlabel("Temperatur [K]")
 plt.ylabel("Trykk [P]")
 plt.plot(T_intervall,I_simp_val)
@@ -590,4 +589,51 @@ ax_t_l2d.legend()
 fig_2d.suptitle("Figur av Kubisk spline mot Kurve interpolering")
 plt.show()
 
-""""""
+"""2e"""
+
+def p_interpol(T):
+    return interpol_l(T)/(T*interpol_vg(T) - interpol_vv(T))
+
+n = abs(274-647-1)
+T_intervall = np.linspace(274,647,n)
+
+a = T_intervall[0]
+b = T_intervall[-1]
+
+h = (b-a)/n
+
+I_simp = p_interpol(a)
+
+I_simp_val = np.zeros(n)
+I_simp_val[0] = p_interpol(a)
+
+for i in range(1,n):
+    if (i % 2 == 0):
+        I_simp += 2*p_interpol(T_intervall[i])
+        I_simp_val[i] = h/3*I_simp
+    else:
+        I_simp += 4*p_interpol(T_intervall[i])
+        I_simp_val[i] = h/3*I_simp
+    
+
+I_simp = I_simp*h/3
+
+print(I_simp)
+
+plt.title("Simpsons integrering av likning (13), Kubisk spline")
+plt.xlabel("Temperatur [K]")
+plt.ylabel("Trykk [P]")
+plt.plot(T_intervall,I_simp_val)
+plt.show()
+
+"""2f"""
+
+# Finne et punkt (p0,t0), bruker krital punktet
+p0_an = p_c
+L_an = 1000 # Vi må finne egen verdi som passer best
+T0_an = T_c
+
+analytic_solution = p0_an*np.exp((L_an/R) * (1/T0_an - 1/T_intervall))
+
+plt.plot(T_intervall, analytic_solution)
+plt.show()
