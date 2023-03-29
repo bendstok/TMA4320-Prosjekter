@@ -333,88 +333,121 @@ def V_11(T,V):
     return 0 - (R*T)/(V-b) + a/(V^2)
 
 
-#Ikke Ferdig kode
-def func(V):
-    R = 8.31446261815324
-    eT_eksp = 640
-    ep_eksp = 20300000
-    a = 27 * R**2 * eT_eksp**2 / (64 * ep_eksp)
-    b = R * eT_eksp / (8 * ep_eksp)
-    V_list = np.zeros(2)
-    V_list[0] = (R*T)/(V[1]-b) - a/(V[1]**2) - (R*T)/(V[0]-b) + a/(V[0]**2)
-    V_list[1] = R*T/(V[1]-V[0]) * np.log((V[1]-b)/(V[0]-b)) - a/(V[1]*V[0]) - R*T/(V[1]-b) + a/(V[1]**2)
-    return V_list
-
-def derivMultiple(func, x ,h = 10e-6):
-     
+#Ferdig kode
+def func(V,T,a,b):
     """
-    Numerisk derivasjon, med en h_list
-    
-    ...
+    Likningssystemet som skal løses
     
     Input:
-    func: funksjon
-    x: x-punkt
-    h: steglengde
+    V: Liste med variabler (Volum), V[0] = V_v, V[1] =V_g
+    T: Temperatur
+    a: Konstant
+    b: Konstant
     
     Output:
-    deriv: f'(x), den deriverte i det punktet.
+    V_list: Utregnet svar
     """
+    #Definerer Gasskonstanten
+    R = 8.31446261815324
     
-    # hvorfor er denne vv her?
-    h_list = np.ones(len(x)) * h
-    return (func(x + h) - func(x)) / h
+    #Lager en liste for systemet av likninger
+    V_list=np.zeros(2)
+    
+    #Regner ut
+    V_list[0]=(R*T)/(V[1]-b)-a/(V[1]**2)-(R*T)/(V[0]-b)+a/(V[0]**2)
+    V_list[1]=R*T/(V[1]-V[0])*np.log((V[1]-b)/(V[0]-b))-a/(V[1]*V[0])-R*T/(V[1]-b)+a/(V[1]**2)
+    return V_list
 
-def newtonMultiple(func, x, h=0.0001, tol=0.0001, k=10000):
-    
+def Jacobi(V,T,a,b):
     """
-    a
-    """
+    Jacobi matrisen til likningssystemet func
     
-    x_list = np.zeros((k+1,len(x)))
-    x_list[0] = x
+    Input:
+    V: Liste med variabler (Volum), V[0] = V_v, V[1] =V_g
+    T: Temperatur
+    a: Konstant
+    b: Konstant
+    
+    Output:
+    matrix: Jacobi matrisen til likningsystemet func
+    """
+    #Definerer Gasskonstanten
+    R = 8.31446261815324
+    #Oppretter Jacobi matrise   
+    matrix = np.zeros((2,2))
+    #Regner ut Jacobi matrisen
+    matrix[0,0] = R*T/((V[1]-b)**2)+2*a/(V[0]**3)
+    matrix[0,1] = -R*T/((V[1]-b)**2)+2*a/(V[1]**3)
+    matrix[1,0] = -R*T/((V[1]-V[0])*(V[0]-b))+V[1]*a/((V[1]*V[0])**2)+R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
+    matrix[1,1] = R*T/((V[1]-V[0])*(V[1]-b))+R*T/((V[1]-b)**2)+V[0]*a/((V[1]*V[0])**2)+V[0]*a/((V[0]*V[1])**2)-2*a/(V[1]**3)-R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
+    return matrix
+
+def newtonMultiple(func, Jacobi, x, T, a, b, h=0.0001, tol=0.0001, k=1000):
+    """
+    Funksjonen bruker Newtons metode for å løse likningssytemet
+    
+    Input:
+    func: Likningssystemet som skal løses
+    Jacobi: Jacobi matrisen til likningssystemt
+    x: Startsverdi for variablene som det skal løses for
+    T: Temperatur
+    a: Konstant
+    b: Konstant
+    h: Steglengde
+    tol: Toleranse
+    k: Maks antall iterasjoner
+    
+    Output:
+    x_list[-1]: Nullpunkt for likningsystemet
+    """
+    #Oppretter liste av lister for å lagre nullpunkter og setter inn startsverdi
+    x_list=np.zeros((k+1,len(x)))
+    x_list[0]=x
+    
+    #Newtons metode
     for i in range(k):
-        x_list[i+1] = x_list[i] - func(x_list[i]) / derivMultiple(func,x_list[i],h)
-        if abs(func(x_list[i+1])).max()<tol:
-            x_list = x_list[0:i+2]
+        x_list[i+1] = x_list[i]-np.linalg.inv(Jacobi(x_list[i],T,a,b))@func(x_list[i],T,a,b)
+        if abs(func(x_list[i+1],T,a,b)).max()<tol:
+            x_liste = x_liste[0:i+2]
             break
-    return x_list
+    #Returnerer det siste steget
+    return x_list[-1]
 
+#Regner ut V_v og V_g for forskjellige T
+#Lager liste med T verdier mellom T_lower og T_upper
+T_lower=274
+T_upper=647
+T_list=np.linspace(T_lower,T_upper,T_upper-T_lower+1)
 
-# Hva er dette?
-V_0 = np.array([100,200])
+#Lager list for å lagre V_v og V_g
+V_v = np.zeros(len(T_list))
+V_g = np.zeros(len(T_list))
 
-# Lager en liste for helverdige temperaturer
-T_lower = 274
-T_upper = 657
-T_mengde = (T_upper - T_lower) + 1
-T_list = np.linspace(T_lower, T_upper, T_mengde)
+#Setter konstanter (KAN FJERNES HVIS DET ALLEREDE ER DEFINERT)
+a=0.5534843454745333
+b=3.0480961647686777e-05
 
-# Lager lister med T_list mengde
-V_v=np.zeros(len(T_list))
-V_g=np.zeros(len(T_list))
-V_vSC=np.zeros(len(T_list))
-V_gSC=np.zeros(len(T_list))
+#Setter startspunkt for newtons metode (V_0[0]: V_v, V_0[1]: V_g)
+V_0 = np.array([12658e-6,35.6e-6])
 
-# Itererer gjennom nrwtions metode for V_v og V_g
-for i in range(len(T_list)):
-    T=T_list[i]
-    V_v[i]=newtonMultiple(func,V_0)[-1,0]
-    V_g[i]=newtonMultiple(func,V_0)[-1,0]
-    V_vSC[i]=scipy.optimize.fsolve(func,V_0,xtol=0.0001)[0]
-    V_gSC[i]=scipy.optimize.fsolve(func,V_0,xtol=0.0001)[0]
+#Regner ut de først V_v og V_g med utgangspunkt i V_0 og T_lower
+V_v[0] = newtonMultiple(func,Jacobi,V_0,T_lower,a,b)[0]
+V_g[0] = newtonMultiple(func,Jacobi,V_0,T_lower,a,b)[1]
 
-#Plotter verdiene
+#Regner ut resten av V_v og V_g med forskjellig T
+V_list = np.array([V_v[0],V_g[0]])
+for i in range(1,len(T_list)):
+    V_list = newtonMultiple(func,Jacobi,V_list,T_list[i],a,b,tol=0.1)
+    V_v[i] = V_list[0]
+    V_g[i] = V_list[1]
+    
+#Plotter
 plt.plot(T_list,V_v,label="V_v")
+plt.legend()
+plt.show()
 plt.plot(T_list,V_g,label="V_g")
 plt.legend()
 plt.show()
-plt.plot(T_list,V_vSC,label="V_vSC")
-plt.plot(T_list,V_gSC,label="V_gSC")
-plt.yscale('log')
-plt.legend()
-plt.show()
-
 
 """
 Oppgave 1f
