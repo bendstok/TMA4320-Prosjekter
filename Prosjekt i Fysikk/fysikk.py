@@ -47,8 +47,8 @@ R = 8.31446261815324
 
 # Eksperiementelle verdier for vann i SI-enheter
 T_c = 647.096 #Kelvin
-p_c = 22064000 #Pascal
-V_c = 0.000055948 #Kubikkmeter
+p_c = 22.064000 #MegaPascal
+V_c = 55.948 #MilliLiter
 
 #fra t_c og p_c, får vi:
 a = 27 * R**2 * T_c**2 / (64 * p_c)
@@ -59,20 +59,6 @@ print(b)
 
 print("Volum fra b: " +  str(3 * b))
 print("Volum eksperimentellt: " +  str(V_c))
-
-
-# Fra https://www.engineeringtoolbox.com/water-properties-temperature-equilibrium-pressure-d_2099.html#heat_capacity
-# T -> 640K P -> 20 300 000 Bar
-
-eT_eksp = 640
-ep_eksp = 20300000
-a_eksp = 27 * R**2 * eT_eksp**2 / (64 * ep_eksp)
-b_eksp = R * eT_eksp / (8 * ep_eksp)
-
-print("Volum fra b (engi tool): " +  str(3 * b_eksp))
-print("Volum eksperimentellt (engi tool): " +  str(V_c))
-
-# FINN DEN EKSPERIMENTELLE VOLUM HER? ^^
 
 
 
@@ -91,8 +77,6 @@ Oppgave 1b
 Nå plotter vi van der waals kurve med en satt T_c, fra 75ml til 300ml, og sammenligner det med kurven fra figur 2 på vår guide.
 TEKST M A R K D O W N!!!!!
 """
-
-# VISE ET BILDE FRA GUIDEN OM DET?
 
 # Plotteverdier
 plottstart = 75
@@ -127,7 +111,7 @@ def vanderwaalP(T, V, a, b):
 # itererer gjennom van der Waals ligning med volumene
 vanP = np.zeros(plottmengde)
 for i in range(plottmengde):
-    vanP[i] = vanderwaalP(T_c, Vplot[i], 27 * R**2 * T_c**2 / (64 *  22.064), R * T_c / (8 * 22.064))
+    vanP[i] = vanderwaalP(T_c, Vplot[i], 27 * R**2 * T_c**2 / (64 *  p_c), R * T_c / (8 * p_c))
 
 # Plotter    
 plt.plot(Vplot, vanP)
@@ -442,16 +426,16 @@ def newtonMultiple(func, Jacobi, x, T, a, b, h=0.0001, tol=0.0001, k=1000):
 
 #Regner ut V_v og V_g for forskjellige T
 #Lager liste med T verdier mellom T_lower og T_upper
-T_lower=274
-T_upper=647
-T_list=np.linspace(T_lower,T_upper,T_upper-T_lower+1)
+T_lower = 274
+T_upper = 647
+T_list = np.linspace(T_lower,T_upper,T_upper-T_lower+1)
 
 #Lager list for å lagre V_v og V_g
 V_v = np.zeros(len(T_list))
 V_g = np.zeros(len(T_list))
 
 #Setter startspunkt for newtons metode (V_0[0]: V_v, V_0[1]: V_g)
-V_0 = np.array([12658e-6,35.6e-6])
+V_0 = np.array([12658,35.6])
 
 #Regner ut de først V_v og V_g med utgangspunkt i V_0 og T_lower
 V_v[0] = newtonMultiple(func,Jacobi,V_0,T_lower,a,b)[0]
@@ -503,22 +487,28 @@ TEKST M A R K D O W N!!!!!
 """
 
 # 1 bar = 100'000 Pa
-barToPa = 10e5
+barToMPa = 10e-1
 
 TempK = np.array([273.16, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 530, 560, 590, 620, 630, 640, 647.1])
-TrykkP = barToPa * np.array([6.1E-03, 0.0099, 0.0354, 0.105, 0.272, 0.622, 1.29, 2.46, 4.37, 7.34, 11.7, 17.9, 26.4, 44.6, 71.1, 108, 159, 180, 203, 221])
+TrykkP = barToMPa * np.array([6.1E-03, 0.0099, 0.0354, 0.105, 0.272, 0.622, 1.29, 2.46, 4.37, 7.34, 11.7, 17.9, 26.4, 44.6, 71.1, 108, 159, 180, 203, 221])
 
 # Verdier som passer for Vv, Vg, og L:
-TrykkVerdier = barToPa * np.array([6.1E-03, 0.0354, 0.622, 26.4, 203, 221])
+TrykkVerdier = barToMPa * np.array([6.1E-03, 0.0354, 0.622, 26.4, 203, 221])
 
-#Regner ut trykkene fra V_v med ulike T (V_g funker også)
-P_list = np.zeros(len(T_list))
+#Regner ut trykkene fra V_v og V_g med ulike T
+P_listv = np.zeros(len(T_list))
+P_listg = np.zeros(len(T_list))
 for i in range(len(T_list)):
-    P_list[i] = vanderwaalP(T_list[i], V_v[i], a, b)
+    P_listv[i] = vanderwaalP(T_list[i], V_v[i], a, b)
+    P_listg[i] = vanderwaalP(T_list[i], V_g[i], a, b)
+
+    
+    
 
 #Plotter de eksperimentelle og koeksistensverdiene sammen
 plt.plot(TempK,TrykkP,label=r"$Eksperimentelle$")
-plt.plot(T_list,P_list,label="Koesistensielle")
+plt.plot(T_list,P_listv,label="Koesistensielle (v)")
+plt.plot(T_list,P_listg,label="Koesistensielle (g)")
 plt.title(r"Eksperimentelle og koeksistensielle verdier plottet sammen logaritmisk")
 plt.grid()
 plt.yscale("log")
@@ -529,6 +519,7 @@ TEKST M A R K D O W N!!!!!
 De koeksistensielle verdiene ser ut til å være høyere enn eksperimentelle ved lave temperaturer.
 Så nermer verdiene seg, ettersom eksperimentelle verdier stiger kraftig, mens de andre gjør det sakte.
 Til slutt vil de koeksistensielle verdiene være for lave i forhold til de eksperimentelle, ettersom de første gir et P som ligner formen til V_v, men omvendt
+Den gjør et stor avvik av de eksperimentelle verdiene. det kan hende at det er forsi van der Waals ligning ikke er tlstrekkelig, eller at programmet er litt feil
 TEKST M A R K D O W N!!!!!
 """
 
@@ -537,33 +528,37 @@ TEKST M A R K D O W N!!!!!
 """
 TEKST M A R K D O W N!!!!!
 Oppgave 1g
+Nå velger vi temperatur istedenfor volum, og printer ut P(V)
 TEKST M A R K D O W N!!!!!
 """
 
-def p_8(T,V):
-    return (R*T)/(V-b) - a/(V**2)
+#Vi velger temperatur = 460K, med tilhørende verdier. v på enden er bare å få dem til et annet variabelnavn.
+Tv = T_list[550-T_lower]
+Vvv = V_v[550-T_lower]
+Vgv = V_g[550-T_lower]
+Pvv = P_listv[550-T_lower]
+Pgv = P_listg[550-T_lower]
 
-T_g = 460
-
-# Tilfeldige verdier
-vv = 10
-p_v = 10
-p_g = 30
-
-
-volume_space = np.linspace(5,12,380) # Plot
-plt.plot(volume_space, p_8(T_g,volume_space), label="P(V)")
-plt.plot(vv, p_v, 'bo', label=r"Punkt $(V_v,p(V_v))$")
-plt.plot(vv, p_g, 'ro', label=r"Punkt $(V_v,p(V_v))$")
-plt.axline((vv,vv),(p_v,p_g), ls="--", c="r",label=r"Linje Gjennom $(V_v,p(V_v)$ og $(V_v,p(V_g)$))")
-plt.xlabel("Volum [L]")
-plt.ylabel("Trykk [P]")
+# Volumrom, og regner ut P(V)
+volume_space = np.linspace(45,305,2601)
+V_listforplot = np.zeros(len(volume_space))
+for i in range(len(volume_space)):
+    V_listforplot[i] = vanderwaalP(Tv, volume_space[i], a, b)
+    
+# Plot
+plt.plot(volume_space, V_listforplot, label="P(V)")
+plt.plot(Vvv, Pvv, 'bo', label=r"Punkt $(V_v,p(V_v))$")
+plt.plot(Vgv, Pgv, 'ro', label=r"Punkt $(V_g,p(V_g))$")
+plt.axline((Vvv,Pvv),(Vgv,Pgv), ls="--", c="r",label=r"Linje Gjennom $(V_v,p(V_v)$ og $(V_v,p(V_g)$))")
+plt.xlabel("Volum [mL]")
+plt.ylabel("Trykk [MPa]")
 plt.title("")
 plt.legend()
 plt.show()
 
 """
 TEKST M A R K D O W N!!!!!
+Dette ser ut som et riktig seende van der waals plott.
 En linje fra V_v til V_g på en PV-diagram er overgangslinjen, fra venstre til høyre, fra flytende form til gassform.
 Volumet vil øke, mens trykket (Og temperaturen i et PT-diagram) holder seg den samme.
 TEKST M A R K D O W N!!!!!
