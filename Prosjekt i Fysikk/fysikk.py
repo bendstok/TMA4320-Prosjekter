@@ -381,10 +381,10 @@ def Jacobi(V,T,a,b):
     matrix = np.zeros((2,2))
     
     #Regner ut Jacobi matrisen
-    matrix[0,0] = R*T/((V[1]-b)**2)+2*a/(V[0]**3)
+    matrix[0,0] = R*T/((V[0]-b)**2)-2*a/(V[0]**3)
     matrix[0,1] = -R*T/((V[1]-b)**2)+2*a/(V[1]**3)
     matrix[1,0] = -R*T/((V[1]-V[0])*(V[0]-b))+V[1]*a/((V[1]*V[0])**2)+R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
-    matrix[1,1] = R*T/((V[1]-V[0])*(V[1]-b))+R*T/((V[1]-b)**2)+V[0]*a/((V[1]*V[0])**2)+V[0]*a/((V[0]*V[1])**2)-2*a/(V[1]**3)-R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
+    matrix[1,1] = R*T/((V[1]-V[0])*(V[1]-b))+R*T/((V[1]-b)**2)+V[0]*a/((V[1]*V[0])**2)-2*a/(V[1]**3)-R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
     return matrix
 
 # Newtons metode for flere funksjoner
@@ -449,31 +449,33 @@ for i in range(1,len(T_list)):
     V_g[i] = V_list[1]
 
 #Plotter
-plt.plot(T_list,V_v,label=r"$V_v$")
+plt.plot(V_v,T_list,label=r"$V_v$")
 plt.title(r"$V_v$")
-plt.xlabel(r"$T[K]$")
+plt.ylabel(r"$T[K]$")
 plt.grid()
 plt.legend()
 plt.show()
-plt.plot(T_list,V_g,label="V_g")
+plt.plot(V_g,T_list,label="V_g")
 plt.title(r"$V_g$")
-plt.xlabel(r"$T[K]$")
+plt.ylabel(r"$T[K]$")
 plt.grid()
 plt.legend()
 plt.show()
-plt.plot(T_list,V_v,label=r"$V_v$")
-plt.plot(T_list,V_g,label="V_g")
+plt.plot(V_v,T_list,label=r"$V_v$")
+plt.plot(V_g,T_list,label="V_g")
 plt.title(r"$V_v og V_g$ plottet sammen logaritmisk")
 plt.grid()
-plt.yscale("log")
+plt.xscale("log")
+plt.legend()
 plt.show()
 
 """
 TEKST M A R K D O W N!!!!!
-For V_v ser vi at den går raskere ned, helt til den krasjer ved omtrent 540K.
-Så går den sakte men sikkert nedover helt til den når det kritiske temperaturpunktet.
-For V_g, øker den mer og mer sakte. så ved rundt 540K, går den nediver, så  raskt oppover igjen.
-Når den nermer seg det kritiske temperaturpunktet, øker volumnet mer og mer kraftig, altså at /\v øker når T øker ner T_c.
+For V_v ser vi at den går raskt opp, og så dale, helt til den når tpoppen ved kritisk temperatur
+
+For V_g, daler den raskt, og så daler saktere nedover.
+Når den nermer seg det kritiske temperaturpunktet, vil volumforskjellene til V_v og V_g nerme et punkt som er lik for dem begge.
+Altså at /\V går til 0
 TEKST M A R K D O W N!!!!!
 """
 
@@ -518,8 +520,7 @@ plt.show()
 TEKST M A R K D O W N!!!!!
 De koeksistensielle verdiene ser ut til å være høyere enn eksperimentelle ved lave temperaturer.
 Så nermer verdiene seg, ettersom eksperimentelle verdier stiger kraftig, mens de andre gjør det sakte.
-Til slutt vil de koeksistensielle verdiene være for lave i forhold til de eksperimentelle, ettersom de første gir et P som ligner formen til V_v, men omvendt
-Den gjør et stor avvik av de eksperimentelle verdiene. det kan hende at det er forsi van der Waals ligning ikke er tlstrekkelig, eller at programmet er litt feil
+Til slutt vil de koeksistensielle verdiene være for lave i forhold til de eksperimentelle, ettersom de første gir et P som ligner formen til V_v.
 TEKST M A R K D O W N!!!!!
 """
 
@@ -573,13 +574,24 @@ Vi kommenterer på resultatene vi får
 TEKST M A R K D O W N!!!!!
 """
 
+plt.plot(V_v,T_list,label=r"$V_v$")
+plt.plot(V_g,T_list,label="V_g")
+plt.plot(volume_space, V_listforplot, label="P(V)")
+plt.plot(Vvv, Pvv, 'bo', label=r"Punkt $(V_v,p(V_v))$")
+plt.plot(Vgv, Pgv, 'ro', label=r"Punkt $(V_g,p(V_g))$")
+plt.axline((Vvv,Pvv),(Vgv,Pgv), ls="--", c="r",label=r"Linje Gjennom $(V_v,p(V_v)$ og $(V_v,p(V_g)$))")
+plt.title(r"$V_v og V_g$ plottet sammen,")
+plt.grid()
+plt.legend()
+plt.show()
 
-
+#KOMMENTER HER OM PUNKTENE OG GRAFEN ER ENIG MED V_V OG V_G, OG KOMMENTER OM VAN DER WAAL ER TOLSTREKKELIG ELLER IKKE
 """
 TEKST M A R K D O W N!!!!!
-Something something ikke tilstrekkelig
+#KOMMENTER HER OM PUNKTENE OG GRAFEN ER ENIG MED V_V OG V_G, OG KOMMENTER OM VAN DER WAAL ER TOLSTREKKELIG ELLER IKKE
 TEKST M A R K D O W N!!!!!
 """
+#KOMMENTER HER OM PUNKTENE OG GRAFEN ER ENIG MED V_V OG V_G, OG KOMMENTER OM VAN DER WAAL ER TOLSTREKKELIG ELLER IKKE
 
 """
 Oppgave 2a
