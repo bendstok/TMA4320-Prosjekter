@@ -397,10 +397,10 @@ def Jacobi(V,T,a,b):
     matrix = np.zeros((2,2))
     
     #Regner ut Jacobi matrisen
-    matrix[0,0] = R*T/((V[0]-b)**2)-2*a/(V[0]**3)
+    matrix[0,0] = R*T/((V[1]-b)**2)+2*a/(V[0]**3)
     matrix[0,1] = -R*T/((V[1]-b)**2)+2*a/(V[1]**3)
     matrix[1,0] = -R*T/((V[1]-V[0])*(V[0]-b))+V[1]*a/((V[1]*V[0])**2)+R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
-    matrix[1,1] = R*T/((V[1]-V[0])*(V[1]-b))+R*T/((V[1]-b)**2)+V[0]*a/((V[1]*V[0])**2)-2*a/(V[1]**3)-R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
+    matrix[1,1] = R*T/((V[1]-V[0])*(V[1]-b))+R*T/((V[1]-b)**2)+V[0]*a/((V[1]*V[0])**2)+V[0]*a/((V[0]*V[1])**2)-2*a/(V[1]**3)-R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
     return matrix
 
 # Newtons metode for flere funksjoner
@@ -434,7 +434,7 @@ def newtonMultiple(func, Jacobi, x, T, a, b, h=0.0001, tol=0.0001, k=1000):
         if abs(func(x_list[i+1],T,a,b)).max()<tol:
             x_list = x_list[0:i+2]
             break
-
+    
     #Returnerer det siste steget
     return x_list[-1]
 
@@ -463,7 +463,7 @@ for i in range(1,len(T_list)):
     V_list = newtonMultiple(func,Jacobi,V_list,T_list[i],a,b)
     V_v[i] = V_list[0]
     V_g[i] = V_list[1]
-    
+
 #Plotter
 plt.plot(T_list,V_v,label=r"$V_v$")
 plt.title(r"$V_v$")
@@ -505,13 +505,31 @@ TEKST M A R K D O W N!!!!!
 # 1 bar = 100'000 Pa
 barToPa = 10e5
 
+TempK = np.array([273.16, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 530, 560, 590, 620, 630, 640, 647.1])
 TrykkP = barToPa * np.array([6.1E-03, 0.0099, 0.0354, 0.105, 0.272, 0.622, 1.29, 2.46, 4.37, 7.34, 11.7, 17.9, 26.4, 44.6, 71.1, 108, 159, 180, 203, 221])
 
 # Verdier som passer for Vv, Vg, og L:
 TrykkVerdier = barToPa * np.array([6.1E-03, 0.0354, 0.622, 26.4, 203, 221])
 
+#Regner ut trykkene fra V_v med ulike T (V_g funker også)
+P_list = np.zeros(len(T_list))
+for i in range(len(T_list)):
+    P_list[i] = vanderwaalP(T_list[i], V_v[i], a, b)
+
+#Plotter de eksperimentelle og koeksistensverdiene sammen
+plt.plot(TempK,TrykkP,label=r"$Eksperimentelle$")
+plt.plot(T_list,P_list,label="Koesistensielle")
+plt.title(r"Eksperimentelle og koeksistensielle verdier plottet sammen logaritmisk")
+plt.grid()
+plt.yscale("log")
+plt.show()
+
 """
-Eh, bendik, kan du sette opp dette. du vet hvordan 1e fungerer
+TEKST M A R K D O W N!!!!!
+De koeksistensielle verdiene ser ut til å være høyere enn eksperimentelle ved lave temperaturer.
+Så nermer verdiene seg, ettersom eksperimentelle verdier stiger kraftig, mens de andre gjør det sakte.
+Til slutt vil de koeksistensielle verdiene være for lave i forhold til de eksperimentelle, ettersom de første gir et P som ligner formen til V_v, men omvendt
+TEKST M A R K D O W N!!!!!
 """
 
 
