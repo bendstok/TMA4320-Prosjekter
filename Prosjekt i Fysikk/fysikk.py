@@ -397,10 +397,10 @@ def Jacobi(V,T,a,b):
     matrix = np.zeros((2,2))
     
     #Regner ut Jacobi matrisen
-    matrix[0,0] = R*T/((V[1]-b)**2)+2*a/(V[0]**3)
+    matrix[0,0] = R*T/((V[0]-b)**2)-2*a/(V[0]**3)
     matrix[0,1] = -R*T/((V[1]-b)**2)+2*a/(V[1]**3)
     matrix[1,0] = -R*T/((V[1]-V[0])*(V[0]-b))+V[1]*a/((V[1]*V[0])**2)+R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
-    matrix[1,1] = R*T/((V[1]-V[0])*(V[1]-b))+R*T/((V[1]-b)**2)+V[0]*a/((V[1]*V[0])**2)+V[0]*a/((V[0]*V[1])**2)-2*a/(V[1]**3)-R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
+    matrix[1,1] = R*T/((V[1]-V[0])*(V[1]-b))+R*T/((V[1]-b)**2)+V[0]*a/((V[1]*V[0])**2)-2*a/(V[1]**3)-R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
     return matrix
 
 # Newtons metode for flere funksjoner
@@ -432,9 +432,9 @@ def newtonMultiple(func, Jacobi, x, T, a, b, h=0.0001, tol=0.0001, k=1000):
     for i in range(k):
         x_list[i+1] = x_list[i]-np.linalg.inv(Jacobi(x_list[i],T,a,b))@func(x_list[i],T,a,b)
         if abs(func(x_list[i+1],T,a,b)).max()<tol:
-            x_liste = x_liste[0:i+2]
+            x_list = x_list[0:i+2]
             break
-    
+
     #Returnerer det siste steget
     return x_list[-1]
 
@@ -460,16 +460,28 @@ V_g[0] = newtonMultiple(func,Jacobi,V_0,T_lower,a,b)[1]
 #Regner ut resten av V_v og V_g med forskjellig T
 V_list = np.array([V_v[0],V_g[0]])
 for i in range(1,len(T_list)):
-    V_list = newtonMultiple(func,Jacobi,V_list,T_list[i],a,b,tol=0.1)
+    V_list = newtonMultiple(func,Jacobi,V_list,T_list[i],a,b)
     V_v[i] = V_list[0]
     V_g[i] = V_list[1]
     
 #Plotter
-plt.plot(T_list,V_v,label="V_v")
+plt.plot(T_list,V_v,label=r"$V_v$")
+plt.title(r"$V_v$")
+plt.xlabel(r"$T[K]$")
+plt.grid()
 plt.legend()
 plt.show()
 plt.plot(T_list,V_g,label="V_g")
+plt.title(r"$V_g$")
+plt.xlabel(r"$T[K]$")
+plt.grid()
 plt.legend()
+plt.show()
+plt.plot(T_list,V_v,label=r"$V_v$")
+plt.plot(T_list,V_g,label="V_g")
+plt.title(r"$V_v og V_g$ plottet sammen logaritmisk")
+plt.grid()
+plt.yscale("log")
 plt.show()
 
 """
