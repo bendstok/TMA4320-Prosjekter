@@ -559,7 +559,8 @@ plt.show()
 """
 TEKST M A R K D O W N!!!!!
 Dette ser ut som et riktig seende van der waals plott.
-En linje fra V_v til V_g på en PV-diagram er overgangslinjen, fra venstre til høyre, fra flytende form til gassform.
+Mellom V_v, og V_g, vil vannet endre seg fra flytende from til gass form.
+Linjen viser hvor dette skjer.
 Volumet vil øke, mens trykket (Og temperaturen i et PT-diagram) holder seg den samme.
 TEKST M A R K D O W N!!!!!
 """
@@ -567,11 +568,12 @@ TEKST M A R K D O W N!!!!!
 """
 TEKST M A R K D O W N!!!!!
 Oppgave 1h
-Til slutt bruker vi newtons metode i 1e, og dens resultatet, til å plotte P(V_v) og P(V_g).
+Til slutt bruker vi newtons metode fra 1e, og dens resultatet, til å plotte P(V_v) og P(V_g).
 Vi kommenterer på resultatene vi får
 TEKST M A R K D O W N!!!!!
 """
-            
+
+
 
 """
 TEKST M A R K D O W N!!!!!
@@ -582,7 +584,7 @@ TEKST M A R K D O W N!!!!!
 """
 Oppgave 2a
 TEKST M A R K D O W N!!!!!
-Nå som vi har vist at van der Waald tilstandsligning ikke er tilstrekkelig til å beskrive fasediagrammen, går vi åver til eksperimentelle verdier, istedenfor analytiske
+Nå som vi har vist at van der Waals tilstandsligning ikke er tilstrekkelig til å beskrive fasediagrammen, går vi åver til eksperimentelle verdier, istedenfor analytiske
 Vi henter ut informasjon fra samme nettside som vi gjorde i 1f
 TEKST M A R K D O W N!!!!!
 """
@@ -698,12 +700,12 @@ h = (b-a)/n
 def p_int(T):
     
     """
-    funksjon
+    Interpolasjon
     
     Input:
     T: temperatur
     
-    Output: En funksjon for V_v som passer godt
+    Output: Første del av simpsons metode?
     """
     
     return l2t_func(T, *popt_L2)/(T*(Vg2t_func(T,*popt_vg2) - Vv2t_func(T,*popt_vv2)))
@@ -726,10 +728,12 @@ I_simp = I_simp*h/3
 
 print(I_simp)
 
-plt.title("Simpsons integrering av likning (13), Kurve interpolering")
+plt.title("Simpsons integrering av likning (13), Kurve interpolering; sammen med eksperimentelle verdier")
 plt.xlabel("Temperatur [K]")
 plt.ylabel("Trykk [P]")
 plt.plot(T_intervall,I_simp_val)
+plt.plot(TempK,TrykkP,label=r"$Eksperimentelle$")
+# Det ^^ passet ikke så godt. hvorfor?
 plt.show()
 
 """
@@ -780,12 +784,12 @@ TEKST M A R K D O W N!!!!!
 def p_interpol(T):
     
     """
-    funksjon for V_g
+    Interpolasjon
     
     Input:
     T: temperatur
     
-    Output: En funksjon for V_v som passer godt
+    Output: Første del av simpsons metode?
     """
     
     return interpol_l(T)/(T*interpol_vg(T) - interpol_vv(T))
