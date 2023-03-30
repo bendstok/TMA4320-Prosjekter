@@ -568,6 +568,7 @@ TEKST M A R K D O W N!!!!!
 # Vi har 1 mol
 Mm = 18E-3
 
+# Disse verdiene er hentet for å matche verdiene med L2 og andre verdier så nerme som mulig.
 #               0.01C 26.9C 86.9C 227C 367C 373.946C 
 T2 =  np.array([273.16, 300, 360, 500, 640, 647.1])
 Vg2 = np.array([Mm/0.00485, Mm/0.02558, Mm/0.3786, Mm/13.20, Mm/177.1, Mm/322.0]) 
@@ -579,14 +580,39 @@ L2  = np.array([45054, 43988, 41120, 33462, 12967, 0]) # Joule / mol
 """
 TEKST M A R K D O W N!!!!!
 Oppgave 2b
+nå bruker vi scipy.optimize.curve_fit for å finne gode passende funksjoner for V_v, V_g, og L som en funksjon av T. 
 TEKST M A R K D O W N!!!!!
 """
+
 def Vv2t_func(X,a,b,c,d,e):
+    
+    """
+    funksjon for V_v
+    
+    Input:
+    X: variabelinout
+    a til e: konstanter for funksjonen
+    
+    Output: En funksjon for V_v som passer godt
+    """
+    
     return  a*np.exp(X)+b -c*X**2 + d*X + e*X**3
 
 def Vg2t_func(X,a,b,c):
+    
+    """
+    funksjon for V_g
+    
+    Input:
+    X: variabelinout
+    a til c: konstanter for funksjonen
+    
+    Output: En funksjon for V_v som passer godt
+    """
+    
     return  a*(b**X) + c
 
+#Plotter for funksjonene for V_v og V_g
 fig_t, (ax_t_vg, ax_t_vv, ax_t_l) = plt.subplots(1,3)
 
 popt_vv2, covt_vv2 = curve_fit(Vv2t_func,T2,Vv2)
@@ -606,8 +632,20 @@ ax_t_vv.legend()
 fig_t.tight_layout()
 
 def l2t_func(X,a,b,c,d):
+    
+    """
+    funksjon for V_g
+    
+    Input:
+    X: variabelinout
+    a til d: konstanter for funksjonen
+    
+    Output: En funksjon for V_v som passer godt
+    """
+    
     return d*X**3 + a*X**2 + b*X + c
 
+#Plotter for funksjonen for L
 popt_L2, covt_L2 = curve_fit(l2t_func,T2,L2)
 
 ax_t_l.plot(T2,L2,"r+", label=r"Data for $L(T)$")
@@ -621,6 +659,7 @@ plt.show()
 """
 TEKST M A R K D O W N!!!!!
 Oppgave 2c
+(Setter opp eksperimentell trykk fra 1f, brb)
 TEKST M A R K D O W N!!!!!
 """
 n = abs(274-647-1)
@@ -632,6 +671,16 @@ b = T_intervall[-1]
 h = (b-a)/n
 
 def p_int(T):
+    
+    """
+    funksjon
+    
+    Input:
+    T: temperatur
+    
+    Output: En funksjon for V_v som passer godt
+    """
+    
     return l2t_func(T, *popt_L2)/(T*(Vg2t_func(T,*popt_vg2) - Vv2t_func(T,*popt_vv2)))
 
 I_simp = p_int(a)
@@ -704,6 +753,16 @@ TEKST M A R K D O W N!!!!!
 """
 
 def p_interpol(T):
+    
+    """
+    funksjon for V_g
+    
+    Input:
+    T: temperatur
+    
+    Output: En funksjon for V_v som passer godt
+    """
+    
     return interpol_l(T)/(T*interpol_vg(T) - interpol_vv(T))
 
 n = abs(274-647-1)
