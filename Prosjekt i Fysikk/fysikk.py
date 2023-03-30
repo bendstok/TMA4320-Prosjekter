@@ -1,4 +1,5 @@
 """
+TEKST M A R K D O W N!!!!!
 Damptrykkurven
 Skrevet av: Lasse Matias Dragsjø, Bendik Kvamme Stokland, og Thomas Olaussen
 Damptrykkurven er en termofysisk begrep som beskriver overgangen fra vann til damp ved ulik trykk, temperatur, og volum.
@@ -11,6 +12,7 @@ I dette rapporten går vi gjennom hvordan vi gjør de numeriske metodene:
 Vi går gjennom van der waals tilstandsligning, og hvorfor den ikke er tilstrekkelig til å beskrive kurven
 Så går vi gjennom ?, og finner fram hvordan vi skal finne disse kurvene.
 Som en oppvarming, starter vi med å se på på noen eksperimentelle verdier for van der waals tilstandsligning.
+TEKST M A R K D O W N!!!!!
 """
 
 # Importerer biblioteker
@@ -24,7 +26,8 @@ from scipy import interpolate
 plt.rcParams['figure.figsize'] = [12, 8]
 
 """
-oppgave a
+TEKST M A R K D O W N!!!!!
+oppgave 1a
 Vi ser på de kritiske verdiene til temperatur, trykk, og volum for van der waals tilstandsligning.
 Den kritiske kunptet er ver punktet på kurvediagrammene der forskjellene mellom væske og gass opphører.
 Van der waals tilstandsligning er gitt ved:
@@ -36,20 +39,23 @@ p_c = a / 27 * b**2
 V_c = 3 * b
 Vi undersøker hva a og b blir med eksperimentelle verdier for disse kritiske verdiene,
 og drøfter videre hva dette forteller oss.
+TEKST M A R K D O W N!!!!!
 """
 
 # Universelle gasskonstant
 R = 8.31446261815324
 
-
-# Eksperiementelle verdier for vann
+# Eksperiementelle verdier for vann i SI-enheter
 T_c = 647.096 #Kelvin
 p_c = 22064000 #Pascal
-V_c = 0.000055948 #kubikkmeter
+V_c = 0.000055948 #Kubikkmeter
 
 #fra t_c og p_c, får vi:
 a = 27 * R**2 * T_c**2 / (64 * p_c)
 b = R * T_c / (8 * p_c)
+
+print(a)
+print(b)
 
 print("Volum fra b: " +  str(3 * b))
 print("Volum eksperimentellt: " +  str(V_c))
@@ -71,15 +77,19 @@ print("Volum eksperimentellt (engi tool): " +  str(V_c))
 
 
 """
+TEKST M A R K D O W N!!!!!
 Her ser vi at den eksperimentelle verdien for 5.6*10^-5, mens den gir 9.1*10^-5 når verdeien fra a og b puttes inn i volumet
 Dette viser oss at selv om vi har fått a ob b fra T_c og p_c, så er det ingen kombinasjoner av a bo g som også gir samme volum.
+TEKST M A R K D O W N!!!!!
 """
 
 
 
 """
-oppgave b
+TEKST M A R K D O W N!!!!!
+Oppgave 1b
 Nå plotter vi van der waals kurve med en satt T_c, fra 75ml til 300ml, og sammenligner det med kurven fra figur 2 på vår guide.
+TEKST M A R K D O W N!!!!!
 """
 
 # VISE ET BILDE FRA GUIDEN OM DET?
@@ -93,7 +103,7 @@ plottmengde = (plottslutt - plottstart) + 1
 Vplot = np.linspace(plottstart, plottslutt, plottmengde)
 
 # Definerer van der Waals ligning
-def vanderwaalP(R, T, V, a, b):
+def vanderwaalP(T, V, a, b):
     
     """
     Van der Waals ligning
@@ -117,7 +127,7 @@ def vanderwaalP(R, T, V, a, b):
 # itererer gjennom van der Waals ligning med volumene
 vanP = np.zeros(plottmengde)
 for i in range(plottmengde):
-    vanP[i] = vanderwaalP(R, T_c, Vplot[i], 27 * R**2 * T_c**2 / (64 *  22.064), R * T_c / (8 * 22.064))
+    vanP[i] = vanderwaalP(T_c, Vplot[i], 27 * R**2 * T_c**2 / (64 *  22.064), R * T_c / (8 * 22.064))
 
 # Plotter    
 plt.plot(Vplot, vanP)
@@ -130,22 +140,26 @@ plt.show()
 
 
 """
+TEKST M A R K D O W N!!!!!
 Denne isotermen har et sadelpunkt, og går ikke oppover, men nedover.
 Den andre isotermenn bøyer seg langt ned, så opp igjen, for så å gå ned igjen
 lavere temperatur vil gjøre at den bøyer seg kraftigere.
-det kritiske punktet er der hvor den slutter å gå oppover, og begynner da bare å gå nedover.
+Det kritiske punktet er der hvor den slutter å gå oppover, og begynner da bare å gå nedover.
+TEKST M A R K D O W N!!!!!
 """
 
 
 
 """
-oppgave c
+TEKST M A R K D O W N!!!!!
+Oppgave 1c
 Nå som vi har fått litt innsikt i wan der Waals ligning, gåt vi over et verktøy vi skal bruke til å få damptrykkurven: Newtons metode
 Vi ser på et eksempel: faseovergangen i et 2d ising-modell.
 Fra ordnet til ordnet tilstand, har kritisk temperatur denne ligningen:
 Sinh^2(2c/T_c) = 1.
 Den analytiske løsningen til den er T_c = 2c / ln(1 + 2^0.5).
 Vi bruker c = 1, og finner løsningen numerisk ved newtons metode
+TEKST M A R K D O W N!!!!!
 """
 
 
@@ -241,20 +255,25 @@ for i in range(100):
     numericalTCliste[i] = newtmet(eksfuncTC, t_c, tol, k)[0]
 print(numericalTCliste)
 
+
 """
+TEKST M A R K D O W N!!!!!
 Verdiene til den analytisle og den numeriske er veldig nerme hverandre.
 Vi kan dermed si at vi har implementert newtons meotde riktig, og at den analytiske løsningen er riktig
 For ulike startverdier, ser vi at alle startverdier fra 0 til 100 konvergerer til det samme tallet.
 Dermed har det ikke noe å si hvor man starter ved dette inntervallet
+TEKST M A R K D O W N!!!!!
 """
 
 
 
 """
-oppgave d
+TEKST M A R K D O W N!!!!!
+Oppgave 1d
 Newtons metode konvergerer kvadratisk nor den har et fungerende startpunkt.
 Dette er analytisk vist.
 Vi finner ut av dette numerisk, ved å bruke en formel som viser omtrentlig konvergensraten q
+TEKST M A R K D O W N!!!!!
 """
 
 #  Utregner e_i
@@ -289,17 +308,24 @@ p_i = np.copy(np.delete(p_i, index))
 
 print("Utregnet q: " + str(np.mean(p_i)))
 
+
 """
+TEKST M A R K D O W N!!!!!
 Vi ser at verdien for q er omtrent 2, som er det den analytiske løsninger foreslår til oss.
 Den viser oss et verdi som er litt lavere enn det, men det er trolig grunnet numeriske feil.
+TEKST M A R K D O W N!!!!!
 """
 
 
 """
+TEKST M A R K D O W N!!!!!
 Oppgave 1e
+Nå utvider vi Newtons metode til flere variabler. slik kan vi regne ut nullpunktet til et sett med ligninger.
+Vi løser dem med hensyn på V_v og V_g som funksjon av temperatur, og kommenterer resultatene.
+TEKST M A R K D O W N!!!!!
 """
 
-
+# Newtons metode på to variabler
 def NewtonTwoVariable(F, J, X, max_i, tol = 10e-4):
     
     """
@@ -327,19 +353,14 @@ def NewtonTwoVariable(F, J, X, max_i, tol = 10e-4):
         iter += 1
     return X
 
-def V_11(T,V):
-
-    
-    return 0 - (R*T)/(V-b) + a/(V^2)
-
-
-#Ferdig kode
+#Definerer funksjonene (11) og (12) fra guiden vår
 def func(V,T,a,b):
+    
     """
     Likningssystemet som skal løses
     
     Input:
-    V: Liste med variabler (Volum), V[0] = V_v, V[1] =V_g
+    V: Liste med variabler (Volum), V[0] = V_v, V[1] = V_g
     T: Temperatur
     a: Konstant
     b: Konstant
@@ -347,8 +368,6 @@ def func(V,T,a,b):
     Output:
     V_list: Utregnet svar
     """
-    #Definerer Gasskonstanten
-    R = 8.31446261815324
     
     #Lager en liste for systemet av likninger
     V_list=np.zeros(2)
@@ -358,7 +377,9 @@ def func(V,T,a,b):
     V_list[1]=R*T/(V[1]-V[0])*np.log((V[1]-b)/(V[0]-b))-a/(V[1]*V[0])-R*T/(V[1]-b)+a/(V[1]**2)
     return V_list
 
+#Funksjon som regner jacobimatrisen til func
 def Jacobi(V,T,a,b):
+    
     """
     Jacobi matrisen til likningssystemet func
     
@@ -371,10 +392,10 @@ def Jacobi(V,T,a,b):
     Output:
     matrix: Jacobi matrisen til likningsystemet func
     """
-    #Definerer Gasskonstanten
-    R = 8.31446261815324
+    
     #Oppretter Jacobi matrise   
     matrix = np.zeros((2,2))
+    
     #Regner ut Jacobi matrisen
     matrix[0,0] = R*T/((V[1]-b)**2)+2*a/(V[0]**3)
     matrix[0,1] = -R*T/((V[1]-b)**2)+2*a/(V[1]**3)
@@ -382,7 +403,9 @@ def Jacobi(V,T,a,b):
     matrix[1,1] = R*T/((V[1]-V[0])*(V[1]-b))+R*T/((V[1]-b)**2)+V[0]*a/((V[1]*V[0])**2)+V[0]*a/((V[0]*V[1])**2)-2*a/(V[1]**3)-R*T*np.log((V[1]-b)/(V[0]-b))/((V[1]-V[0])**2)
     return matrix
 
+# Newtons metode for flere funksjoner
 def newtonMultiple(func, Jacobi, x, T, a, b, h=0.0001, tol=0.0001, k=1000):
+    
     """
     Funksjonen bruker Newtons metode for å løse likningssytemet
     
@@ -400,6 +423,7 @@ def newtonMultiple(func, Jacobi, x, T, a, b, h=0.0001, tol=0.0001, k=1000):
     Output:
     x_list[-1]: Nullpunkt for likningsystemet
     """
+    
     #Oppretter liste av lister for å lagre nullpunkter og setter inn startsverdi
     x_list=np.zeros((k+1,len(x)))
     x_list[0]=x
@@ -410,8 +434,11 @@ def newtonMultiple(func, Jacobi, x, T, a, b, h=0.0001, tol=0.0001, k=1000):
         if abs(func(x_list[i+1],T,a,b)).max()<tol:
             x_liste = x_liste[0:i+2]
             break
+    
     #Returnerer det siste steget
     return x_list[-1]
+
+
 
 #Regner ut V_v og V_g for forskjellige T
 #Lager liste med T verdier mellom T_lower og T_upper
@@ -422,10 +449,6 @@ T_list=np.linspace(T_lower,T_upper,T_upper-T_lower+1)
 #Lager list for å lagre V_v og V_g
 V_v = np.zeros(len(T_list))
 V_g = np.zeros(len(T_list))
-
-#Setter konstanter (KAN FJERNES HVIS DET ALLEREDE ER DEFINERT)
-a=0.5534843454745333
-b=3.0480961647686777e-05
 
 #Setter startspunkt for newtons metode (V_0[0]: V_v, V_0[1]: V_g)
 V_0 = np.array([12658e-6,35.6e-6])
@@ -450,8 +473,21 @@ plt.legend()
 plt.show()
 
 """
+TEKST M A R K D O W N!!!!!
+For V_v ser vi at den går raskere ned, helt til den krasjer ved omtrent 540K.
+Så går den sakte men sikkert nedover helt til den når det kritiske temperaturpunktet.
+For V_g, øker den mer og mer sakte. så ved rundt 540K, går den nediver, så  raskt oppover igjen.
+Når den nermer seg det kritiske temperaturpunktet, øker volumnet mer og mer kraftig, altså at /\v øker når T øker ner T_c.
+TEKST M A R K D O W N!!!!!
+"""
+
+
+"""
+TEKST M A R K D O W N!!!!!
 Oppgave 1f
-Vi henter eksperimentelle verdier fra nettsiden https://www.engineeringtoolbox.com/water-properties-d_1573.html:
+Nå bruker vi newtons flervariablet metode for van der Waals likning til å sammenlignes med eksperimentelle verdier.
+Vi henter de eksperimentelle verdier fra nettsiden https://www.engineeringtoolbox.com/water-properties-d_1573.html.
+TEKST M A R K D O W N!!!!!
 """
 
 # 1 bar = 100'000 Pa
@@ -463,12 +499,16 @@ TrykkP = barToPa * np.array([6.1E-03, 0.0099, 0.0354, 0.105, 0.272, 0.622, 1.29,
 TrykkVerdier = barToPa * np.array([6.1E-03, 0.0354, 0.622, 26.4, 203, 221])
 
 """
-Krever 1e for videre koding av 1f
+Eh, bendik, kan du sette opp dette. du vet hvordan 1e fungerer
 """
 
 
 
-"""1g"""
+"""
+TEKST M A R K D O W N!!!!!
+Oppgave 1g
+TEKST M A R K D O W N!!!!!
+"""
 
 def p_8(T,V):
     return (R*T)/(V-b) - a/(V**2)
@@ -491,17 +531,39 @@ plt.ylabel("Trykk [P]")
 plt.title("")
 plt.legend()
 plt.show()
+
+"""
+TEKST M A R K D O W N!!!!!
+En linje fra V_v til V_g på en PV-diagram er overgangslinjen, fra venstre til høyre, fra flytende form til gassform.
+Volumet vil øke, mens trykket (Og temperaturen i et PT-diagram) holder seg den samme.
+TEKST M A R K D O W N!!!!!
+"""
+
+"""
+TEKST M A R K D O W N!!!!!
+Oppgave 1h
+Til slutt bruker vi newtons metode i 1e, og dens resultatet, til å plotte P(V_v) og P(V_g).
+Vi kommenterer på resultatene vi får
+TEKST M A R K D O W N!!!!!
+"""
             
 
-            
+"""
+TEKST M A R K D O W N!!!!!
+Something something ikke tilstrekkelig
+TEKST M A R K D O W N!!!!!
+"""
 
-# Oppgave 2
+"""
+Oppgave 2a
+TEKST M A R K D O W N!!!!!
+Nå som vi har vist at van der Waald tilstandsligning ikke er tilstrekkelig til å beskrive fasediagrammen, går vi åver til eksperimentelle verdier, istedenfor analytiske
+Vi henter ut informasjon fra samme nettside som vi gjorde i 1f
+TEKST M A R K D O W N!!!!!
+"""
 
-
-"""2a"""
 # https://www.engineeringtoolbox.com/water-properties-d_1573.html
 # https://www.engineeringtoolbox.com/water-properties-temperature-equilibrium-pressure-d_2099.html
-
 
 # Vi har 1 mol
 Mm = 18E-3
@@ -514,7 +576,11 @@ Vv2 = np.array([Mm/999.8, Mm/996.5, Mm/967.4, Mm/831.3, Mm/481.5, Mm/322.0])
 L2  = np.array([45054, 43988, 41120, 33462, 12967, 0]) # Joule / mol 
 
 
-"""2b"""
+"""
+TEKST M A R K D O W N!!!!!
+Oppgave 2b
+TEKST M A R K D O W N!!!!!
+"""
 def Vv2t_func(X,a,b,c,d,e):
     return  a*np.exp(X)+b -c*X**2 + d*X + e*X**3
 
@@ -552,7 +618,11 @@ ax_t_l.legend()
 fig_t.suptitle("Kurve interpolering av innhentet data")
 plt.show()
 
-"""2c"""
+"""
+TEKST M A R K D O W N!!!!!
+Oppgave 2c
+TEKST M A R K D O W N!!!!!
+"""
 n = abs(274-647-1)
 T_intervall = np.linspace(274,647,n)
 
@@ -588,7 +658,11 @@ plt.ylabel("Trykk [P]")
 plt.plot(T_intervall,I_simp_val)
 plt.show()
 
-"""2d"""
+"""
+TEKST M A R K D O W N!!!!!
+Oppgave 2d
+TEKST M A R K D O W N!!!!!
+"""
 
 interpol_vv = interpolate.CubicSpline(T2,Vv2)
 interpol_vg = interpolate.CubicSpline(T2,Vg2)
@@ -623,7 +697,11 @@ ax_t_l2d.legend()
 fig_2d.suptitle("Figur av Kubisk spline mot Kurve interpolering")
 plt.show()
 
-"""2e"""
+"""
+TEKST M A R K D O W N!!!!!
+Oppgave 2e
+TEKST M A R K D O W N!!!!!
+"""
 
 def p_interpol(T):
     return interpol_l(T)/(T*interpol_vg(T) - interpol_vv(T))
@@ -663,7 +741,11 @@ plt.ylabel("Trykk [P]")
 plt.plot(T_intervall,I_simp_val_inter)
 plt.show()
 
-"""2f"""
+"""
+TEKST M A R K D O W N!!!!!
+Oppgave 2f
+TEKST M A R K D O W N!!!!!
+"""
 
 # Finne et punkt (p0,t0), bruker krital punktet
 p0_an = p_c
