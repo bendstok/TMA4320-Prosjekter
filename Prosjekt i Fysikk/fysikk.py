@@ -804,7 +804,7 @@ def p_interpol(T):
     Output: Første del av simpsons metode?
     """
     
-    return interpol_l(T)/(T*interpol_vg(T) - interpol_vv(T))
+    return interpol_l(T)/T*(interpol_vg(T) - interpol_vv(T))
 
 n = abs(274-647-1)
 T_intervall = np.linspace(274,647,n)
