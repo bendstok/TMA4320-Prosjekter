@@ -309,34 +309,6 @@ Vi løser dem med hensyn på V_v og V_g som funksjon av temperatur, og kommenter
 TEKST M A R K D O W N!!!!!
 """
 
-# Newtons metode på to variabler
-def NewtonTwoVariable(F, J, X, max_i, tol = 10e-4):
-    
-    """
-    Løser et ikke lineært system med newtons to variabel metode.
-    
-    Input:
-    F: Funksjonene slik at F = 0\n
-    J: Jacobi matrisen til F\n
-    X: Start verdier\n
-    max_k: max antall iterasjoner\n
-    tol: Toleranse
-    
-    Output:
-    X: verdiene til nullpunkt
-    """
-    
-    F_val = F(X)
-    F_norm = np.linalg.norm(F_val)
-    iter = 0
-    while(abs(F_norm) < tol and iter <= max_i):
-        delta = np.linalg.solve(J(X), - F_val)
-        X = X + delta
-        F_val = F(X)
-        F_norm = np.linalg.norm(F_val)
-        iter += 1
-    return X
-
 #Definerer funksjonene (11) og (12) fra guiden vår
 def func(V,T,a,b):
     
@@ -449,23 +421,29 @@ for i in range(1,len(T_list)):
     V_g[i] = V_list[1]
 
 #Plotter
-plt.plot(V_v,T_list,label=r"$V_v$")
+plt.subplot(1, 2, 1)
+plt.grid()
+plt.plot(T_list,V_v,label=r"$V_v$")
 plt.title(r"$V_v$")
-plt.ylabel(r"$T[K]$")
-plt.grid()
+plt.xlabel("T [K]")
+plt.ylabel("V [mL]")
 plt.legend()
-plt.show()
-plt.plot(V_g,T_list,label="V_g")
+plt.subplot(1, 2, 2)
+plt.grid()
+plt.plot(T_list, V_g,label=r"$V_g$")
 plt.title(r"$V_g$")
-plt.ylabel(r"$T[K]$")
-plt.grid()
+plt.xlabel("T [K]")
+plt.ylabel("V [mL]")
 plt.legend()
 plt.show()
-plt.plot(V_v,T_list,label=r"$V_v$")
-plt.plot(V_g,T_list,label="V_g")
-plt.title(r"$V_v og V_g$ plottet sammen logaritmisk")
+
+plt.plot(T_list,V_v,label=r"$V_v$")
+plt.plot(T_list,V_g,label=r"$V_g$")
+plt.title(r"$V_v$ og $V_g$ plottet sammen logaritmisk")
 plt.grid()
-plt.xscale("log")
+plt.yscale("log")
+plt.xlabel("T [K]")
+plt.ylabel("V [mL]")
 plt.legend()
 plt.show()
 
